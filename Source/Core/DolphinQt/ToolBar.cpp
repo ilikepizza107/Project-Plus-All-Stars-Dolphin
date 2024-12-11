@@ -192,6 +192,6 @@ void ToolBar::UpdateIcons()
   m_fullscreen_action->setIcon(Resources::GetThemeIcon("fullscreen"));
   m_screenshot_action->setIcon(Resources::GetThemeIcon("screenshot"));
   m_config_action->setIcon(Resources::GetThemeIcon("config"));
-  m_controllers_action->setIcon(Resources::GetThemeIcon("classic"));
+  m_controllers_action->setIcon(Resources::GetThemeIcon("gcpad"));
   m_graphics_action->setIcon(Resources::GetThemeIcon("graphics"));
 }
