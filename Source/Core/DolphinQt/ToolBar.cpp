@@ -131,6 +131,10 @@ void ToolBar::MakeActions()
   m_config_action = addAction(tr("Config"), this, &ToolBar::SettingsPressed);
   m_graphics_action = addAction(tr("Graphics"), this, &ToolBar::GraphicsPressed);
   m_controllers_action = addAction(tr("Controllers"), this, &ToolBar::ControllersPressed);
+  
+  addSeparator();
+  
+  m_updater_action = addAction(tr("Update"), this, &ToolBar::InstallUpdateManuallyPressed);
 
   // Ensure every button has about the same width
   std::vector<QWidget*> items;
@@ -138,7 +142,7 @@ void ToolBar::MakeActions()
        {m_open_action, m_pause_play_action, m_stop_action, m_stop_action, m_fullscreen_action,
         m_screenshot_action, m_config_action, m_graphics_action, m_controllers_action,
         m_step_action, m_step_over_action, m_step_out_action, m_skip_action, m_show_pc_action,
-        m_set_pc_action, m_netplay_setup_action})
+        m_set_pc_action, m_netplay_setup_action, m_updater_action})
   {
     items.emplace_back(widgetForAction(action));
   }
@@ -196,4 +200,5 @@ void ToolBar::UpdateIcons()
   m_config_action->setIcon(Resources::GetThemeIcon("config"));
   m_controllers_action->setIcon(Resources::GetThemeIcon("gcpad"));
   m_graphics_action->setIcon(Resources::GetThemeIcon("graphics"));
+  m_updater_action->setIcon(Resources::GetThemeIcon("update"));
 }
