@@ -57,7 +57,8 @@ void GeneralWidget::CreateWidgets()
 
   m_backend_combo = new ToolTipComboBox();
   m_aspect_combo = new ConfigChoice({tr("Auto"), tr("Force 16:9"), tr("Force 4:3"),
-                                     tr("Stretch to Window"), tr("Custom"), tr("Custom (Stretch)")},
+                                     tr("Stretch to Window"), tr("Force 19:15 (P+)"),
+                                     tr("Force 69:40 (P+ Widescreen)"), tr("Custom"), tr("Custom (Stretch)")},
                                     Config::GFX_ASPECT_RATIO);
   m_custom_aspect_label = new QLabel(tr("Custom Aspect Ratio:"));
   m_custom_aspect_label->setHidden(true);
@@ -262,6 +263,8 @@ void GeneralWidget::AddDescriptions()
       "type of TV the game seems to be targeting."
       "<br><br><b>Force 16:9</b>: Mimics a TV with a 16:9 (widescreen) aspect ratio."
       "<br><br><b>Force 4:3</b>: Mimics a TV with a 4:3 aspect ratio."
+      "<br><br><b>Force 19:15 (P+)</b>: Forces P+'s game-specific aspect ratio."
+      "<br><br><b>Force 69:40 (P+ Widescreen)</b>: Forces P+'s game-specific aspect ratio (widescreen)."
       "<br><br><b>Stretch to Window</b>: Stretches the image to the window size. "
       "This will usually distort the image's proportions."
       "<br><br><b>Custom</b>: Mimics a TV with the specified aspect ratio. "
