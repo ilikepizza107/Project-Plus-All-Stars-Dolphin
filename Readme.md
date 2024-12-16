@@ -16,6 +16,7 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
 * To-Do
   * Separate Minimum and Player buffers in netplay window
   * Client side music toggle in netplay window
+  * Spectator button in netplay window
   * Replay manager functionality
   * Overwrite Dolphin updater functions with our own
   * Toggle to tag packets with QoS bit  
