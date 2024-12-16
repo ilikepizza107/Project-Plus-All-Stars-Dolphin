@@ -1,3 +1,24 @@
+# Project+ Dolphin Fork
+
+This is a work-in-progress version of the Dolphin Emulator built for usage with Project+. Current progress:
+
+* Completed
+  * 4 buffer as default setting
+  * Project+ specific aspect ratios
+  * Theming and iconography
+  * Netplay button on toolbar
+  * Update button on toolbar
+  * Brawl rename to "Set me as default! Use the .dol file to play"
+  * HD texture loading with .dol file with GameID workaround
+ 
+* To-Do
+  * Separate Minimum and Player buffers in netplay window
+  * Client side music toggle in netplay window
+  * Replay manager functionality
+  * Overwrite Dolphin updater functions with our own
+  * Toggle to tag packets with QoS bit  
+
+
 # Dolphin - A GameCube and Wii Emulator
 
 [Homepage](https://dolphin-emu.org/) | [Project Site](https://github.com/dolphin-emu/dolphin) | [Buildbot](https://dolphin.ci/) | [Forums](https://forums.dolphin-emu.org/) | [Wiki](https://wiki.dolphin-emu.org/) | [GitHub Wiki](https://github.com/dolphin-emu/dolphin/wiki) | [Issue Tracker](https://bugs.dolphin-emu.org/projects/emulator/issues) | [Coding Style](https://github.com/dolphin-emu/dolphin/blob/master/Contributing.md) | [Transifex Page](https://app.transifex.com/dolphinemu/dolphin-emu/dashboard/)
