@@ -12,12 +12,12 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
   * Update button on toolbar
   * Brawl rename to "Set me as default! Use the .dol file to play"
   * HD texture loading with .dol file with GameID workaround
+  * Netplay replay automatic exporting
  
 * To-Do
   * Separate Minimum and Player buffers in netplay window
   * Client side music toggle in netplay window
   * Spectator button in netplay window
-  * Replay manager functionality
   * Overwrite Dolphin updater functions with our own
   * Toggle to tag packets with QoS bit  
 
