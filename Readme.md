@@ -1,5 +1,7 @@
 # Project+ Dolphin Fork
 
+![image](https://github.com/user-attachments/assets/7f8d43a2-aa9c-4aaf-81b0-72edc547c406)
+
 This is a work-in-progress version of the Dolphin Emulator built for usage with Project+. Current progress:
 
 * Completed
