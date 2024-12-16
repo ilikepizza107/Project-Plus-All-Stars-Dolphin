@@ -26,7 +26,7 @@ const std::string& GetScmRevStr()
 #ifdef __INTEL_COMPILER
       BUILD_TYPE_STR SCM_DESC_STR "-ICC";
 #else
-      BUILD_TYPE_STR SCM_DESC_STR " v3.0.5";
+      BUILD_TYPE_STR SCM_DESC_STR "";
 #endif
   return scm_rev_str;
 }
@@ -70,11 +70,11 @@ const std::string& GetScmUpdateTrackStr()
 const std::string& GetNetplayDolphinVer()
 {
 #ifdef _WIN32
-  static const std::string netplay_dolphin_ver = SCM_DESC_STR " v3.0.5" " Win";
+  static const std::string netplay_dolphin_ver = SCM_DESC_STR " " " Win";
 #elif __APPLE__
-  static const std::string netplay_dolphin_ver = SCM_DESC_STR " v3.0.5" " Mac";
+  static const std::string netplay_dolphin_ver = SCM_DESC_STR " " " Mac";
 #else
-  static const std::string netplay_dolphin_ver = SCM_DESC_STR " v3.0.5" " Lin";
+  static const std::string netplay_dolphin_ver = SCM_DESC_STR " " " Lin";
 #endif
   return netplay_dolphin_ver;
 }

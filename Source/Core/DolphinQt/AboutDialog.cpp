@@ -29,7 +29,7 @@ AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
 
   const QString text =
       QStringLiteral(R"(
-<p style='font-size:38pt; font-weight:400;'>Dolphin</p>
+<p style='font-size:34pt; font-weight:400;'>Project+ Dolphin</p>
 
 <p style='font-size:18pt;'>%VERSION_STRING%</p>
 
@@ -40,7 +40,7 @@ AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
 </p>
 
 <p>
-%CHECK_FOR_UPDATES%: <a href='https://dolphin-emu.org/download'>dolphin-emu.org/download</a>
+%CHECK_FOR_UPDATES%: <a href='https://projectplusgame.com'>projectplusgame.com</a>
 </p>
 
 <p>

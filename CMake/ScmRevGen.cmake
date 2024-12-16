@@ -7,9 +7,7 @@ if(GIT_FOUND)
       OUTPUT_VARIABLE DOLPHIN_WC_REVISION
       OUTPUT_STRIP_TRAILING_WHITESPACE)
   # defines DOLPHIN_WC_DESCRIBE
-  execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} describe --always --long --dirty
-      OUTPUT_VARIABLE DOLPHIN_WC_DESCRIBE
-      OUTPUT_STRIP_TRAILING_WHITESPACE)
+  set(DOLPHIN_WC_DESCRIBE "v3.0.5")
 
   # remove hash (and trailing "-0" if needed) from description
   string(REGEX REPLACE "(-0)?-[^-]+((-dirty)?)$" "\\2" DOLPHIN_WC_DESCRIBE "${DOLPHIN_WC_DESCRIBE}")
@@ -31,7 +29,7 @@ if(GIT_FOUND)
 endif()
 
 # version number
-set(DOLPHIN_VERSION_MAJOR "2412")
+set(DOLPHIN_VERSION_MAJOR "v3.0.5")
 set(DOLPHIN_VERSION_MINOR "0")
 set(DOLPHIN_VERSION_PATCH ${DOLPHIN_WC_REVISION})
 
