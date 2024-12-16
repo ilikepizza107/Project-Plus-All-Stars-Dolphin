@@ -29,6 +29,8 @@
 #include "Core/NetPlayClient.h"
 #include "Core/SysConf.h"
 #include "Core/System.h"
+#include "Core/Config/SYSCONFSettings.h"
+
 
 namespace Core
 {
@@ -232,6 +234,42 @@ void InitializeWiiRoot(bool use_temporary)
 
 void ShutdownWiiRoot()
 {
+  if (Config::Get(Config::SYSCONF_SAVE_REPLAYS))
+  {
+    std::string s_brawl_temp_save = File::GetUserPath(D_USER_IDX) + "WiiSession" DIR_SEP + "title" DIR_SEP + "00010000" DIR_SEP + "52534245" DIR_SEP + "data" DIR_SEP;
+    std::string replay_data = "./ReplayData";  
+  
+    if (File::Exists(s_brawl_temp_save + "collect.vff"))
+    {
+      if (!File::Exists(replay_data))
+      {
+        File::CreateDir(replay_data);
+      }
+
+      time_t rawtime;
+      struct tm* timeinfo;
+      char buffer[80];
+
+      time(&rawtime);
+      timeinfo = localtime(&rawtime);
+
+      strftime(buffer, sizeof(buffer), "%d-%m-%Y %H_%M_%S", timeinfo);
+      std::string date(buffer);
+
+      std::string replay_file = s_brawl_temp_save + "collect.vff" + " " + date;
+      std::string replay_file_backup = replay_data + DIR_SEP "collect.vff" + " " + date;
+
+      //WARN_LOG_FMT(IOS_FS, "Attempting to backup replay data", s_brawl_temp_save.c_str()); // can't get this log line to work rn but the functionality works so it's fine
+      File::Rename(s_brawl_temp_save + "collect.vff", replay_file);
+      File::Copy(replay_file, replay_file_backup);
+
+      if (File::Exists(replay_file_backup))
+        WARN_LOG_FMT(IOS_FS, "Replay file was backed up");
+      else
+        ERROR_LOG_FMT(IOS_FS, "Could not backup replay save file");
+    }
+  }
+  
   if (WiiRootIsTemporary())
   {
     File::DeleteDirRecursively(s_temp_wii_root);

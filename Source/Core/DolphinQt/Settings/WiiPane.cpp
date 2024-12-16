@@ -114,6 +114,7 @@ void WiiPane::ConnectLayout()
   connect(m_system_language_choice, &QComboBox::currentIndexChanged, this, &WiiPane::OnSaveConfig);
   connect(m_sound_mode_choice, &QComboBox::currentIndexChanged, this, &WiiPane::OnSaveConfig);
   connect(m_screensaver_checkbox, &QCheckBox::toggled, this, &WiiPane::OnSaveConfig);
+  connect(m_save_replays_checkbox, &QCheckBox::toggled, this, &WiiPane::OnSaveConfig);
   connect(m_pal60_mode_checkbox, &QCheckBox::toggled, this, &WiiPane::OnSaveConfig);
   connect(m_connect_keyboard_checkbox, &QCheckBox::toggled, this, &WiiPane::OnSaveConfig);
   connect(&Settings::Instance(), &Settings::SDCardInsertionChanged, m_sd_card_checkbox,
@@ -158,6 +159,7 @@ void WiiPane::CreateMisc()
   m_screensaver_checkbox = new QCheckBox(tr("Enable Screen Saver"));
   m_wiilink_checkbox = new QCheckBox(tr("Enable WiiConnect24 via WiiLink"));
   m_connect_keyboard_checkbox = new QCheckBox(tr("Connect USB Keyboard"));
+  m_save_replays_checkbox = new QCheckBox(tr("Save Netplay Replays"));
 
   m_aspect_ratio_choice_label = new QLabel(tr("Aspect Ratio:"));
   m_aspect_ratio_choice = new QComboBox();
@@ -193,17 +195,20 @@ void WiiPane::CreateMisc()
       "the Terms of Service at: https://www.wiilink24.com/tos"));
   m_system_language_choice->setToolTip(tr("Sets the Wii system language."));
   m_connect_keyboard_checkbox->setToolTip(tr("May cause slow down in Wii Menu and some games."));
+  m_save_replays_checkbox->setToolTip(tr("Save replays from netplay sessions to a file."));
+  
 
   misc_settings_group_layout->addWidget(m_pal60_mode_checkbox, 0, 0, 1, 1);
   misc_settings_group_layout->addWidget(m_connect_keyboard_checkbox, 0, 1, 1, 1);
   misc_settings_group_layout->addWidget(m_screensaver_checkbox, 1, 0, 1, 1);
   misc_settings_group_layout->addWidget(m_wiilink_checkbox, 1, 1, 1, 1);
-  misc_settings_group_layout->addWidget(m_aspect_ratio_choice_label, 2, 0, 1, 1);
-  misc_settings_group_layout->addWidget(m_aspect_ratio_choice, 2, 1, 1, 1);
-  misc_settings_group_layout->addWidget(m_system_language_choice_label, 3, 0, 1, 1);
-  misc_settings_group_layout->addWidget(m_system_language_choice, 3, 1, 1, 1);
-  misc_settings_group_layout->addWidget(m_sound_mode_choice_label, 4, 0, 1, 1);
-  misc_settings_group_layout->addWidget(m_sound_mode_choice, 4, 1, 1, 1);
+  misc_settings_group_layout->addWidget(m_save_replays_checkbox, 2, 0, 1, 1);
+  misc_settings_group_layout->addWidget(m_aspect_ratio_choice_label, 3, 0, 1, 1);
+  misc_settings_group_layout->addWidget(m_aspect_ratio_choice, 3, 1, 1, 1);
+  misc_settings_group_layout->addWidget(m_system_language_choice_label, 4, 0, 1, 1);
+  misc_settings_group_layout->addWidget(m_system_language_choice, 4, 1, 1, 1);
+  misc_settings_group_layout->addWidget(m_sound_mode_choice_label, 5, 0, 1, 1);
+  misc_settings_group_layout->addWidget(m_sound_mode_choice, 5, 1, 1, 1);
 }
 
 void WiiPane::CreateSDCard()
@@ -384,6 +389,7 @@ void WiiPane::OnEmulationStateChanged(bool running)
 {
   m_screensaver_checkbox->setEnabled(!running);
   m_pal60_mode_checkbox->setEnabled(!running);
+  m_save_replays_checkbox->setEnabled(!running);
   m_system_language_choice->setEnabled(!running);
   m_aspect_ratio_choice->setEnabled(!running);
   m_sound_mode_choice->setEnabled(!running);
@@ -402,6 +408,7 @@ void WiiPane::LoadConfig()
   m_pal60_mode_checkbox->setChecked(Config::Get(Config::SYSCONF_PAL60));
   m_connect_keyboard_checkbox->setChecked(Settings::Instance().IsUSBKeyboardConnected());
   m_aspect_ratio_choice->setCurrentIndex(Config::Get(Config::SYSCONF_WIDESCREEN));
+  m_save_replays_checkbox->setChecked(Config::Get(Config::SYSCONF_SAVE_REPLAYS));
   m_system_language_choice->setCurrentIndex(Config::Get(Config::SYSCONF_LANGUAGE));
   m_sound_mode_choice->setCurrentIndex(Config::Get(Config::SYSCONF_SOUND_MODE));
   m_wiilink_checkbox->setChecked(Config::Get(Config::MAIN_WII_WIILINK_ENABLE));
@@ -431,7 +438,9 @@ void WiiPane::OnSaveConfig()
   Config::ConfigChangeCallbackGuard config_guard;
 
   Config::SetBase(Config::SYSCONF_SCREENSAVER, m_screensaver_checkbox->isChecked());
+  Config::SetBase(Config::SYSCONF_SAVE_REPLAYS, m_save_replays_checkbox->isChecked());
   Config::SetBase(Config::SYSCONF_PAL60, m_pal60_mode_checkbox->isChecked());
+  Config::SetBase(Config::SYSCONF_SAVE_REPLAYS, m_save_replays_checkbox->isChecked());
   Settings::Instance().SetUSBKeyboardConnected(m_connect_keyboard_checkbox->isChecked());
 
   Config::SetBase<u32>(Config::SYSCONF_SENSOR_BAR_POSITION,
