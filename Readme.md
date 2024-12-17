@@ -1,6 +1,7 @@
 # Project+ Dolphin Fork
 
-![image](https://github.com/user-attachments/assets/7f8d43a2-aa9c-4aaf-81b0-72edc547c406)
+![image](https://github.com/user-attachments/assets/969b8a0f-e464-44f9-bbdd-7800d821f0ae)
+
 
 This is a work-in-progress version of the Dolphin Emulator built for usage with Project+. Current progress:
 
@@ -19,8 +20,6 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
   * Client side music toggle in netplay window
   * Spectator button in netplay window
   * Overwrite Dolphin updater functions with our own
-  * Toggle to disable QoS bittagging
-
 
 # Dolphin - A GameCube and Wii Emulator
 
