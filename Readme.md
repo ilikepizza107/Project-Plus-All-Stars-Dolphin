@@ -19,7 +19,7 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
   * Client side music toggle in netplay window
   * Spectator button in netplay window
   * Overwrite Dolphin updater functions with our own
-  * Toggle to tag packets with QoS bit  
+  * Toggle to disable QoS bittagging
 
 
 # Dolphin - A GameCube and Wii Emulator
