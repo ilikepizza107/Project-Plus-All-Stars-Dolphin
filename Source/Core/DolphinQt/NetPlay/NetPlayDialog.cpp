@@ -229,7 +229,11 @@ void NetPlayDialog::CreateMainLayout()
     Settings::Instance().GetNetPlayServer()->ComputeGameDigest(
         NetPlay::NetPlayClient::GetSDCardIdentifier());
   });
-
+  m_game_digest_menu->addAction(tr("Save file"), this, [] {
+    Settings::Instance().GetNetPlayServer()->ComputeGameDigest(
+        NetPlay::NetPlayClient::GetBrawlFileIdentifier());
+  });
+  
   m_other_menu = m_menu_bar->addMenu(tr("Other"));
   m_record_input_action = m_other_menu->addAction(tr("Record Inputs"));
   m_record_input_action->setCheckable(true);

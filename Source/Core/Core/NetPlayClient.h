@@ -178,6 +178,7 @@ public:
                       std::string redirect_folder);
 
   static SyncIdentifier GetSDCardIdentifier();
+  static SyncIdentifier GetBrawlFileIdentifier();
 
 protected:
   struct AsyncQueueEntry

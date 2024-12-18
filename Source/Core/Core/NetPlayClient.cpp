@@ -2590,6 +2590,8 @@ void NetPlayClient::ComputeGameDigest(const SyncIdentifier& sync_identifier)
     file = File::GetUserPath(F_WIISDCARDIMAGE_IDX);
   else if (auto game = m_dialog->FindGameFile(sync_identifier))
     file = game->GetFilePath();
+  else if (sync_identifier == GetBrawlFileIdentifier())
+    file = File::GetSysDirectory() + "Wii" + DIR_SEP + "title" + DIR_SEP + "00010000" + DIR_SEP + "52534245" + DIR_SEP + "data" + DIR_SEP + BRAWL_SAVE_FILE;
 
   if (file.empty() || !File::Exists(file))
   {
@@ -2651,6 +2653,11 @@ void NetPlayClient::SetWiiSyncData(std::unique_ptr<IOS::HLE::FS::FileSystem> fs,
 SyncIdentifier NetPlayClient::GetSDCardIdentifier()
 {
   return SyncIdentifier{{}, "sd", {}, {}, {}, {}};
+}
+
+SyncIdentifier NetPlayClient::GetBrawlFileIdentifier()
+{
+  return SyncIdentifier{{}, "Save", {}, {}, {}, {}};
 }
 
 std::string GetPlayerMappingString(PlayerId pid, const PadMappingArray& pad_map,
