@@ -145,8 +145,7 @@ Or useful for having multiple distinct Dolphin setups for testing/development/TA
 2. `cd Build`
 3. `cmake .. -DLINUX_LOCAL_DEV=true`
 4. `make -j $(nproc)`
-5. `cp -r ../Data/Sys/ Binaries/`
-6. `touch Binaries/portable.txt`
+5. `cp -r ../Data/Sys/ ../Data/User/ ../Data/Launcher/ ../Data/portable.txt Binaries/`
 
 ## Building for Android
 
