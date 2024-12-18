@@ -6,7 +6,7 @@
 This is a work-in-progress version of the Dolphin Emulator built for usage with Project+. Current progress:
 
 * Completed
-  * 4 buffer as default setting
+  * 2 buffer as default setting (equivalent to 4 in FPM)
   * Project+ specific aspect ratios
   * Theming and iconography
   * Netplay button on toolbar
@@ -15,12 +15,15 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
   * HD texture loading with .dol file with GameID workaround
   * Netplay replay automatic exporting
   * Auto-copy netplay code on netplay window startup
- 
+  * Pre-configured hotkeys for volume up/down and opening netplay chat
+  * Brawl save file MD5 check
+    
 * To-Do
   * Separate Minimum and Player buffers in netplay window
   * Client side music toggle in netplay window
   * Spectator button in netplay window
   * Overwrite Dolphin updater functions with our own
+  * "On SI Read" polling method
 
 # Dolphin - A GameCube and Wii Emulator
 
