@@ -67,6 +67,8 @@
 #include "VideoCommon/NetPlayGolfUI.h"
 #include "VideoCommon/VideoConfig.h"
 
+bool copyCode;
+
 namespace
 {
 QString InetAddressToString(const Common::TraversalInetAddress& addr)
@@ -296,6 +298,8 @@ void NetPlayDialog::CreatePlayersLayout()
   m_players_list = new QTableWidget;
   m_kick_button = new QPushButton(tr("Kick Player"));
   m_assign_ports_button = new QPushButton(tr("Assign Controller Ports"));
+  
+  copyCode = false;
 
   m_players_list->setTabKeyNavigation(false);
   m_players_list->setColumnCount(5);
@@ -733,7 +737,12 @@ void NetPlayDialog::UpdateGUI()
         m_hostcode_label->setText(
             InetAddressToString(Common::g_TraversalClient->GetExternalAddress()));
       }
-
+	  
+	  if (copyCode == false)
+	  {
+		QApplication::clipboard()->setText(m_hostcode_label->text());
+		copyCode = true;
+	  }
       m_hostcode_action_button->setEnabled(true);
       m_hostcode_action_button->setText(tr("Copy"));
       m_is_copy_button_retry = false;
