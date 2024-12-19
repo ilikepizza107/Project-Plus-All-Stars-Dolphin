@@ -222,6 +222,7 @@ void InitializeWiiRoot(bool use_temporary)
     MoveToBackupIfExists(s_temp_redirect_root);
 
     File::SetUserPath(D_SESSION_WIIROOT_IDX, s_temp_wii_root);
+	File::Copy(File::GetUserPath(D_USER_IDX) + NETPLAY_SAVE_DIR, s_temp_wii_root);
   }
   else
   {
@@ -253,7 +254,7 @@ void ShutdownWiiRoot()
       time(&rawtime);
       timeinfo = localtime(&rawtime);
 
-      strftime(buffer, sizeof(buffer), "%d-%m-%Y %H_%M_%S", timeinfo);
+      strftime(buffer, sizeof(buffer), "%Y-%m-%d %H_%M_%S", timeinfo);
       std::string date(buffer);
 
       std::string replay_file = s_brawl_temp_save + "collect.vff" + " " + date;

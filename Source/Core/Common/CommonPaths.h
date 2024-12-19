@@ -89,6 +89,8 @@
 #define GRAPHICSMOD_DIR "GraphicMods"
 #define WIISDSYNC_DIR "WiiSDSync"
 #define ASSEMBLY_DIR "SavedAssembly"
+#define NETPLAY_SAVE_DIR "NetplaySave"
+
 
 // This one is only used to remove it if it was present
 #define SHADERCACHE_LEGACY_DIR "ShaderCache"
@@ -151,10 +153,11 @@
 
 #define GECKO_CODE_HANDLER "codehandler.bin"
 
+#define BRAWL_SAVE_FILE "autosv0.bin"
+
 // Subdirs in Sys
 #define GC_SYS_DIR "GC"
 #define WII_SYS_DIR "Wii"
-#define BRAWL_SAVE_FILE "autosv0.bin"
 
 // Subdirs in Config
 #define GRAPHICSMOD_CONFIG_DIR "GraphicMods"
