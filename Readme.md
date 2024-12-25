@@ -17,6 +17,7 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
   * Auto-copy netplay code on netplay window startup
   * Pre-configured hotkeys for volume up/down and opening netplay chat
   * Brawl save file MD5 check
+  * Discord Rich Presence support
     
 * To-Do
   * Separate Minimum and Player buffers in netplay window
