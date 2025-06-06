@@ -9,6 +9,7 @@
 
 #include <QDialog>
 #include <QMenuBar>
+#include <QCheckBox>
 
 #include "Common/Lazy.h"
 #include "Core/NetPlayClient.h"
@@ -162,7 +163,7 @@ private:
   QAction* m_golf_mode_overlay_action;
   QAction* m_fixed_delay_action;
   QAction* m_hide_remote_gbas_action;
-  QAction* m_brawlmusic_off_action;
+  QCheckBox* m_brawlmusic_off;
   QPushButton* m_quit_button;
   QSplitter* m_splitter;
   QActionGroup* m_network_mode_group;
