@@ -18,10 +18,10 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
   * Pre-configured hotkeys for volume up/down and opening netplay chat
   * Brawl save file MD5 check
   * Discord Rich Presence support
-  * Separate Minimum and Player buffers in netplay window (thanks ilikepizza!)
+  * Separate Minimum and Player buffers in netplay window
+  * Client side music toggle in netplay window
     
 * To-Do
-  * Client side music toggle in netplay window
   * Spectator button in netplay window
   * Overwrite Dolphin updater functions with our own
   * "On SI Read" polling method
