@@ -79,6 +79,7 @@ public:
   void OnIndexRefreshFailed(const std::string error) override;
 
   bool IsRecording() override;
+  bool IsSpectator() override;
   bool IsMusicOff() override;
   std::shared_ptr<const UICommon::GameFile>
   FindGameFile(const NetPlay::SyncIdentifier& sync_identifier,
@@ -164,6 +165,7 @@ private:
   QAction* m_fixed_delay_action;
   QAction* m_hide_remote_gbas_action;
   QCheckBox* m_brawlmusic_off;
+  QCheckBox* m_is_spectator;
   QPushButton* m_quit_button;
   QSplitter* m_splitter;
   QActionGroup* m_network_mode_group;
