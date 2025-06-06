@@ -18,6 +18,10 @@ void SetAdapterCallback(std::function<void(void)> func);
 void StartScanThread();
 void StopScanThread();
 
+// P+ change: for poll rate display
+bool IsReadingAtReducedRate();
+double ReadRate();
+
 // Buttons have PAD_GET_ORIGIN set on new connection
 // Netplay and CSIDevice_GCAdapter make use of this.
 GCPadStatus Input(int chan);

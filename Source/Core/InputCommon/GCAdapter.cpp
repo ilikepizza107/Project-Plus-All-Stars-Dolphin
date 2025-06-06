@@ -171,6 +171,10 @@ static std::optional<Config::ConfigChangedCallbackID> s_config_callback_id = std
 static bool s_is_adapter_wanted = false;
 static std::array<bool, SerialInterface::MAX_SI_CHANNELS> s_config_rumble_enabled{};
 
+// P+ change: for poll rate display
+static u64 s_consecutive_slow_transfers = 0;
+static double s_read_rate = 0.0;
+
 static void ReadThreadFunc()
 {
   Common::SetCurrentThreadName("GCAdapter Read Thread");
@@ -206,6 +210,9 @@ static void ReadThreadFunc()
 
   // Reset rumble once on initial reading
   ResetRumble();
+  
+  // P+ change: for poll rate display
+  s_read_rate = 0.0;
 
   while (s_read_adapter_thread_running.IsSet())
   {
@@ -213,9 +220,30 @@ static void ReadThreadFunc()
     std::array<u8, CONTROLLER_INPUT_PAYLOAD_EXPECTED_SIZE> input_buffer;
 
     int payload_size = 0;
+	
+	// P+ change: for poll rate display
+    std::chrono::high_resolution_clock::time_point start =
+        std::chrono::high_resolution_clock::now();
     int error = libusb_interrupt_transfer(s_handle, s_endpoint_in, input_buffer.data(),
                                           int(input_buffer.size()), &payload_size, USB_TIMEOUT_MS);
-    if (error != LIBUSB_SUCCESS)
+    // P+ change: for poll rate display
+    std::chrono::high_resolution_clock::time_point now = std::chrono::high_resolution_clock::now();
+   
+   double elapsed_ms =
+        std::chrono::duration_cast<std::chrono::nanoseconds>(now - start).count() / 1000000.0;
+
+    if (elapsed_ms > 15.0)
+    {
+      s_consecutive_slow_transfers++;
+    }
+    else
+    {
+      s_consecutive_slow_transfers = 0;
+    }
+
+    s_read_rate = elapsed_ms;
+
+	if (error != LIBUSB_SUCCESS)
     {
       ERROR_LOG_FMT(CONTROLLERINTERFACE, "Read: libusb_interrupt_transfer failed: {}",
                     LibusbUtils::ErrorWrap(error));
@@ -489,6 +517,18 @@ void StopScanThread()
 #endif
     s_adapter_detect_thread.join();
   }
+}
+
+// P+ change: for poll rate display
+bool IsReadingAtReducedRate()
+{
+  return s_consecutive_slow_transfers > 80;
+}
+
+
+double ReadRate()
+{
+  return s_read_rate;
 }
 
 static void Setup()
