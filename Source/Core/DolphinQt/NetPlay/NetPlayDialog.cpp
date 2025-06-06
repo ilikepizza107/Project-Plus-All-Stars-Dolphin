@@ -267,10 +267,10 @@ void NetPlayDialog::CreateMainLayout()
   options_widget->addWidget(m_minimum_buffer_size_box, 0, 2, Qt::AlignVCenter);
   options_widget->addWidget(m_player_buffer_label, 0, 3, Qt::AlignVCenter);
   options_widget->addWidget(m_player_buffer_size_box, 0, 4, Qt::AlignVCenter);
+  options_widget->addWidget(m_brawlmusic_off, 0, 5, Qt::AlignVCenter);
   options_widget->addWidget(m_is_spectator, 0, 6, Qt::AlignVCenter);
-  options_widget->addWidget(m_brawlmusic_off, 0, 7, Qt::AlignVCenter);
   options_widget->addWidget(m_quit_button, 0, 8, Qt::AlignVCenter | Qt::AlignRight);
-  options_widget->setColumnStretch(5, 1000);
+  options_widget->setColumnStretch(7, 1000);
 
   m_main_layout->addLayout(options_widget, 2, 0, 1, -1, Qt::AlignRight);
   m_main_layout->setRowStretch(1, 1000);
