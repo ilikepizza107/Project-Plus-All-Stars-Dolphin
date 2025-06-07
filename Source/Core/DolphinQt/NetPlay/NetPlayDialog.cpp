@@ -139,8 +139,8 @@ void NetPlayDialog::CreateMainLayout()
   m_player_buffer_size_box = new QSpinBox;
   m_player_buffer_label = new QLabel(tr("Player Buffer:"));
   m_quit_button = new QPushButton(tr("Quit"));
-  m_is_spectator = new QCheckBox(tr("Spectator"));
   m_brawlmusic_off = new QCheckBox(tr("Client Side Music Off"));
+  m_is_spectator = new QCheckBox(tr("Spectator"));
   m_splitter = new QSplitter(Qt::Horizontal);
   m_menu_bar = new QMenuBar(this);
 
@@ -267,10 +267,10 @@ void NetPlayDialog::CreateMainLayout()
   options_widget->addWidget(m_minimum_buffer_size_box, 0, 2, Qt::AlignVCenter);
   options_widget->addWidget(m_player_buffer_label, 0, 3, Qt::AlignVCenter);
   options_widget->addWidget(m_player_buffer_size_box, 0, 4, Qt::AlignVCenter);
+  options_widget->addWidget(m_brawlmusic_off, 0, 5, Qt::AlignVCenter);
   options_widget->addWidget(m_is_spectator, 0, 6, Qt::AlignVCenter);
-  options_widget->addWidget(m_brawlmusic_off, 0, 7, Qt::AlignVCenter);
   options_widget->addWidget(m_quit_button, 0, 8, Qt::AlignVCenter | Qt::AlignRight);
-  options_widget->setColumnStretch(5, 1000);
+  options_widget->setColumnStretch(7, 1000);
 
   m_main_layout->addLayout(options_widget, 2, 0, 1, -1, Qt::AlignRight);
   m_main_layout->setRowStretch(1, 1000);
@@ -405,6 +405,8 @@ void NetPlayDialog::ConnectWidgets()
   connect(m_start_button, &QPushButton::clicked, this, &NetPlayDialog::OnStart);
   connect(m_quit_button, &QPushButton::clicked, this, &NetPlayDialog::reject);
 
+  connect(m_is_spectator, &QCheckBox::toggled, this, &NetPlayDialog::IsSpectatorEnabled); 
+
   connect(m_game_button, &QPushButton::clicked, [this] {
     GameListDialog gld(m_game_list_model, this);
     SetQWidgetWindowDecorations(&gld);
@@ -491,6 +493,17 @@ void NetPlayDialog::OnChat()
 
     SendMessage(msg);
   });
+}
+
+void NetPlayDialog::IsSpectatorEnabled(bool enabled)
+{
+  auto client = Settings::Instance().GetNetPlayClient();
+  if (!client)
+    return;
+  sf::Packet packet;
+  packet << static_cast<u8>(NetPlay::MessageID::PadSpectator);
+  packet << enabled;
+  client->SendAsync(std::move(packet));
 }
 
 void NetPlayDialog::OnIndexAdded(bool success, const std::string error)
@@ -913,8 +926,8 @@ void NetPlayDialog::SetOptionsEnabled(bool enabled)
     m_host_input_authority_action->setEnabled(enabled);
     m_golf_mode_action->setEnabled(enabled);
     m_fixed_delay_action->setEnabled(enabled);
-	m_is_spectator->setEnabled(enabled);
     m_brawlmusic_off->setEnabled(enabled);
+    m_is_spectator->setEnabled(enabled);
   }
 
   m_record_input_action->setEnabled(enabled);
@@ -1201,8 +1214,8 @@ void NetPlayDialog::LoadSettings()
   const bool strict_settings_sync = Config::Get(Config::NETPLAY_STRICT_SETTINGS_SYNC);
   const bool golf_mode_overlay = Config::Get(Config::NETPLAY_GOLF_MODE_OVERLAY);
   const bool hide_remote_gbas = Config::Get(Config::NETPLAY_HIDE_REMOTE_GBAS);
-  const bool is_spectator = Config::Get(Config::NETPLAY_IS_SPECTATOR);
   const bool brawlmusic_off = Config::Get(Config::NETPLAY_BRAWL_MUSIC_OFF);
+  const bool is_spectator = Config::Get(Config::NETPLAY_IS_SPECTATOR);
 
   m_minimum_buffer_size_box->setValue(minimum_buffer_size);
   m_player_buffer_size_box->setValue(player_buffer_size);
@@ -1221,8 +1234,8 @@ void NetPlayDialog::LoadSettings()
   m_golf_mode_overlay_action->setChecked(golf_mode_overlay);
   m_hide_remote_gbas_action->setChecked(hide_remote_gbas);
 
-  m_is_spectator->setChecked(is_spectator);
   m_brawlmusic_off->setChecked(brawlmusic_off);
+  m_is_spectator->setChecked(is_spectator);
 
   const std::string network_mode = Config::Get(Config::NETPLAY_NETWORK_MODE);
 
@@ -1266,8 +1279,8 @@ void NetPlayDialog::SaveSettings()
   Config::SetBase(Config::NETPLAY_STRICT_SETTINGS_SYNC, m_strict_settings_sync_action->isChecked());
   Config::SetBase(Config::NETPLAY_GOLF_MODE_OVERLAY, m_golf_mode_overlay_action->isChecked());
   Config::SetBase(Config::NETPLAY_HIDE_REMOTE_GBAS, m_hide_remote_gbas_action->isChecked());
-  Config::SetBase(Config::NETPLAY_IS_SPECTATOR, m_is_spectator->isChecked());
   Config::SetBase(Config::NETPLAY_BRAWL_MUSIC_OFF, m_brawlmusic_off->isChecked());
+  Config::SetBase(Config::NETPLAY_IS_SPECTATOR, m_is_spectator->isChecked());
 
   std::string network_mode;
   if (m_fixed_delay_action->isChecked())

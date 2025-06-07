@@ -47,8 +47,8 @@ struct NetSettings
   bool allow_sd_writes = false;
   bool oc_enable = false;
   float oc_factor = 0;
-  bool is_spectator = false;
   bool brawlmusic_off = false;
+  bool is_spectator = false;
   Common::EnumMap<ExpansionInterface::EXIDeviceType, ExpansionInterface::MAX_SLOT> exi_device{};
   int memcard_size_override = -1;
 
@@ -148,6 +148,7 @@ enum class MessageID : u8
   ChunkedDataComplete = 0x44,
   ChunkedDataAbort = 0x45,
 
+  PadSpectator = 0x5F,
   PadData = 0x60,
   PadMapping = 0x61,
   PadBufferMinimum = 0x62,

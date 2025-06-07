@@ -797,6 +797,47 @@ unsigned int NetPlayServer::OnData(sf::Packet& packet, Client& player)
   }
   break;
 
+  case MessageID::PadSpectator:
+  {
+    bool spectator;
+    packet >> spectator;
+
+    auto padmap = GetPadMapping();
+  
+    int player_port = -1;
+    for (int i = 0; i < (int)padmap.size(); i++)
+    {
+      if (padmap[i] == player.pid)
+      {
+        player_port = i;
+        break;
+      }
+    }
+
+    if (spectator)
+    {
+      if (player_port != -1)
+        padmap[player_port] = 0;
+    }
+    else
+    {
+      bool assigned = false;
+      for (int i = 0; i < (int)padmap.size(); i++)
+      {
+        if (padmap[i] == 0)
+        {
+          padmap[i] = player.pid;
+          assigned = true;
+          break;
+        }
+      }
+    }
+
+    this->SetPadMapping(padmap);
+  }
+  break;
+
+
   case MessageID::PadData:
   {
     // if this is pad data from the last game still being received, ignore it
@@ -1455,8 +1496,8 @@ bool NetPlayServer::SetupNetSettings()
   settings.golf_mode = Config::Get(Config::NETPLAY_NETWORK_MODE) == "golf";
   settings.use_fma = DoAllPlayersHaveHardwareFMA();
   settings.hide_remote_gbas = Config::Get(Config::NETPLAY_HIDE_REMOTE_GBAS);
-  settings.is_spectator = Config::Get(Config::NETPLAY_IS_SPECTATOR);
   settings.brawlmusic_off = Config::Get(Config::NETPLAY_BRAWL_MUSIC_OFF);
+  settings.is_spectator = Config::Get(Config::NETPLAY_IS_SPECTATOR);
 
   // Unload GameINI to restore things to normal
   Config::RemoveLayer(Config::LayerType::GlobalGame);
@@ -1602,8 +1643,8 @@ bool NetPlayServer::StartGame()
   spac << m_settings.allow_sd_writes;
   spac << m_settings.oc_enable;
   spac << m_settings.oc_factor;
-  spac << m_settings.is_spectator;
   spac << m_settings.brawlmusic_off;
+  spac << m_settings.is_spectator;
 
   for (auto slot : ExpansionInterface::SLOTS)
     spac << static_cast<int>(m_settings.exi_device[slot]);
