@@ -148,6 +148,7 @@ enum class MessageID : u8
   ChunkedDataComplete = 0x44,
   ChunkedDataAbort = 0x45,
 
+  PadSpectator = 0x5F,
   PadData = 0x60,
   PadMapping = 0x61,
   PadBufferMinimum = 0x62,
