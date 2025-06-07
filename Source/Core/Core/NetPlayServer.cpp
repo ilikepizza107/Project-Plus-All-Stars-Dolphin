@@ -797,6 +797,47 @@ unsigned int NetPlayServer::OnData(sf::Packet& packet, Client& player)
   }
   break;
 
+  case MessageID::PadSpectator:
+  {
+    bool spectator;
+    packet >> spectator;
+
+    auto padmap = GetPadMapping();
+  
+    int player_port = -1;
+    for (int i = 0; i < (int)padmap.size(); i++)
+    {
+      if (padmap[i] == player.pid)
+      {
+        player_port = i;
+        break;
+      }
+    }
+
+    if (spectator)
+    {
+      if (player_port != -1)
+        padmap[player_port] = 0;
+    }
+    else
+    {
+      bool assigned = false;
+      for (int i = 0; i < (int)padmap.size(); i++)
+      {
+        if (padmap[i] == 0)
+        {
+          padmap[i] = player.pid;
+          assigned = true;
+          break;
+        }
+      }
+    }
+
+    this->SetPadMapping(padmap);
+  }
+  break;
+
+
   case MessageID::PadData:
   {
     // if this is pad data from the last game still being received, ignore it

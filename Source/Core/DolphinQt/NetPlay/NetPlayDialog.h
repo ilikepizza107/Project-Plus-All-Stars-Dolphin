@@ -81,6 +81,7 @@ public:
   bool IsRecording() override;
   bool IsMusicOff() override;
   bool IsSpectator() override;
+  void IsSpectatorEnabled(bool enabled);
   std::shared_ptr<const UICommon::GameFile>
   FindGameFile(const NetPlay::SyncIdentifier& sync_identifier,
                NetPlay::SyncIdentifierComparison* found = nullptr) override;

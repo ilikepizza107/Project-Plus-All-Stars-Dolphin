@@ -405,6 +405,8 @@ void NetPlayDialog::ConnectWidgets()
   connect(m_start_button, &QPushButton::clicked, this, &NetPlayDialog::OnStart);
   connect(m_quit_button, &QPushButton::clicked, this, &NetPlayDialog::reject);
 
+  connect(m_is_spectator, &QCheckBox::toggled, this, &NetPlayDialog::IsSpectatorEnabled); 
+
   connect(m_game_button, &QPushButton::clicked, [this] {
     GameListDialog gld(m_game_list_model, this);
     SetQWidgetWindowDecorations(&gld);
@@ -491,6 +493,17 @@ void NetPlayDialog::OnChat()
 
     SendMessage(msg);
   });
+}
+
+void NetPlayDialog::IsSpectatorEnabled(bool enabled)
+{
+  auto client = Settings::Instance().GetNetPlayClient();
+  if (!client)
+    return;
+  sf::Packet packet;
+  packet << static_cast<u8>(NetPlay::MessageID::PadSpectator);
+  packet << enabled;
+  client->SendAsync(std::move(packet));
 }
 
 void NetPlayDialog::OnIndexAdded(bool success, const std::string error)
