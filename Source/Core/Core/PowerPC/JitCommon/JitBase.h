@@ -36,9 +36,9 @@ struct PowerPCState;
 }  // namespace PowerPC
 class PPCSymbolDB;
 
-//#define JIT_LOG_GENERATED_CODE  // Enables logging of generated code
-//#define JIT_LOG_GPR             // Enables logging of the PPC general purpose regs
-//#define JIT_LOG_FPR             // Enables logging of the PPC floating point regs
+// #define JIT_LOG_GENERATED_CODE  // Enables logging of generated code
+// #define JIT_LOG_GPR             // Enables logging of the PPC general purpose regs
+// #define JIT_LOG_FPR             // Enables logging of the PPC floating point regs
 
 // Use these to control the instruction selection
 // #define INSTRUCTION_START FallBackToInterpreter(inst); return;
@@ -167,7 +167,7 @@ protected:
 
   static const std::array<std::pair<bool JitBase::*, const Config::Info<bool>*>, 23> JIT_SETTINGS;
 
-  bool DoesConfigNeedRefresh();
+  bool DoesConfigNeedRefresh() const;
   void RefreshConfig();
 
   void InitFastmemArena();
@@ -178,8 +178,16 @@ protected:
   void CleanUpAfterStackFault();
 
   bool CanMergeNextInstructions(int count) const;
+  bool HasConstantCarry() const
+  {
+#ifdef _M_ARM_64
+    return js.carryFlag == CarryFlag::ConstantTrue || js.carryFlag == CarryFlag::ConstantFalse;
+#else
+    return false;
+#endif
+  }
 
-  bool ShouldHandleFPExceptionForInstruction(const PPCAnalyst::CodeOp* op);
+  bool ShouldHandleFPExceptionForInstruction(const PPCAnalyst::CodeOp* op) const;
 
 public:
   explicit JitBase(Core::System& system);

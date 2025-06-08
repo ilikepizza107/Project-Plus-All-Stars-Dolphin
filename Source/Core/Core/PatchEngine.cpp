@@ -100,6 +100,7 @@ std::string SerializeLine(const PatchEntry& entry)
   }
 }
 
+
 static bool IsEnabledMusicCode(const Patch& patch)
 {
   if (NetPlay::IsNetPlayRunning() && patch.name == "[P+] Music Off")
@@ -201,10 +202,8 @@ void LoadPatches()
   LoadPatchSection("OnFrame", &s_on_frame, globalIni, localIni);
 
 #ifdef USE_RETRO_ACHIEVEMENTS
-  {
-    std::lock_guard lg{AchievementManager::GetInstance().GetLock()};
-    AchievementManager::GetInstance().FilterApprovedPatches(s_on_frame, sconfig.GetGameID());
-  }
+  AchievementManager::GetInstance().FilterApprovedPatches(s_on_frame, sconfig.GetGameID(),
+                                                          sconfig.GetRevision());
 #endif  // USE_RETRO_ACHIEVEMENTS
 
   // Check if I'm syncing Codes
@@ -215,8 +214,10 @@ void LoadPatches()
   }
   else
   {
-    Gecko::SetActiveCodes(Gecko::LoadCodes(globalIni, localIni));
-    ActionReplay::LoadAndApplyCodes(globalIni, localIni);
+    Gecko::SetActiveCodes(Gecko::LoadCodes(globalIni, localIni), sconfig.GetGameID(),
+                          sconfig.GetRevision());
+    ActionReplay::LoadAndApplyCodes(globalIni, localIni, sconfig.GetGameID(),
+                                    sconfig.GetRevision());
   }
 }
 
@@ -263,9 +264,6 @@ static void ApplyPatches(const Core::CPUThreadGuard& guard, const std::vector<Pa
 static void ApplyMemoryPatches(const Core::CPUThreadGuard& guard,
                                std::span<const std::size_t> memory_patch_indices)
 {
-  if (AchievementManager::GetInstance().IsHardcoreModeActive())
-    return;
-
   std::lock_guard lock(s_on_frame_memory_mutex);
   for (std::size_t index : memory_patch_indices)
   {
@@ -317,6 +315,17 @@ static void ApplyStartupPatches(Core::System& system)
 {
   ASSERT(Core::IsCPUThread());
   Core::CPUThreadGuard guard(system);
+
+  const auto& ppc_state = system.GetPPCState();
+  if (!ppc_state.msr.DR || !ppc_state.msr.IR)
+  {
+    DEBUG_LOG_FMT(ACTIONREPLAY,
+                  "Need to retry later. CPU configuration is currently incorrect. PC = {:#010x}, "
+                  "MSR = {:#010x}",
+                  ppc_state.pc, ppc_state.msr.Hex);
+    return;
+  }
+
   ApplyPatches(guard, s_on_frame);
 }
 
@@ -353,7 +362,7 @@ bool ApplyFramePatches(Core::System& system)
 void Shutdown()
 {
   s_on_frame.clear();
-  ActionReplay::ApplyCodes({});
+  ActionReplay::ApplyCodes({}, "", 0);
   Gecko::Shutdown();
 }
 

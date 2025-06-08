@@ -8,6 +8,7 @@
 #include "Common/Timer.h"
 
 #include "Core/AchievementManager.h"
+#include "Core/Config/GraphicsSettings.h"
 #include "Core/Config/MainSettings.h"
 #include "Core/Config/NetplaySettings.h"
 #include "Core/Movie.h"
@@ -91,7 +92,7 @@ bool OnScreenUI::Initialize(u32 width, u32 height, float scale)
     font_tex->Load(0, font_tex_width, font_tex_height, font_tex_width, font_tex_pixels,
                    sizeof(u32) * font_tex_width * font_tex_height);
 
-    io.Fonts->TexID = font_tex.get();
+    io.Fonts->TexID = *font_tex.get();
 
     m_imgui_textures.push_back(std::move(font_tex));
   }
@@ -315,7 +316,7 @@ void OnScreenUI::DrawDebugText()
   if (g_ActiveConfig.bOverlayStats)
     g_stats.Display();
 
-  if (g_ActiveConfig.bShowNetPlayMessages && g_netplay_chat_ui)
+  if (Config::Get(Config::GFX_SHOW_NETPLAY_MESSAGES) && g_netplay_chat_ui)
     g_netplay_chat_ui->Display();
 
   if (Config::Get(Config::NETPLAY_GOLF_MODE_OVERLAY) && g_netplay_golf_ui)
@@ -330,7 +331,7 @@ void OnScreenUI::DrawDebugText()
   const std::string profile_output = Common::Profiler::ToString();
   if (!profile_output.empty())
     ImGui::TextUnformatted(profile_output.c_str());
-
+    
   // P+ change: warn if adapter is being read at reduced rate
   if (GCAdapter::IsReadingAtReducedRate())
   {
@@ -349,9 +350,6 @@ void OnScreenUI::DrawDebugText()
 
   }
 }
-
- 
-
 
 void OnScreenUI::DrawChallengesAndLeaderboards()
 {
@@ -393,8 +391,8 @@ void OnScreenUI::DrawChallengesAndLeaderboards()
     {
       for (auto& [name, texture] : m_challenge_texture_map)
       {
-        ImGui::Image(texture.get(), ImVec2(static_cast<float>(texture->GetWidth()) * scale,
-                                           static_cast<float>(texture->GetHeight()) * scale));
+        ImGui::Image(*texture.get(), ImVec2(static_cast<float>(texture->GetWidth()) * scale,
+                                            static_cast<float>(texture->GetHeight()) * scale));
         ImGui::SameLine();
       }
     }

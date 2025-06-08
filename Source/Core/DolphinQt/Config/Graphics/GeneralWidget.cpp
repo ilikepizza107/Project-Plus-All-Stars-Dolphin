@@ -23,6 +23,7 @@
 #include "DolphinQt/Config/ConfigControls/ConfigChoice.h"
 #include "DolphinQt/Config/ConfigControls/ConfigInteger.h"
 #include "DolphinQt/Config/ConfigControls/ConfigRadio.h"
+#include "DolphinQt/Config/GameConfigWidget.h"
 #include "DolphinQt/Config/Graphics/GraphicsWindow.h"
 #include "DolphinQt/Config/ToolTipControls/ToolTipComboBox.h"
 #include "DolphinQt/QtUtils/ModalMessageBox.h"
@@ -35,10 +36,8 @@
 GeneralWidget::GeneralWidget(GraphicsWindow* parent)
 {
   CreateWidgets();
-  LoadSettings();
   ConnectWidgets();
   AddDescriptions();
-  emit BackendChanged(QString::fromStdString(Config::Get(Config::MAIN_GFX_BACKEND)));
 
   connect(parent, &GraphicsWindow::BackendChanged, this, &GeneralWidget::OnBackendChanged);
   connect(&Settings::Instance(), &Settings::EmulationStateChanged, this, [this](Core::State state) {
@@ -47,67 +46,85 @@ GeneralWidget::GeneralWidget(GraphicsWindow* parent)
   OnEmulationStateChanged(!Core::IsUninitialized(Core::System::GetInstance()));
 }
 
+GeneralWidget::GeneralWidget(GameConfigWidget* parent, Config::Layer* layer) : m_game_layer(layer)
+{
+  CreateWidgets();
+  ConnectWidgets();
+  AddDescriptions();
+}
+
 void GeneralWidget::CreateWidgets()
 {
   auto* main_layout = new QVBoxLayout;
 
   // Basic Section
   auto* m_video_box = new QGroupBox(tr("Basic"));
-  m_video_layout = new QGridLayout();
+  auto* const video_layout = new QGridLayout{m_video_box};
 
-  m_backend_combo = new ToolTipComboBox();
-  m_aspect_combo = new ConfigChoice({tr("Auto"), tr("Force 16:9"), tr("Force 4:3"),
-                                     tr("Stretch to Window"), tr("Force 19:15 (P+)"),
-                                     tr("Force 69:40 (P+ Widescreen)"), tr("Custom"), tr("Custom (Stretch)")},
-                                    Config::GFX_ASPECT_RATIO);
-  m_custom_aspect_label = new QLabel(tr("Custom Aspect Ratio:"));
-  m_custom_aspect_label->setHidden(true);
-  constexpr int MAX_CUSTOM_ASPECT_RATIO_RESOLUTION = 10000;
-  m_custom_aspect_width = new ConfigInteger(1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION,
-                                            Config::GFX_CUSTOM_ASPECT_RATIO_WIDTH);
-  m_custom_aspect_width->setEnabled(false);
-  m_custom_aspect_width->setHidden(true);
-  m_custom_aspect_height = new ConfigInteger(1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION,
-                                             Config::GFX_CUSTOM_ASPECT_RATIO_HEIGHT);
-  m_custom_aspect_height->setEnabled(false);
-  m_custom_aspect_height->setHidden(true);
-  m_adapter_combo = new ToolTipComboBox;
-  m_enable_vsync = new ConfigBool(tr("V-Sync"), Config::GFX_VSYNC);
-  m_enable_fullscreen = new ConfigBool(tr("Start in Fullscreen"), Config::MAIN_FULLSCREEN);
-
-  m_video_box->setLayout(m_video_layout);
-
+  std::vector<std::pair<QString, QString>> options;
   for (auto& backend : VideoBackendBase::GetAvailableBackends())
   {
-    m_backend_combo->addItem(tr(backend->GetDisplayName().c_str()),
-                             QVariant(QString::fromStdString(backend->GetName())));
+    options.push_back(std::make_pair(tr(backend->GetDisplayName().c_str()),
+                                     QString::fromStdString(backend->GetName())));
   }
+  m_backend_combo = new ConfigStringChoice(options, Config::MAIN_GFX_BACKEND, m_game_layer);
+  m_previous_backend = m_backend_combo->currentIndex();
 
-  m_video_layout->addWidget(new QLabel(tr("Backend:")), 0, 0);
-  m_video_layout->addWidget(m_backend_combo, 0, 1, 1, -1);
+  m_aspect_combo = new ConfigChoice({tr("Auto"), tr("Force 16:9"), tr("Force 4:3"),
+                                    tr("Stretch to Window"), tr("Force 19:15 (P+)"),
+                                    tr("Force 69:40 (P+ Widescreen)"), tr("Custom"), tr("Custom (Stretch)")},
+                                    Config::GFX_ASPECT_RATIO, m_game_layer);
+  m_custom_aspect_label = new QLabel(tr("Custom Aspect Ratio:"));
+  constexpr int MAX_CUSTOM_ASPECT_RATIO_RESOLUTION = 10000;
+  m_custom_aspect_width = new ConfigInteger(1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION,
+                                            Config::GFX_CUSTOM_ASPECT_RATIO_WIDTH, m_game_layer);
+  m_custom_aspect_height = new ConfigInteger(1, MAX_CUSTOM_ASPECT_RATIO_RESOLUTION,
+                                             Config::GFX_CUSTOM_ASPECT_RATIO_HEIGHT, m_game_layer);
+  ToggleCustomAspectRatio(m_aspect_combo->currentIndex());
 
-  m_video_layout->addWidget(new QLabel(tr("Adapter:")), 1, 0);
-  m_video_layout->addWidget(m_adapter_combo, 1, 1, 1, -1);
+  m_adapter_combo = new ToolTipComboBox;
+  m_enable_vsync = new ConfigBool(tr("V-Sync"), Config::GFX_VSYNC, m_game_layer);
+  m_enable_fullscreen =
+      new ConfigBool(tr("Start in Fullscreen"), Config::MAIN_FULLSCREEN, m_game_layer);
 
-  m_video_layout->addWidget(new QLabel(tr("Aspect Ratio:")), 3, 0);
-  m_video_layout->addWidget(m_aspect_combo, 3, 1, 1, -1);
+  video_layout->addWidget(new QLabel(tr("Backend:")), 0, 0);
+  video_layout->addWidget(m_backend_combo, 0, 1, 1, -1);
 
-  m_video_layout->addWidget(m_custom_aspect_label, 4, 0);
-  m_video_layout->addWidget(m_custom_aspect_width, 4, 1);
-  m_video_layout->addWidget(m_custom_aspect_height, 4, 2);
+  video_layout->addWidget(new QLabel(tr("Adapter:")), 1, 0);
+  video_layout->addWidget(m_adapter_combo, 1, 1, 1, -1);
 
-  m_video_layout->addWidget(m_enable_vsync, 5, 0);
-  m_video_layout->addWidget(m_enable_fullscreen, 5, 1, 1, -1);
+  video_layout->addWidget(new QLabel(tr("Aspect Ratio:")), 2, 0);
+  video_layout->addWidget(m_aspect_combo, 2, 1, 1, -1);
+
+  video_layout->addWidget(m_custom_aspect_label, 3, 0);
+  video_layout->addWidget(m_custom_aspect_width, 3, 1);
+  video_layout->addWidget(m_custom_aspect_height, 3, 2);
+
+  auto* const basic_grid = new QGridLayout;
+  video_layout->addLayout(basic_grid, video_layout->rowCount(), 0, 1, -1);
+  basic_grid->addWidget(m_enable_vsync, 0, 0);
+  basic_grid->addWidget(m_enable_fullscreen, 0, 1);
+
+  auto* const precision_timing =
+      new ConfigBool(tr("Precision Frame Timing"), Config::MAIN_PRECISION_FRAME_TIMING);
+  precision_timing->SetDescription(
+      tr("Uses high resolution timers and \"busy waiting\" for improved frame pacing."
+         "<br><br>This will marginally increase power usage."
+         "<br><br><dolphin_emphasis>If unsure, leave this checked.</dolphin_emphasis>"));
+  basic_grid->addWidget(precision_timing, 1, 0);
 
   // Other
   auto* m_options_box = new QGroupBox(tr("Other"));
   auto* m_options_layout = new QGridLayout();
 
-  m_show_ping = new ConfigBool(tr("Show NetPlay Ping"), Config::GFX_SHOW_NETPLAY_PING);
-  m_autoadjust_window_size =
-      new ConfigBool(tr("Auto-Adjust Window Size"), Config::MAIN_RENDER_WINDOW_AUTOSIZE);
-  m_show_messages = new ConfigBool(tr("Show NetPlay Messages"), Config::GFX_SHOW_NETPLAY_MESSAGES);
-  m_render_main_window = new ConfigBool(tr("Render to Main Window"), Config::MAIN_RENDER_TO_MAIN);
+  m_show_ping =
+      new ConfigBool(tr("Show NetPlay Ping"), Config::GFX_SHOW_NETPLAY_PING, m_game_layer);
+  m_autoadjust_window_size = new ConfigBool(tr("Auto-Adjust Window Size"),
+                                            Config::MAIN_RENDER_WINDOW_AUTOSIZE, m_game_layer);
+  m_show_messages =
+      new ConfigBool(tr("Show NetPlay Messages"), Config::GFX_SHOW_NETPLAY_MESSAGES, m_game_layer);
+  m_render_main_window =
+      new ConfigBool(tr("Render to Main Window"), Config::MAIN_RENDER_TO_MAIN, m_game_layer);
 
   m_options_box->setLayout(m_options_layout);
 
@@ -129,13 +146,13 @@ void GeneralWidget::CreateWidgets()
   }};
   for (size_t i = 0; i < modes.size(); i++)
   {
-    m_shader_compilation_mode[i] =
-        new ConfigRadioInt(tr(modes[i]), Config::GFX_SHADER_COMPILATION_MODE, static_cast<int>(i));
+    m_shader_compilation_mode[i] = new ConfigRadioInt(
+        tr(modes[i]), Config::GFX_SHADER_COMPILATION_MODE, static_cast<int>(i), m_game_layer);
     shader_compilation_layout->addWidget(m_shader_compilation_mode[i], static_cast<int>(i / 2),
                                          static_cast<int>(i % 2));
   }
   m_wait_for_shaders = new ConfigBool(tr("Compile Shaders Before Starting"),
-                                      Config::GFX_WAIT_FOR_SHADERS_BEFORE_STARTING);
+                                      Config::GFX_WAIT_FOR_SHADERS_BEFORE_STARTING, m_game_layer);
   shader_compilation_layout->addWidget(m_wait_for_shaders);
   shader_compilation_box->setLayout(shader_compilation_layout);
 
@@ -150,46 +167,26 @@ void GeneralWidget::CreateWidgets()
 void GeneralWidget::ConnectWidgets()
 {
   // Video Backend
-  connect(m_backend_combo, &QComboBox::currentIndexChanged, this, &GeneralWidget::SaveSettings);
+  connect(m_backend_combo, &QComboBox::currentIndexChanged, this, &GeneralWidget::BackendWarning);
   connect(m_adapter_combo, &QComboBox::currentIndexChanged, this, [&](int index) {
-    g_Config.iAdapter = index;
     Config::SetBaseOrCurrent(Config::GFX_ADAPTER, index);
     emit BackendChanged(QString::fromStdString(Config::Get(Config::MAIN_GFX_BACKEND)));
   });
-  connect(m_aspect_combo, qOverload<int>(&QComboBox::currentIndexChanged), this, [&](int index) {
-    const bool is_custom_aspect_ratio = (index == static_cast<int>(AspectMode::Custom)) ||
-                                        (index == static_cast<int>(AspectMode::CustomStretch));
-    m_custom_aspect_width->setEnabled(is_custom_aspect_ratio);
-    m_custom_aspect_height->setEnabled(is_custom_aspect_ratio);
-    m_custom_aspect_label->setHidden(!is_custom_aspect_ratio);
-    m_custom_aspect_width->setHidden(!is_custom_aspect_ratio);
-    m_custom_aspect_height->setHidden(!is_custom_aspect_ratio);
-  });
+  connect(m_aspect_combo, &QComboBox::currentIndexChanged, this,
+          &GeneralWidget::ToggleCustomAspectRatio);
 }
 
-void GeneralWidget::LoadSettings()
+void GeneralWidget::ToggleCustomAspectRatio(int index)
 {
-  // Video Backend
-  m_backend_combo->setCurrentIndex(m_backend_combo->findData(
-      QVariant(QString::fromStdString(Config::Get(Config::MAIN_GFX_BACKEND)))));
-
-  const bool is_custom_aspect_ratio =
-      (Config::Get(Config::GFX_ASPECT_RATIO) == AspectMode::Custom) ||
-      (Config::Get(Config::GFX_ASPECT_RATIO) == AspectMode::CustomStretch);
-  m_custom_aspect_width->setEnabled(is_custom_aspect_ratio);
-  m_custom_aspect_height->setEnabled(is_custom_aspect_ratio);
+  const bool is_custom_aspect_ratio = (index == static_cast<int>(AspectMode::Custom)) ||
+                                      (index == static_cast<int>(AspectMode::CustomStretch));
   m_custom_aspect_label->setHidden(!is_custom_aspect_ratio);
   m_custom_aspect_width->setHidden(!is_custom_aspect_ratio);
   m_custom_aspect_height->setHidden(!is_custom_aspect_ratio);
 }
 
-void GeneralWidget::SaveSettings()
+void GeneralWidget::BackendWarning()
 {
-  // Video Backend
-  const auto current_backend = m_backend_combo->currentData().toString().toStdString();
-  if (Config::Get(Config::MAIN_GFX_BACKEND) == current_backend)
-    return;
-
   if (Config::GetActiveLayerForConfig(Config::MAIN_GFX_BACKEND) == Config::LayerType::Base)
   {
     auto warningMessage = VideoBackendBase::GetAvailableBackends()[m_backend_combo->currentIndex()]
@@ -206,15 +203,14 @@ void GeneralWidget::SaveSettings()
       SetQWidgetWindowDecorations(&confirm_sw);
       if (confirm_sw.exec() != QMessageBox::Yes)
       {
-        m_backend_combo->setCurrentIndex(m_backend_combo->findData(
-            QVariant(QString::fromStdString(Config::Get(Config::MAIN_GFX_BACKEND)))));
+        m_backend_combo->setCurrentIndex(m_previous_backend);
         return;
       }
     }
   }
 
-  Config::SetBaseOrCurrent(Config::MAIN_GFX_BACKEND, current_backend);
-  emit BackendChanged(QString::fromStdString(current_backend));
+  m_previous_backend = m_backend_combo->currentIndex();
+  emit BackendChanged(m_backend_combo->currentData().toString());
 }
 
 void GeneralWidget::OnEmulationStateChanged(bool running)
@@ -223,12 +219,18 @@ void GeneralWidget::OnEmulationStateChanged(bool running)
   m_render_main_window->setEnabled(!running);
   m_enable_fullscreen->setEnabled(!running);
 
-  const bool supports_adapters = !g_Config.backend_info.Adapters.empty();
+  const bool supports_adapters = !g_backend_info.Adapters.empty();
   m_adapter_combo->setEnabled(!running && supports_adapters);
 
   std::string current_backend = m_backend_combo->currentData().toString().toStdString();
   if (Config::Get(Config::MAIN_GFX_BACKEND) != current_backend)
+  {
+    {
+      const QSignalBlocker blocker(m_backend_combo);
+      m_backend_combo->Load();
+    }
     emit BackendChanged(QString::fromStdString(Config::Get(Config::MAIN_GFX_BACKEND)));
+  }
 }
 
 void GeneralWidget::AddDescriptions()
@@ -351,20 +353,21 @@ void GeneralWidget::AddDescriptions()
 
 void GeneralWidget::OnBackendChanged(const QString& backend_name)
 {
-  m_backend_combo->setCurrentIndex(m_backend_combo->findData(QVariant(backend_name)));
-
   const QSignalBlocker blocker(m_adapter_combo);
 
   m_adapter_combo->clear();
 
-  const auto& adapters = g_Config.backend_info.Adapters;
+  const auto& adapters = g_backend_info.Adapters;
 
   for (const auto& adapter : adapters)
     m_adapter_combo->addItem(QString::fromStdString(adapter));
 
   const bool supports_adapters = !adapters.empty();
 
-  m_adapter_combo->setCurrentIndex(g_Config.iAdapter);
+  const int adapter_index = Config::Get(Config::GFX_ADAPTER);
+  if (adapter_index < m_adapter_combo->count())
+    m_adapter_combo->setCurrentIndex(adapter_index);
+
   m_adapter_combo->setEnabled(supports_adapters &&
                               Core::IsUninitialized(Core::System::GetInstance()));
 

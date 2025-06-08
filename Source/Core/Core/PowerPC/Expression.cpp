@@ -136,15 +136,14 @@ static double CallstackFunc(expr_func* f, vec_expr_t* args, void* c)
   if (!std::isnan(num))
   {
     u32 address = static_cast<u32>(num);
-    return std::any_of(stack.begin(), stack.end(),
-                       [address](const auto& s) { return s.vAddress == address; });
+    return std::ranges::any_of(stack, [address](const auto& s) { return s.vAddress == address; });
   }
 
   const char* cstr = expr_get_str(&vec_nth(args, 0));
   if (cstr != nullptr)
   {
-    return std::any_of(stack.begin(), stack.end(),
-                       [cstr](const auto& s) { return s.Name.find(cstr) != std::string::npos; });
+    return std::ranges::any_of(
+        stack, [cstr](const auto& s) { return s.Name.find(cstr) != std::string::npos; });
   }
 
   return 0;
@@ -231,8 +230,7 @@ Expression::Expression(std::string_view text, ExprPointer ex, ExprVarListPointer
     : m_text(text), m_expr(std::move(ex)), m_vars(std::move(vars))
 {
   using LookupKV = std::pair<std::string_view, Expression::VarBinding>;
-  static constexpr auto sorted_lookup = []() consteval
-  {
+  static constexpr auto sorted_lookup = []() consteval {
     using enum Expression::VarBindingType;
     auto unsorted_lookup = std::to_array<LookupKV>({
         {"r0", {GPR, 0}},
@@ -386,8 +384,7 @@ Expression::Expression(std::string_view text, ExprPointer ex, ExprVarListPointer
     });
     std::ranges::sort(unsorted_lookup, {}, &LookupKV::first);
     return unsorted_lookup;
-  }
-  ();
+  }();
   static_assert(std::ranges::adjacent_find(sorted_lookup, {}, &LookupKV::first) ==
                     sorted_lookup.end(),
                 "Expression: Sorted lookup should not contain duplicate keys.");
