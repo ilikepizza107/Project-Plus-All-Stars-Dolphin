@@ -17,6 +17,7 @@
 
 #include "Common/Assert.h"
 #include "Common/CommonTypes.h"
+#include "Common/Contains.h"
 #include "Common/StringUtil.h"
 #include "Core/Host.h"
 #include "DiscIO/Enums.h"
@@ -38,17 +39,13 @@ static std::optional<DiscIO::Language> TryParseLanguage(const std::string& local
   // Special handling of Chinese due to its two writing systems
   if (split_locale[0] == "zh")
   {
-    const auto locale_contains = [&split_locale](std::string_view str) {
-      return std::find(split_locale.cbegin(), split_locale.cend(), str) != split_locale.cend();
-    };
-
-    if (locale_contains("Hans"))
+    if (Common::Contains(split_locale, "Hans"))
       return DiscIO::Language::SimplifiedChinese;
-    if (locale_contains("Hant"))
+    if (Common::Contains(split_locale, "Hant"))
       return DiscIO::Language::TraditionalChinese;
 
     // Mainland China and Singapore use simplified characters
-    if (locale_contains("CN") || locale_contains("SG"))
+    if (Common::Contains(split_locale, "CN") || Common::Contains(split_locale, "SG"))
       return DiscIO::Language::SimplifiedChinese;
     else
       return DiscIO::Language::TraditionalChinese;
@@ -79,11 +76,9 @@ static DiscIO::Language ComputeDefaultLanguage()
 
 static std::optional<std::string> TryParseCountryCode(const std::string& locale)
 {
-  const auto is_upper = [](char c) { return std::isupper(c, std::locale::classic()); };
-
   for (const std::string& part : SplitString(locale, '-'))
   {
-    if (part.size() == 2 && is_upper(part[0]) && is_upper(part[1]))
+    if (part.size() == 2 && Common::IsUpper(part[0]) && Common::IsUpper(part[1]))
       return part;
   }
 
@@ -95,13 +90,15 @@ static std::string ComputeDefaultCountryCode()
 #ifdef _WIN32
   // Windows codepath: Check the regional information.
   // More likely to match the user's physical location than locales are.
-  // TODO: Can we use GetUserDefaultGeoName? (It was added in a Windows 10 update)
-  GEOID geo = GetUserGeoID(GEOCLASS_NATION);
-  const int buffer_size = GetGeoInfoW(geo, GEO_ISO2, nullptr, 0, 0);
-  std::vector<wchar_t> buffer(buffer_size);
-  const int result = GetGeoInfoW(geo, GEO_ISO2, buffer.data(), buffer_size, 0);
-  if (result != 0)
-    return TStrToUTF8(buffer.data());
+  const int buffer_size = GetUserDefaultGeoName(nullptr, 0);
+  if (buffer_size == 3)
+  {
+    std::wstring buffer(buffer_size, L'\0');
+    const int result = GetUserDefaultGeoName(buffer.data(), buffer_size);
+    buffer.resize(2);
+    if (result > 0)
+      return WStringToUTF8(buffer);
+  }
 #endif
 
   // Generic codepath: Check the locales.

@@ -7,7 +7,7 @@ if(GIT_FOUND)
       OUTPUT_VARIABLE DOLPHIN_WC_REVISION
       OUTPUT_STRIP_TRAILING_WHITESPACE)
   # defines DOLPHIN_WC_DESCRIBE
-   execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} describe --always --long --dirty
+  execute_process(WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND ${GIT_EXECUTABLE} describe --always --long --dirty
       OUTPUT_VARIABLE DOLPHIN_WC_DESCRIBE
       OUTPUT_STRIP_TRAILING_WHITESPACE)
 
@@ -29,6 +29,8 @@ if(GIT_FOUND)
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_QUIET)
 endif()
+
+string(TIMESTAMP DOLPHIN_WC_BUILD_DATE "%Y-%m-%d" UTC)
 
 # version number
 set(DOLPHIN_VERSION_MAJOR "v3.1.2")
@@ -65,6 +67,9 @@ endfunction()
 configure_source_file("Source/Core/Common/scmrev.h")
 
 if(APPLE)
-  configure_source_file("Source/Core/DolphinQt/Info.plist")
-  configure_source_file("Source/Core/MacUpdater/Info.plist")
+  configure_source_file("Source/Core/VersionInfo.plist")
+endif()
+
+if(LINUX)
+  configure_source_file("Flatpak/org.DolphinEmu.dolphin-emu.metainfo.xml")
 endif()

@@ -3,6 +3,8 @@
 
 #include "Core/HW/WiimoteReal/IOLinux.h"
 
+#include <ranges>
+
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/hci.h>
 #include <bluetooth/hci_lib.h>
@@ -12,6 +14,7 @@
 
 #include "Common/CommonTypes.h"
 #include "Common/Logging/Log.h"
+#include "Core/Config/MainSettings.h"
 
 namespace WiimoteReal
 {
@@ -50,6 +53,8 @@ bool WiimoteScannerLinux::IsReady() const
 
 void WiimoteScannerLinux::FindWiimotes(std::vector<Wiimote*>& found_wiimotes, Wiimote*& found_board)
 {
+  WiimoteScannerLinux::AddAutoConnectAddresses(found_wiimotes);
+
   // supposedly 1.28 seconds
   int const wait_len = 1;
 
@@ -73,30 +78,29 @@ void WiimoteScannerLinux::FindWiimotes(std::vector<Wiimote*>& found_wiimotes, Wi
   DEBUG_LOG_FMT(WIIMOTE, "Found {} Bluetooth device(s).", found_devices);
 
   // Display discovered devices
-  for (int i = 0; i < found_devices; ++i)
+  for (auto& scan_info : scan_infos | std::ranges::views::take(found_devices))
   {
-    NOTICE_LOG_FMT(WIIMOTE, "found a device...");
-
     // BT names are a maximum of 248 bytes apparently
     char name[255] = {};
-    if (hci_read_remote_name(m_device_sock, &scan_infos[i].bdaddr, sizeof(name), name, 1000) < 0)
+    if (hci_read_remote_name(m_device_sock, &scan_info.bdaddr, sizeof(name), name, 1000) < 0)
     {
-      ERROR_LOG_FMT(WIIMOTE, "name request failed");
+      ERROR_LOG_FMT(WIIMOTE, "Bluetooth read remote name failed.");
       continue;
     }
 
-    NOTICE_LOG_FMT(WIIMOTE, "device name {}", name);
+    INFO_LOG_FMT(WIIMOTE, "Found bluetooth device with name: {}", name);
+
     if (!IsValidDeviceName(name))
       continue;
 
     char bdaddr_str[18] = {};
-    ba2str(&scan_infos[i].bdaddr, bdaddr_str);
+    ba2str(&scan_info.bdaddr, bdaddr_str);
 
     if (!IsNewWiimote(bdaddr_str))
       continue;
 
     // Found a new device
-    Wiimote* wm = new WiimoteLinux(scan_infos[i].bdaddr);
+    Wiimote* wm = new WiimoteLinux(scan_info.bdaddr);
     if (IsBalanceBoardName(name))
     {
       found_board = wm;
@@ -107,6 +111,27 @@ void WiimoteScannerLinux::FindWiimotes(std::vector<Wiimote*>& found_wiimotes, Wi
       found_wiimotes.push_back(wm);
       NOTICE_LOG_FMT(WIIMOTE, "Found Wiimote ({}).", bdaddr_str);
     }
+  }
+}
+
+void WiimoteScannerLinux::AddAutoConnectAddresses(std::vector<Wiimote*>& found_wiimotes)
+{
+  std::string entries = Config::Get(Config::MAIN_WIIMOTE_AUTO_CONNECT_ADDRESSES);
+  if (entries.empty())
+    return;
+  for (const auto& bt_address_str : SplitString(entries, ','))
+  {
+    bdaddr_t bt_addr;
+    if (str2ba(bt_address_str.c_str(), &bt_addr) < 0)
+    {
+      WARN_LOG_FMT(WIIMOTE, "Bad Known Bluetooth Address: {}", bt_address_str);
+      continue;
+    }
+    if (!IsNewWiimote(bt_address_str))
+      continue;
+    Wiimote* wm = new WiimoteLinux(bt_addr);
+    found_wiimotes.push_back(wm);
+    NOTICE_LOG_FMT(WIIMOTE, "Added Wiimote with fixed address ({}).", bt_address_str);
   }
 }
 

@@ -256,8 +256,8 @@ void JitArm64::Shutdown()
 void JitArm64::FallBackToInterpreter(UGeckoInstruction inst)
 {
   FlushCarry();
-  gpr.Flush(FlushMode::All, ARM64Reg::INVALID_REG);
-  fpr.Flush(FlushMode::All, ARM64Reg::INVALID_REG);
+  gpr.Flush(FlushMode::All, ARM64Reg::INVALID_REG, IgnoreDiscardedRegisters::Yes);
+  fpr.Flush(FlushMode::All, ARM64Reg::INVALID_REG, IgnoreDiscardedRegisters::Yes);
 
   if (js.op->canEndBlock)
   {
@@ -1208,7 +1208,7 @@ bool JitArm64::DoJit(u32 em_address, JitBlock* b, u32 nextPC)
         gpr.Lock(ARM64Reg::W30);
         BitSet32 regs_in_use = gpr.GetCallerSavedUsed();
         BitSet32 fprs_in_use = fpr.GetCallerSavedUsed();
-        regs_in_use[DecodeReg(ARM64Reg::W30)] = 0;
+        regs_in_use[DecodeReg(ARM64Reg::W30)] = false;
 
         ABI_PushRegisters(regs_in_use);
         m_float_emit.ABI_PushRegisters(fprs_in_use, ARM64Reg::X30);
