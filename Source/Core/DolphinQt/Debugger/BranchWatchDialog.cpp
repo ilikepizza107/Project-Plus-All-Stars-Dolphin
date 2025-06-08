@@ -80,19 +80,19 @@ public:
   [[noreturn]] void setSourceModel(QAbstractItemModel* source_model) override { Crash(); }
   bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
 
-  template <bool BranchWatchProxyModel::* member>
+  template <bool BranchWatchProxyModel::*member>
   void OnToggled(bool enabled)
   {
     this->*member = enabled;
     invalidateRowsFilter();
   }
-  template <QString BranchWatchProxyModel::* member>
+  template <QString BranchWatchProxyModel::*member>
   void OnSymbolTextChanged(const QString& text)
   {
     this->*member = text;
     invalidateRowsFilter();
   }
-  template <std::optional<u32> BranchWatchProxyModel::* member>
+  template <std::optional<u32> BranchWatchProxyModel::*member>
   void OnAddressTextChanged(const QString& text)
   {
     bool ok = false;
@@ -458,12 +458,8 @@ BranchWatchDialog::BranchWatchDialog(Core::System& system, Core::BranchWatch& br
   m_mnu_table_context_origin->addActions(
       {delete_action, m_act_insert_nop, m_act_copy_address, m_mnu_set_breakpoint->menuAction()});
 
-  m_mnu_table_context_destin = new QMenu(this);
-  m_mnu_table_context_destin->addActions(
-      {delete_action, m_act_insert_blr, m_act_copy_address, m_mnu_set_breakpoint->menuAction()});
-
-  m_mnu_table_context_symbol = new QMenu(this);
-  m_mnu_table_context_symbol->addActions(
+  m_mnu_table_context_destin_or_symbol = new QMenu(this);
+  m_mnu_table_context_destin_or_symbol->addActions(
       {delete_action, m_act_insert_blr, m_act_copy_address, m_mnu_set_breakpoint->menuAction()});
 
   m_mnu_table_context_other = new QMenu(this);
@@ -711,10 +707,8 @@ void BranchWatchDialog::OnTimeout() const
 
 void BranchWatchDialog::OnEmulationStateChanged(Core::State new_state) const
 {
-  const bool core_initialized = new_state != Core::State::Uninitialized;
-  RefreshVisibleContextMenuActions(core_initialized);
-  m_btn_was_overwritten->setEnabled(core_initialized);
-  m_btn_not_overwritten->setEnabled(core_initialized);
+  m_btn_was_overwritten->setEnabled(new_state != Core::State::Uninitialized);
+  m_btn_not_overwritten->setEnabled(new_state != Core::State::Uninitialized);
   if (TimerCondition(m_branch_watch, new_state))
     m_timer->start(BRANCH_WATCH_TOOL_TIMER_DELAY_MS);
   else if (m_timer->isActive())
@@ -1198,44 +1192,25 @@ QMenu* BranchWatchDialog::GetTableContextMenu(const QModelIndex& index) const
   switch (index.column())
   {
   case Column::Instruction:
-    RefreshContextMenuActions_Instruction(core_initialized);
-    return m_mnu_table_context_instruction;
+    return GetTableContextMenu_Instruction(core_initialized);
   case Column::Condition:
-    RefreshContextMenuActions_Condition(core_initialized);
-    return m_mnu_table_context_condition;
+    return GetTableContextMenu_Condition(core_initialized);
   case Column::Origin:
-    RefreshContextMenuActions_Origin(core_initialized);
-    return m_mnu_table_context_origin;
+    return GetTableContextMenu_Origin(core_initialized);
   case Column::Destination:
-    RefreshContextMenuActions_Destin(core_initialized);
-    return m_mnu_table_context_destin;
+    return GetTableContextMenu_Destin(core_initialized);
   case Column::RecentHits:
   case Column::TotalHits:
     return m_mnu_table_context_other;
   case Column::OriginSymbol:
   case Column::DestinSymbol:
-    RefreshContextMenuActions_Symbol(core_initialized);
-    return m_mnu_table_context_symbol;
+    return GetTableContextMenu_Symbol(core_initialized);
   }
   static_assert(Column::NumberOfColumns == 8);
   Common::Unreachable();
 }
 
-void BranchWatchDialog::RefreshVisibleContextMenuActions(bool core_initialized) const
-{
-  if (m_mnu_table_context_instruction->isVisible())
-    RefreshContextMenuActions_Instruction(core_initialized);
-  else if (m_mnu_table_context_condition->isVisible())
-    RefreshContextMenuActions_Condition(core_initialized);
-  else if (m_mnu_table_context_origin->isVisible())
-    RefreshContextMenuActions_Origin(core_initialized);
-  else if (m_mnu_table_context_destin->isVisible())
-    RefreshContextMenuActions_Destin(core_initialized);
-  else if (m_mnu_table_context_symbol->isVisible())
-    RefreshContextMenuActions_Symbol(core_initialized);
-}
-
-void BranchWatchDialog::RefreshContextMenuActions_Instruction(bool core_initialized) const
+QMenu* BranchWatchDialog::GetTableContextMenu_Instruction(bool core_initialized) const
 {
   const bool all_branches_conditional =  // Taking advantage of short-circuit evaluation here.
       core_initialized && std::ranges::all_of(m_index_list_temp, [this](const QModelIndex& index) {
@@ -1244,9 +1219,10 @@ void BranchWatchDialog::RefreshContextMenuActions_Instruction(bool core_initiali
       });
   m_act_invert_condition->setEnabled(all_branches_conditional);
   m_act_invert_decrement_check->setEnabled(all_branches_conditional);
+  return m_mnu_table_context_instruction;
 }
 
-void BranchWatchDialog::RefreshContextMenuActions_Condition(bool core_initialized) const
+QMenu* BranchWatchDialog::GetTableContextMenu_Condition(bool core_initialized) const
 {
   const bool all_branches_conditional =  // Taking advantage of short-circuit evaluation here.
       core_initialized && std::ranges::all_of(m_index_list_temp, [this](const QModelIndex& index) {
@@ -1254,17 +1230,19 @@ void BranchWatchDialog::RefreshContextMenuActions_Condition(bool core_initialize
             m_table_proxy->GetBranchWatchSelection(index).collection_ptr->first.original_inst);
       });
   m_act_make_unconditional->setEnabled(all_branches_conditional);
+  return m_mnu_table_context_condition;
 }
 
-void BranchWatchDialog::RefreshContextMenuActions_Origin(bool core_initialized) const
+QMenu* BranchWatchDialog::GetTableContextMenu_Origin(bool core_initialized) const
 {
   SetBreakpointMenuActionsIcons();
   m_act_insert_nop->setEnabled(core_initialized);
   m_act_copy_address->setEnabled(true);
   m_mnu_set_breakpoint->setEnabled(true);
+  return m_mnu_table_context_origin;
 }
 
-void BranchWatchDialog::RefreshContextMenuActions_Destin(bool core_initialized) const
+QMenu* BranchWatchDialog::GetTableContextMenu_Destin(bool core_initialized) const
 {
   SetBreakpointMenuActionsIcons();
   const bool all_branches_save_lr =  // Taking advantage of short-circuit evaluation here.
@@ -1274,9 +1252,10 @@ void BranchWatchDialog::RefreshContextMenuActions_Destin(bool core_initialized) 
   m_act_insert_blr->setEnabled(all_branches_save_lr);
   m_act_copy_address->setEnabled(true);
   m_mnu_set_breakpoint->setEnabled(true);
+  return m_mnu_table_context_destin_or_symbol;
 }
 
-void BranchWatchDialog::RefreshContextMenuActions_Symbol(bool core_initialized) const
+QMenu* BranchWatchDialog::GetTableContextMenu_Symbol(bool core_initialized) const
 {
   SetBreakpointMenuActionsIcons();
   const bool all_symbols_valid =
@@ -1286,4 +1265,5 @@ void BranchWatchDialog::RefreshContextMenuActions_Symbol(bool core_initialized) 
   m_act_insert_blr->setEnabled(core_initialized && all_symbols_valid);
   m_act_copy_address->setEnabled(all_symbols_valid);
   m_mnu_set_breakpoint->setEnabled(all_symbols_valid);
+  return m_mnu_table_context_destin_or_symbol;
 }

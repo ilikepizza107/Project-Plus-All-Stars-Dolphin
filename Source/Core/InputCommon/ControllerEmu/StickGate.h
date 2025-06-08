@@ -8,6 +8,7 @@
 
 #include "Common/Matrix.h"
 
+#include "InputCommon/ControlReference/ControlReference.h"
 #include "InputCommon/ControllerEmu/ControlGroup/ControlGroup.h"
 #include "InputCommon/ControllerEmu/Setting/NumericSetting.h"
 
@@ -116,8 +117,8 @@ protected:
   virtual Control* GetModifierInput() const;
 
 private:
-  void LoadConfig(Common::IniFile::Section*, const std::string& base_name) override;
-  void SaveConfig(Common::IniFile::Section*, const std::string& base_name) override;
+  void LoadConfig(Common::IniFile::Section*, const std::string&, const std::string&) override;
+  void SaveConfig(Common::IniFile::Section*, const std::string&, const std::string&) override;
 
   CalibrationData m_calibration;
   SettingValue<double> m_deadzone_setting;

@@ -12,12 +12,10 @@ enum class ShaderCompilationMode : int;
 enum class StereoMode : int;
 enum class StereoPerEyeResolution : int;
 enum class TextureFilteringMode : int;
-enum class AnisotropicFilteringMode : int;
 enum class OutputResamplingMode : int;
 enum class ColorCorrectionRegion : int;
 enum class TriState : int;
 enum class FrameDumpResolutionType : int;
-enum class VertexLoaderType : int;
 
 namespace Config
 {
@@ -48,7 +46,6 @@ extern const Info<bool> GFX_SHOW_VTIMES;
 extern const Info<bool> GFX_SHOW_GRAPHS;
 extern const Info<bool> GFX_SHOW_SPEED;
 extern const Info<bool> GFX_SHOW_SPEED_COLORS;
-extern const Info<bool> GFX_MOVABLE_PERFORMANCE_METRICS;
 extern const Info<int> GFX_PERF_SAMP_WINDOW;
 extern const Info<bool> GFX_SHOW_NETPLAY_PING;
 extern const Info<bool> GFX_SHOW_NETPLAY_MESSAGES;
@@ -65,7 +62,7 @@ extern const Info<bool> GFX_CACHE_HIRES_TEXTURES;
 extern const Info<bool> GFX_DUMP_EFB_TARGET;
 extern const Info<bool> GFX_DUMP_XFB_TARGET;
 extern const Info<bool> GFX_DUMP_FRAMES_AS_IMAGES;
-extern const Info<bool> GFX_USE_LOSSLESS;
+extern const Info<bool> GFX_USE_FFV1;
 extern const Info<std::string> GFX_DUMP_FORMAT;
 extern const Info<std::string> GFX_DUMP_CODEC;
 extern const Info<std::string> GFX_DUMP_PIXEL_FORMAT;
@@ -112,8 +109,7 @@ extern const Info<bool> GFX_MODS_ENABLE;
 // Graphics.Enhancements
 
 extern const Info<TextureFilteringMode> GFX_ENHANCE_FORCE_TEXTURE_FILTERING;
-// NOTE - this is x in (1 << x)
-extern const Info<AnisotropicFilteringMode> GFX_ENHANCE_MAX_ANISOTROPY;
+extern const Info<int> GFX_ENHANCE_MAX_ANISOTROPY;  // NOTE - this is x in (1 << x)
 extern const Info<OutputResamplingMode> GFX_ENHANCE_OUTPUT_RESAMPLING;
 extern const Info<std::string> GFX_ENHANCE_POST_SHADER;
 extern const Info<bool> GFX_ENHANCE_FORCE_TRUE_COLOR;
@@ -187,9 +183,5 @@ extern const Info<bool> GFX_PERF_QUERIES_ENABLE;
 // Android custom GPU drivers
 
 extern const Info<std::string> GFX_DRIVER_LIB_NAME;
-
-// Vertex loader
-
-extern const Info<VertexLoaderType> GFX_VERTEX_LOADER_TYPE;
 
 }  // namespace Config

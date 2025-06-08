@@ -4,7 +4,6 @@
 #pragma once
 
 #include <d3d12.h>
-
 #include "VideoBackends/D3D12/DescriptorAllocator.h"
 #include "VideoBackends/D3D12/DescriptorHeapManager.h"
 #include "VideoCommon/AbstractGfx.h"

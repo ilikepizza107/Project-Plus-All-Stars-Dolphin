@@ -3,14 +3,23 @@
 
 #pragma once
 
-#include <chrono>
+#include <string>
+#include <vector>
 
-class MappingWindow;
+#include "InputCommon/ControllerInterface/CoreDevice.h"
+#include "InputCommon/ControllerInterface/MappingCommon.h"
+
+class QString;
+class OutputReference;
+class QPushButton;
 
 namespace MappingCommon
 {
-// A slight delay improves behavior when "clicking" the detect button via key-press.
-static constexpr auto INPUT_DETECT_INITIAL_DELAY = std::chrono::milliseconds{100};
+QString DetectExpression(QPushButton* button, ciface::Core::DeviceContainer& device_container,
+                         const std::vector<std::string>& device_strings,
+                         const ciface::Core::DeviceQualifier& default_device,
+                         ciface::MappingCommon::Quote quote = ciface::MappingCommon::Quote::On);
 
-void CreateMappingProcessor(MappingWindow*);
+void TestOutput(QPushButton* button, OutputReference* reference);
+
 }  // namespace MappingCommon

@@ -137,40 +137,43 @@ void PostProcessingConfiguration::LoadOptions(const std::string& code)
 
   std::vector<GLSLStringOption> option_strings;
   GLSLStringOption* current_strings = nullptr;
-  std::string line_str;
-  while (std::getline(in, line_str))
+  while (!in.eof())
   {
-    std::string_view line = line_str;
+    std::string line_str;
+    if (std::getline(in, line_str))
+    {
+      std::string_view line = line_str;
 
 #ifndef _WIN32
-    // Check for CRLF eol and convert it to LF
-    if (!line.empty() && line.at(line.size() - 1) == '\r')
-      line.remove_suffix(1);
+      // Check for CRLF eol and convert it to LF
+      if (!line.empty() && line.at(line.size() - 1) == '\r')
+        line.remove_suffix(1);
 #endif
 
-    if (!line.empty())
-    {
-      if (line[0] == '[')
+      if (!line.empty())
       {
-        size_t endpos = line.find("]");
-
-        if (endpos != std::string::npos)
+        if (line[0] == '[')
         {
-          // New section!
-          std::string_view sub = line.substr(1, endpos - 1);
-          option_strings.push_back({std::string(sub)});
-          current_strings = &option_strings.back();
+          size_t endpos = line.find("]");
+
+          if (endpos != std::string::npos)
+          {
+            // New section!
+            std::string_view sub = line.substr(1, endpos - 1);
+            option_strings.push_back({std::string(sub)});
+            current_strings = &option_strings.back();
+          }
         }
-      }
-      else
-      {
-        if (current_strings)
+        else
         {
-          std::string key, value;
-          Common::IniFile::ParseLine(line, &key, &value);
+          if (current_strings)
+          {
+            std::string key, value;
+            Common::IniFile::ParseLine(line, &key, &value);
 
-          if (!(key.empty() && value.empty()))
-            current_strings->m_options.emplace_back(key, value);
+            if (!(key.empty() && value.empty()))
+              current_strings->m_options.emplace_back(key, value);
+          }
         }
       }
     }
@@ -685,7 +688,7 @@ std::string PostProcessing::GetHeader(bool user_post_process) const
   ss << "SAMPLER_BINDING(0) uniform sampler2DArray samp0;\n";
   ss << "SAMPLER_BINDING(1) uniform sampler2DArray samp1;\n";
 
-  if (g_backend_info.bSupportsGeometryShaders)
+  if (g_ActiveConfig.backend_info.bSupportsGeometryShaders)
   {
     ss << "VARYING_LOCATION(0) in VertexData {\n";
     ss << "  float3 v_tex0;\n";
@@ -770,7 +773,7 @@ std::string PostProcessing::GetFooter() const
 static std::string GetVertexShaderBody()
 {
   std::ostringstream ss;
-  if (g_backend_info.bSupportsGeometryShaders)
+  if (g_ActiveConfig.backend_info.bSupportsGeometryShaders)
   {
     ss << "VARYING_LOCATION(0) out VertexData {\n";
     ss << "  float3 v_tex0;\n";
@@ -789,12 +792,12 @@ static std::string GetVertexShaderBody()
   ss << "  v_tex0 = float3(src_rect.xy + (src_rect.zw * v_tex0.xy), float(src_layer));\n";
 
   // Vulkan Y needs to be inverted on every pass
-  if (g_backend_info.api_type == APIType::Vulkan)
+  if (g_ActiveConfig.backend_info.api_type == APIType::Vulkan)
   {
     ss << "  opos.y = -opos.y;\n";
   }
   // OpenGL Y needs to be inverted in all passes except the last one
-  else if (g_backend_info.api_type == APIType::OpenGL)
+  else if (g_ActiveConfig.backend_info.api_type == APIType::OpenGL)
   {
     ss << "  if (intermediary_buffer != 0)\n";
     ss << "    opos.y = -opos.y;\n";
@@ -887,7 +890,7 @@ void PostProcessing::FillUniformBuffer(const MathUtil::Rectangle<int>& src,
                                static_cast<float>(src.GetHeight()) * rcp_src_height};
   builtin_uniforms.src_layer = static_cast<s32>(src_layer);
   builtin_uniforms.time = static_cast<u32>(m_timer.ElapsedMs());
-  builtin_uniforms.graphics_api = static_cast<s32>(g_backend_info.api_type);
+  builtin_uniforms.graphics_api = static_cast<s32>(g_ActiveConfig.backend_info.api_type);
   builtin_uniforms.intermediary_buffer = static_cast<s32>(intermediary_buffer);
 
   builtin_uniforms.resampling_method = static_cast<s32>(g_ActiveConfig.output_resampling_mode);
@@ -1009,7 +1012,7 @@ static bool UseGeometryShaderForPostProcess(bool is_intermediary_buffer)
   switch (g_ActiveConfig.stereo_mode)
   {
   case StereoMode::QuadBuffer:
-    return !g_backend_info.bUsesExplictQuadBuffering;
+    return !g_ActiveConfig.backend_info.bUsesExplictQuadBuffering;
   case StereoMode::Anaglyph:
   case StereoMode::Passive:
     return is_intermediary_buffer;

@@ -369,8 +369,10 @@ RCForkGuard RegCache::Fork()
 
 void RegCache::Discard(BitSet32 pregs)
 {
-  ASSERT_MSG(DYNA_REC, std::ranges::none_of(m_xregs, &X64CachedReg::IsLocked),
-             "Someone forgot to unlock a X64 reg");
+  ASSERT_MSG(
+      DYNA_REC,
+      std::none_of(m_xregs.begin(), m_xregs.end(), [](const auto& x) { return x.IsLocked(); }),
+      "Someone forgot to unlock a X64 reg");
 
   for (preg_t i : pregs)
   {
@@ -389,10 +391,12 @@ void RegCache::Discard(BitSet32 pregs)
   }
 }
 
-void RegCache::Flush(BitSet32 pregs, IgnoreDiscardedRegisters ignore_discarded_registers)
+void RegCache::Flush(BitSet32 pregs)
 {
-  ASSERT_MSG(DYNA_REC, std::ranges::none_of(m_xregs, &X64CachedReg::IsLocked),
-             "Someone forgot to unlock a X64 reg");
+  ASSERT_MSG(
+      DYNA_REC,
+      std::none_of(m_xregs.begin(), m_xregs.end(), [](const auto& x) { return x.IsLocked(); }),
+      "Someone forgot to unlock a X64 reg");
 
   for (preg_t i : pregs)
   {
@@ -406,8 +410,7 @@ void RegCache::Flush(BitSet32 pregs, IgnoreDiscardedRegisters ignore_discarded_r
     case PPCCachedReg::LocationType::Default:
       break;
     case PPCCachedReg::LocationType::Discarded:
-      ASSERT_MSG(DYNA_REC, ignore_discarded_registers != IgnoreDiscardedRegisters::No,
-                 "Attempted to flush discarded PPC reg {}", i);
+      ASSERT_MSG(DYNA_REC, false, "Attempted to flush discarded PPC reg {}", i);
       break;
     case PPCCachedReg::LocationType::SpeculativeImmediate:
       // We can have a cached value without a host register through speculative constants.
@@ -455,8 +458,9 @@ void RegCache::Commit()
 
 bool RegCache::IsAllUnlocked() const
 {
-  return std::ranges::none_of(m_regs, &PPCCachedReg::IsLocked) &&
-         std::ranges::none_of(m_xregs, &X64CachedReg::IsLocked) && !IsAnyConstraintActive();
+  return std::none_of(m_regs.begin(), m_regs.end(), [](const auto& r) { return r.IsLocked(); }) &&
+         std::none_of(m_xregs.begin(), m_xregs.end(), [](const auto& x) { return x.IsLocked(); }) &&
+         !IsAnyConstraintActive();
 }
 
 void RegCache::PreloadRegisters(BitSet32 to_preload)
@@ -521,9 +525,10 @@ void RegCache::BindToRegister(preg_t i, bool doLoad, bool makeDirty)
     }
 
     ASSERT_MSG(DYNA_REC,
-               std::ranges::none_of(
-                   m_regs, [xr](const auto& l) { return l.has_value() && l->IsSimpleReg(xr); },
-                   &PPCCachedReg::Location),
+               std::none_of(m_regs.begin(), m_regs.end(),
+                            [xr](const auto& r) {
+                              return r.Location().has_value() && r.Location()->IsSimpleReg(xr);
+                            }),
                "Xreg {} already bound", Common::ToUnderlying(xr));
 
     m_regs[i].SetBoundTo(xr);
@@ -748,5 +753,6 @@ void RegCache::Realize(preg_t preg)
 
 bool RegCache::IsAnyConstraintActive() const
 {
-  return std::ranges::any_of(m_constraints, &RCConstraint::IsActive);
+  return std::any_of(m_constraints.begin(), m_constraints.end(),
+                     [](const auto& c) { return c.IsActive(); });
 }

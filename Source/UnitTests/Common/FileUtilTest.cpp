@@ -24,7 +24,7 @@ protected:
     }
   }
 
-  void SetUp() override
+  void SetUp()
   {
     if (m_parent_directory.empty())
     {

@@ -7,7 +7,6 @@
 #include "Common/CommonTypes.h"
 #include "Common/Config/Config.h"
 #include "Common/StringUtil.h"
-#include "Common/Unreachable.h"
 
 #include "Core/Config/SessionSettings.h"
 #include "Core/ConfigManager.h"
@@ -338,12 +337,8 @@ void JitArm64::ps_sel(UGeckoInstruction inst)
     const auto V0Q = fpr.GetScopedReg();
     const ARM64Reg V0 = reg_encoder(V0Q);
     m_float_emit.FCMGE(size, V0, VA);
-    if (d == b)
-      m_float_emit.BIT(VD, VC, V0);
-    else if (d == c)
-      m_float_emit.BIF(VD, VB, V0);
-    else
-      Common::Unreachable();
+    m_float_emit.BSL(V0, VC, VB);
+    m_float_emit.MOV(VD, V0);
   }
 
   ASSERT_MSG(DYNA_REC, singles == (fpr.IsSingle(a) && fpr.IsSingle(b) && fpr.IsSingle(c)),

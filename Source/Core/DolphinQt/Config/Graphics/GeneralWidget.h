@@ -11,8 +11,6 @@ class ConfigBool;
 class ConfigChoice;
 class ConfigInteger;
 class ConfigRadioInt;
-class ConfigStringChoice;
-class GameConfigWidget;
 class GraphicsWindow;
 class QCheckBox;
 class QComboBox;
@@ -21,26 +19,19 @@ class QRadioButton;
 class QGridLayout;
 class ToolTipComboBox;
 
-namespace Config
-{
-class Layer;
-}  // namespace Config
-
 class GeneralWidget final : public QWidget
 {
   Q_OBJECT
 public:
   explicit GeneralWidget(GraphicsWindow* parent);
-  GeneralWidget(GameConfigWidget* parent, Config::Layer* layer);
-
 signals:
   void BackendChanged(const QString& backend);
 
 private:
-  void BackendWarning();
+  void LoadSettings();
+  void SaveSettings();
 
   void CreateWidgets();
-  void ToggleCustomAspectRatio(int index);
   void ConnectWidgets();
   void AddDescriptions();
 
@@ -48,7 +39,8 @@ private:
   void OnEmulationStateChanged(bool running);
 
   // Video
-  ConfigStringChoice* m_backend_combo;
+  QGridLayout* m_video_layout;
+  ToolTipComboBox* m_backend_combo;
   ToolTipComboBox* m_adapter_combo;
   ConfigChoice* m_aspect_combo;
   QLabel* m_custom_aspect_label;
@@ -64,6 +56,4 @@ private:
   ConfigBool* m_render_main_window;
   std::array<ConfigRadioInt*, 4> m_shader_compilation_mode{};
   ConfigBool* m_wait_for_shaders;
-  int m_previous_backend = 0;
-  Config::Layer* m_game_layer = nullptr;
 };

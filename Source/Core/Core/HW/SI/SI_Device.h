@@ -106,13 +106,6 @@ enum SIDevices : int
   SIDEVICE_COUNT,
 };
 
-enum class DataResponse
-{
-  NoData,
-  Success,
-  ErrorNoResponse,
-};
-
 class ISIDevice
 {
 public:
@@ -126,7 +119,8 @@ public:
   virtual int RunBuffer(u8* buffer, int request_length);
   virtual int TransferInterval();
 
-  virtual DataResponse GetData(u32& hi, u32& low) = 0;
+  // Return true on new data
+  virtual bool GetData(u32& hi, u32& low) = 0;
 
   // Send a command directly (no detour per buffer)
   virtual void SendCommand(u32 command, u8 poll) = 0;

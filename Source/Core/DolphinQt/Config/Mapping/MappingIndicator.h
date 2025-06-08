@@ -45,23 +45,9 @@ public:
 
 protected:
   virtual void Draw() {}
-  virtual void Update(float elapsed_seconds) {}
 
 private:
   void paintEvent(QPaintEvent*) override;
-
-  Clock::time_point m_last_update = Clock::now();
-};
-
-class ButtonIndicator final : public MappingIndicator
-{
-public:
-  ButtonIndicator(ControlReference* control_ref);
-
-private:
-  ControlReference* const m_control_ref;
-  QSize sizeHint() const override;
-  void Draw() override;
 };
 
 class SquareIndicator : public MappingIndicator
@@ -112,7 +98,6 @@ public:
 
 private:
   void Draw() override;
-  void Update(float elapsed_seconds) override;
 
   ControllerEmu::Tilt& m_group;
   WiimoteEmu::MotionState m_motion_state{};
@@ -147,7 +132,6 @@ public:
 
 private:
   void Draw() override;
-  void Update(float elapsed_seconds) override;
 
   void DrawUnderGate(QPainter& p) override;
 
@@ -162,19 +146,11 @@ public:
 
 private:
   void Draw() override;
-  void Update(float elapsed_seconds) override;
 
   ControllerEmu::Shake& m_shake_group;
   WiimoteEmu::MotionState m_motion_state{};
-
-  struct ShakeSample
-  {
-    ControllerEmu::Shake::StateData state;
-    float age = 0.f;
-  };
-
-  std::deque<ShakeSample> m_position_samples;
-  float m_grid_line_position = 0;
+  std::deque<ControllerEmu::Shake::StateData> m_position_samples;
+  int m_grid_line_position = 0;
 };
 
 class AccelerometerMappingIndicator : public SquareIndicator
@@ -198,12 +174,11 @@ public:
 
 private:
   void Draw() override;
-  void Update(float elapsed_seconds) override;
 
   ControllerEmu::IMUGyroscope& m_gyro_group;
   Common::Quaternion m_state = Common::Quaternion::Identity();
   Common::Vec3 m_previous_velocity = {};
-  float m_stable_time = 0;
+  u32 m_stable_steps = 0;
 };
 
 class IRPassthroughMappingIndicator : public SquareIndicator

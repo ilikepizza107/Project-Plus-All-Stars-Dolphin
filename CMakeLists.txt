@@ -24,7 +24,7 @@ endif()
 
 # Minimum OS X version.
 # This is inserted into the Info.plist as well.
-set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0.0" CACHE STRING "")
+set(CMAKE_OSX_DEPLOYMENT_TARGET "10.15.0" CACHE STRING "")
 
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/FlagsOverride.cmake")
 
@@ -44,7 +44,7 @@ endif()
 
 set(COMPILER ${CMAKE_CXX_COMPILER_ID})
 if (COMPILER STREQUAL "GNU")
-  set(COMPILER "GCC") # prefer printing GCC instead of GNU
+  set(COMPILER "GCC") # perfer printing GCC instead of GNU
 endif()
 
 # Enforce minimum compiler versions that support the c++20 features we use
@@ -98,7 +98,6 @@ option(ENABLE_GENERIC "Enables generic build that should run on any little-endia
 option(ENABLE_HEADLESS "Enables running Dolphin as a headless variant" OFF)
 option(ENABLE_ALSA "Enables ALSA sound backend" ON)
 option(ENABLE_PULSEAUDIO "Enables PulseAudio sound backend" ON)
-option(ENABLE_CUBEB "Enables Cubeb sound backend" ON)
 option(ENABLE_LLVM "Enables LLVM support, for disassembly" ON)
 option(ENABLE_TESTS "Enables building the unit tests" ON)
 option(ENABLE_VULKAN "Enables vulkan video backend" ON)
@@ -124,11 +123,6 @@ option(OPROFILING "Enable profiling" OFF)
 # TODO: Add DSPSpy
 option(DSPTOOL "Build dsptool" OFF)
 
-# RetroAchievements developer tools require Windows hooks
-if(WIN32)
-  option(RC_CLIENT_SUPPORTS_RAINTEGRATION "Enables RetroAchievements developer tools" ON)
-endif()
-
 # Enable SDL by default on operating systems that aren't Android.
 if(NOT ANDROID)
   option(ENABLE_SDL "Enables SDL as a generic controller backend" ON)
@@ -149,7 +143,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   option(ENABLE_VTUNE "Enable Intel VTune integration for JIT code." OFF)
 
   if(NOT ANDROID)
-    option(ENABLE_HWDB "Enables the udev hardware database" ON)
     option(ENABLE_EVDEV "Enables the evdev controller backend" ON)
   endif()
 endif()
@@ -413,7 +406,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "FreeBSD")
   set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/usr/local/lib")
 
   if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14.0)
-    # Workaround: the llvm libc++ and versions of clang earlier than 14 have a bug with consteval
+    # Workaround: the llvm libc++ and versions of clang eariler than 14 have a bug with consteval
     # so we define FMT_CONSTEVAL to blank to just disable consteval in fmt
     add_definitions(-DFMT_CONSTEVAL=)
   endif()
@@ -572,16 +565,6 @@ if(OPROFILING)
   endif()
 endif()
 
-if(ENABLE_HWDB)
-  find_package(LIBUDEV REQUIRED)
-  if(LIBUDEV_FOUND)
-    message(STATUS "libudev found, enabling hardware database")
-    add_definitions(-DHAVE_LIBUDEV=1)
-  else()
-    message(FATAL_ERROR "Couldn't find libudev. Can't build hardware database.\nDisable ENABLE_HWDB if you wish to build without hardware database support")
-  endif()
-endif()
-
 if(ENABLE_EVDEV)
   find_package(LIBUDEV REQUIRED)
   find_package(LIBEVDEV REQUIRED)
@@ -689,7 +672,7 @@ dolphin_make_imported_target_if_missing(LibLZMA::LibLZMA LIBLZMA)
 
 dolphin_find_optional_system_library_pkgconfig(ZSTD libzstd>=1.4.0 zstd::zstd Externals/zstd)
 
-dolphin_find_optional_system_library_pkgconfig(ZLIB zlib>=1.3.1 ZLIB::ZLIB Externals/zlib-ng)
+add_subdirectory(Externals/zlib-ng)
 
 dolphin_find_optional_system_library_pkgconfig(MINIZIP
   "minizip>=4.0.4" minizip::minizip Externals/minizip-ng
@@ -712,10 +695,12 @@ if (APPLE OR WIN32)
   include_directories(Externals/ed25519)
 endif()
 
-if(ENABLE_CUBEB)
-  dolphin_find_optional_system_library(CUBEB Externals/cubeb)
-  add_definitions(-DHAVE_CUBEB)
-endif()
+# Using static soundtouch from Externals
+# Unable to use system soundtouch library: We require shorts, not floats.
+add_subdirectory(Externals/soundtouch)
+include_directories(Externals/soundtouch)
+
+dolphin_find_optional_system_library(CUBEB Externals/cubeb)
 
 if(NOT ANDROID)
   dolphin_find_optional_system_library_pkgconfig(
@@ -724,7 +709,7 @@ if(NOT ANDROID)
   add_definitions(-D__LIBUSB__)
 endif()
 
-dolphin_find_optional_system_library(SFML Externals/SFML 3.0 COMPONENTS Network System)
+dolphin_find_optional_system_library(SFML Externals/SFML 2.1 COMPONENTS network system)
 
 if(USE_UPNP)
   dolphin_find_optional_system_library(MINIUPNPC Externals/miniupnpc 1.6)
@@ -798,16 +783,14 @@ if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/Common/scmrev.h)
 endif()
 
 if(APPLE)
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Source/Core)
-  if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/VersionInfo.plist)
-    file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/VersionInfo.plist)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/DolphinQt)
+  if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/DolphinQt/Info.plist)
+    file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/DolphinQt/Info.plist)
   endif()
-endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Flatpak)
-  if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Flatpak/org.DolphinEmu.dolphin-emu.metainfo.xml)
-    file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/Flatpak/org.DolphinEmu.dolphin-emu.metainfo.xml)
+  file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/MacUpdater)
+  if (NOT EXISTS ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/MacUpdater/Info.plist)
+    file(TOUCH ${CMAKE_CURRENT_BINARY_DIR}/Source/Core/MacUpdater/Info.plist)
   endif()
 endif()
 
@@ -818,7 +801,7 @@ endif()
 add_custom_target(
 	dolphin_scmrev
 	${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DPROJECT_BINARY_DIR=${PROJECT_BINARY_DIR} -DDISTRIBUTOR=${DISTRIBUTOR} -DDOLPHIN_DEFAULT_UPDATE_TRACK=${DOLPHIN_DEFAULT_UPDATE_TRACK} -DGIT_FOUND=${GIT_FOUND} -DGIT_EXECUTABLE=${GIT_EXECUTABLE} -DDOLPHIN_WC_REVISION=${DOLPHIN_WC_REVISION} -DDOLPHIN_WC_DESCRIBE=${DOLPHIN_WC_DESCRIBE} -DDOLPHIN_WC_BRANCH=${DOLPHIN_WC_BRANCH} -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ScmRevGen.cmake
-	BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/Common/scmrev.h" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/DolphinQt/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/MacUpdater/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Flatpak/org.DolphinEmu.dolphin-emu.metainfo.xml"
+	BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/Common/scmrev.h" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/DolphinQt/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/MacUpdater/Info.plist"
 	VERBATIM
 )
 

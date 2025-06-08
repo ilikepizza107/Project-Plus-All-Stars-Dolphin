@@ -52,7 +52,6 @@ add_executable(dolphin-emu
   Config/ConfigControls/ConfigBool.h
   Config/ConfigControls/ConfigChoice.cpp
   Config/ConfigControls/ConfigChoice.h
-  Config/ConfigControls/ConfigControl.h
   Config/ConfigControls/ConfigInteger.cpp
   Config/ConfigControls/ConfigInteger.h
   Config/ConfigControls/ConfigRadio.cpp
@@ -247,8 +246,6 @@ add_executable(dolphin-emu
   DiscordHandler.h
   DiscordJoinRequestDialog.cpp
   DiscordJoinRequestDialog.h
-  EmulatedUSB/WiiSpeakWindow.cpp
-  EmulatedUSB/WiiSpeakWindow.h
   FIFO/FIFOAnalyzer.cpp
   FIFO/FIFOAnalyzer.h
   FIFO/FIFOPlayerWindow.cpp
@@ -316,8 +313,6 @@ add_executable(dolphin-emu
   QtUtils/ImageConverter.h
   QtUtils/ModalMessageBox.cpp
   QtUtils/ModalMessageBox.h
-  QtUtils/NonAutodismissibleMenu.cpp
-  QtUtils/NonAutodismissibleMenu.h
   QtUtils/NonDefaultQPushButton.cpp
   QtUtils/NonDefaultQPushButton.h
   QtUtils/ParallelProgressDialog.h
@@ -416,9 +411,6 @@ PRIVATE
   -DQT_USE_QSTRINGBUILDER
   -DQT_NO_CAST_FROM_ASCII
   -DQT_NO_CAST_TO_ASCII
-  # This Qt version should match Externals/Qt.
-  # It disables deprecation warnings we can't fix yet.
-  -DQT_WARN_DEPRECATED_UP_TO=0x060501
 )
 
 target_include_directories(dolphin-emu
@@ -580,11 +572,12 @@ endif()
 
 if(APPLE)
   include(BundleUtilities)
+  set(BUNDLE_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/DolphinQt.app)
 
   # Ask for an application bundle.
   set_target_properties(dolphin-emu PROPERTIES
     MACOSX_BUNDLE true
-    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in"
+    MACOSX_BUNDLE_INFO_PLIST "${CMAKE_CURRENT_BINARY_DIR}/Info.plist"
     XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY ""
     OUTPUT_NAME DolphinQt
     )
@@ -621,9 +614,6 @@ if(APPLE)
     source_group("Resources" FILES "${CMAKE_SOURCE_DIR}/Data/${res}")
   endforeach()
 
-  include(DolphinInjectVersionInfo)
-  dolphin_inject_version_info(dolphin-emu)
-
   # Copy MoltenVK into the bundle
   if(ENABLE_VULKAN)
     if(USE_BUNDLED_MOLTENVK)
@@ -658,7 +648,7 @@ if(APPLE)
       COMMAND "${CMAKE_SOURCE_DIR}/Tools/mac-codesign.sh"
       "-e" "${CMAKE_CURRENT_SOURCE_DIR}/DolphinEmu$<$<CONFIG:Debug>:Debug>.entitlements"
       "${MACOS_CODE_SIGNING_IDENTITY}"
-      "$<TARGET_BUNDLE_DIR:dolphin-emu>"
+      "${BUNDLE_PATH}"
     )
   endif()
 else()
@@ -681,7 +671,4 @@ endif()
 if(USE_RETRO_ACHIEVEMENTS)
   target_link_libraries(dolphin-emu PRIVATE rcheevos)
   target_compile_definitions(dolphin-emu PRIVATE -DUSE_RETRO_ACHIEVEMENTS)
-  if(RC_CLIENT_SUPPORTS_RAINTEGRATION)
-    target_compile_definitions(dolphin-emu PRIVATE -DRC_CLIENT_SUPPORTS_RAINTEGRATION)
-  endif()
 endif()

@@ -3,9 +3,8 @@
 
 #pragma once
 
-#include <d3d11_4.h>
+#include <d3d11.h>
 #include <string_view>
-
 #include "VideoBackends/D3D/D3DState.h"
 #include "VideoCommon/AbstractGfx.h"
 

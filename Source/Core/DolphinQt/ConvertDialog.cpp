@@ -52,8 +52,8 @@ ConvertDialog::ConvertDialog(QList<std::shared_ptr<const UICommon::GameFile>> fi
   m_format->addItem(QStringLiteral("GCZ"), static_cast<int>(DiscIO::BlobType::GCZ));
   m_format->addItem(QStringLiteral("WIA"), static_cast<int>(DiscIO::BlobType::WIA));
   m_format->addItem(QStringLiteral("RVZ"), static_cast<int>(DiscIO::BlobType::RVZ));
-  if (std::ranges::all_of(
-          m_files, [](const auto& file) { return file->GetBlobType() == DiscIO::BlobType::PLAIN; }))
+  if (std::all_of(m_files.begin(), m_files.end(),
+                  [](const auto& file) { return file->GetBlobType() == DiscIO::BlobType::PLAIN; }))
   {
     m_format->setCurrentIndex(m_format->count() - 1);
   }
@@ -153,7 +153,7 @@ void ConvertDialog::OnFormatChanged()
     // To support legacy versions of dolphin, we have to check the GCZ block size
     // See DiscIO::IsGCZBlockSizeLegacyCompatible() for details
     const auto block_size_ok = [this](int block_size) {
-      return std::ranges::all_of(m_files, [block_size](const auto& file) {
+      return std::all_of(m_files.begin(), m_files.end(), [block_size](const auto& file) {
         return DiscIO::IsGCZBlockSizeLegacyCompatible(block_size, file->GetVolumeSize());
       });
     };
@@ -248,8 +248,9 @@ void ConvertDialog::OnFormatChanged()
   m_compression->setEnabled(m_compression->count() > 1);
 
   // Block scrubbing of RVZ containers and Datel discs
-  const bool scrubbing_allowed = format != DiscIO::BlobType::RVZ &&
-                                 std::ranges::none_of(m_files, &UICommon::GameFile::IsDatelDisc);
+  const bool scrubbing_allowed =
+      format != DiscIO::BlobType::RVZ &&
+      std::none_of(m_files.begin(), m_files.end(), std::mem_fn(&UICommon::GameFile::IsDatelDisc));
 
   m_scrub->setEnabled(scrubbing_allowed);
   if (!scrubbing_allowed)
@@ -308,7 +309,7 @@ void ConvertDialog::Convert()
   }
 
   if (!scrub && format == DiscIO::BlobType::GCZ &&
-      std::ranges::any_of(m_files, [](const auto& file) {
+      std::any_of(m_files.begin(), m_files.end(), [](const auto& file) {
         return file->GetPlatform() == DiscIO::Platform::WiiDisc && !file->IsDatelDisc();
       }))
   {
@@ -320,7 +321,7 @@ void ConvertDialog::Convert()
     }
   }
 
-  if (std::ranges::any_of(m_files, &UICommon::GameFile::IsNKit))
+  if (std::any_of(m_files.begin(), m_files.end(), std::mem_fn(&UICommon::GameFile::IsNKit)))
   {
     if (!ShowAreYouSureDialog(
             tr("Dolphin can't convert NKit files to non-NKit files. Converting an NKit file in "

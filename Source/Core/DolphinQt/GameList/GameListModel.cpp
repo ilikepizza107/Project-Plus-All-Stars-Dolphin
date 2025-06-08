@@ -9,8 +9,6 @@
 #include <QRegularExpression>
 
 #include "Core/Config/MainSettings.h"
-#include "Core/Core.h"
-#include "Core/TimePlayed.h"
 
 #include "DiscIO/Enums.h"
 
@@ -34,8 +32,6 @@ GameListModel::GameListModel(QObject* parent) : QAbstractTableModel(parent)
           &GameTracker::RefreshAll);
   connect(&Settings::Instance(), &Settings::TitleDBReloadRequested,
           [this] { m_title_database = Core::TitleDatabase(); });
-  connect(&Settings::Instance(), &Settings::EmulationStateChanged, this,
-          &GameListModel::OnEmulationStateChanged);
 
   for (const QString& dir : Settings::Instance().GetPaths())
     m_tracker.AddDirectory(dir);
@@ -191,25 +187,6 @@ QVariant GameListModel::data(const QModelIndex& index, int role) const
       return compression.isEmpty() ? tr("No Compression") : compression;
     }
     break;
-  case Column::TimePlayed:
-    if (role == Qt::DisplayRole)
-    {
-      const std::string game_id = game.GetGameID();
-      const std::chrono::milliseconds total_time = m_timer.GetTimePlayed(game_id);
-      const auto total_minutes = std::chrono::duration_cast<std::chrono::minutes>(total_time);
-      const auto total_hours = std::chrono::duration_cast<std::chrono::hours>(total_time);
-
-      // i18n: A time displayed as hours and minutes
-      QString formatted_time =
-          tr("%1h %2m").arg(total_hours.count()).arg(total_minutes.count() % 60);
-      return formatted_time;
-    }
-    if (role == SORT_ROLE)
-    {
-      const std::string game_id = game.GetGameID();
-      return static_cast<qlonglong>(m_timer.GetTimePlayed(game_id).count());
-    }
-    break;
   case Column::Tags:
     if (role == Qt::DisplayRole || role == SORT_ROLE)
     {
@@ -255,8 +232,6 @@ QVariant GameListModel::headerData(int section, Qt::Orientation orientation, int
     return tr("Block Size");
   case Column::Compression:
     return tr("Compression");
-  case Column::TimePlayed:
-    return tr("Time Played");
   case Column::Tags:
     return tr("Tags");
   default:
@@ -303,8 +278,6 @@ bool GameListModel::ShouldDisplayGameListItem(int index) const
     {
     case DiscIO::Platform::GameCubeDisc:
       return Config::Get(Config::MAIN_GAMELIST_LIST_GC);
-    case DiscIO::Platform::Triforce:
-      return Config::Get(Config::MAIN_GAMELIST_LIST_TRI);
     case DiscIO::Platform::WiiDisc:
       return Config::Get(Config::MAIN_GAMELIST_LIST_WII);
     case DiscIO::Platform::WiiWAD:
@@ -506,12 +479,4 @@ void GameListModel::DeleteTag(const QString& name)
 void GameListModel::PurgeCache()
 {
   m_tracker.PurgeCache();
-}
-
-void GameListModel::OnEmulationStateChanged(Core::State state)
-{
-  if (state == Core::State::Uninitialized)
-  {
-    m_timer.Reload();
-  }
 }

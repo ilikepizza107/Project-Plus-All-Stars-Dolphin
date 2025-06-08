@@ -6,7 +6,6 @@
 #include <memory>
 #include <string>
 #include <string_view>
-
 #include "Common/CommonTypes.h"
 #include "VideoBackends/D3D12/Common.h"
 #include "VideoBackends/D3D12/DescriptorHeapManager.h"
@@ -14,6 +13,7 @@
 #include "VideoCommon/AbstractGfx.h"
 #include "VideoCommon/AbstractStagingTexture.h"
 #include "VideoCommon/AbstractTexture.h"
+#include "VideoCommon/RenderBase.h"
 
 namespace DX12
 {

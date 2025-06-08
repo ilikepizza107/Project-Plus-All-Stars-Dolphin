@@ -24,7 +24,7 @@ bool IsTAPDevice(const TCHAR* guid)
   if (status != ERROR_SUCCESS)
     return false;
 
-  while (true)
+  for (;;)
   {
     TCHAR enum_name[256];
     TCHAR unit_string[256];

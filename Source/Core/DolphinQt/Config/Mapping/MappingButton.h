@@ -3,11 +3,11 @@
 
 #pragma once
 
+#include "Common/Flag.h"
 #include "DolphinQt/QtUtils/ElidedButton.h"
 
 class ControlReference;
 class MappingWidget;
-class MappingWindow;
 class QEvent;
 class QMouseEvent;
 
@@ -15,30 +15,19 @@ class MappingButton : public ElidedButton
 {
   Q_OBJECT
 public:
-  enum class ControlType
-  {
-    NormalInput,
-    ModifierInput,
-    Output,
-  };
+  MappingButton(MappingWidget* widget, ControlReference* ref, bool indicator);
 
-  MappingButton(MappingWidget* widget, ControlReference* ref, ControlType type);
-
-  ControlReference* GetControlReference();
-  ControlType GetControlType() const;
-
-signals:
-  void ConfigChanged();
-  void QueueNextButtonMapping();
+  bool IsInput() const;
 
 private:
   void Clear();
+  void UpdateIndicator();
+  void ConfigChanged();
   void AdvancedPressed();
 
   void Clicked();
   void mouseReleaseEvent(QMouseEvent* event) override;
 
-  MappingWindow* const m_mapping_window;
-  ControlReference* const m_reference;
-  const ControlType m_control_type;
+  MappingWidget* m_parent;
+  ControlReference* m_reference;
 };

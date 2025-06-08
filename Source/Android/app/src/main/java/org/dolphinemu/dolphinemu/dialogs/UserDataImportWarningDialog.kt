@@ -12,6 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.dolphinemu.dolphinemu.R
 import org.dolphinemu.dolphinemu.activities.UserDataActivity
 import org.dolphinemu.dolphinemu.model.TaskViewModel
+import kotlin.system.exitProcess
 
 class UserDataImportWarningDialog : DialogFragment() {
     private lateinit var taskViewModel: TaskViewModel
@@ -34,6 +35,12 @@ class UserDataImportWarningDialog : DialogFragment() {
                     (requireActivity() as UserDataActivity).importUserData(
                         requireArguments().getString(KEY_URI_RESULT)!!.toUri()
                     )
+                }
+
+                taskViewModel.onResultDismiss = {
+                    if (taskViewModel.mustRestartApp) {
+                        exitProcess(0)
+                    }
                 }
 
                 val taskDialog = TaskDialog()

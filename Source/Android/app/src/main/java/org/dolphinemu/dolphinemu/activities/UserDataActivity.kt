@@ -31,7 +31,6 @@ import java.io.IOException
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-import kotlin.system.exitProcess
 
 class UserDataActivity : AppCompatActivity() {
     private lateinit var taskViewModel: TaskViewModel
@@ -181,10 +180,7 @@ class UserDataActivity : AppCompatActivity() {
             if (!isDolphinUserDataBackup(source))
                 return R.string.user_data_import_invalid_file
 
-            taskViewModel.onResultDismiss = {
-                // Restart the app to apply the imported user data.
-                exitProcess(0)
-            }
+            taskViewModel.mustRestartApp = true
 
             contentResolver.openInputStream(source).use { `is` ->
                 ZipInputStream(`is`).use { zis ->

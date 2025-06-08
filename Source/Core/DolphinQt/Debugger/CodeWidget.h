@@ -50,7 +50,6 @@ public:
 
   void Update();
   void UpdateSymbols();
-  void ActivateSearchAddress();
 signals:
   void RequestPPCComparison(u32 address, bool translate_address);
   void ShowMemory(u32 address);

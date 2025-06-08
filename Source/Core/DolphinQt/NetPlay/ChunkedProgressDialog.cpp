@@ -16,7 +16,6 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-#include "Common/Contains.h"
 #include "Core/NetPlayClient.h"
 #include "Core/NetPlayServer.h"
 
@@ -25,7 +24,7 @@
 static QString GetPlayerNameFromPID(int pid)
 {
   QString player_name = QObject::tr("Invalid Player ID");
-  const auto client = Settings::Instance().GetNetPlayClient();
+  auto client = Settings::Instance().GetNetPlayClient();
   if (!client)
     return player_name;
 
@@ -73,13 +72,13 @@ void ChunkedProgressDialog::show(const QString& title, const u64 data_size,
   m_progress_box->setTitle(title);
   m_data_size = data_size;
 
-  for (const auto& pair : m_progress_bars)
+  for (auto& pair : m_progress_bars)
   {
     m_progress_layout->removeWidget(pair.second);
     pair.second->deleteLater();
   }
 
-  for (const auto& pair : m_status_labels)
+  for (auto& pair : m_status_labels)
   {
     m_progress_layout->removeWidget(pair.second);
     pair.second->deleteLater();
@@ -88,7 +87,7 @@ void ChunkedProgressDialog::show(const QString& title, const u64 data_size,
   m_progress_bars.clear();
   m_status_labels.clear();
 
-  const auto client = Settings::Instance().GetNetPlayClient();
+  auto client = Settings::Instance().GetNetPlayClient();
   if (!client)
     return;
 
@@ -109,7 +108,7 @@ void ChunkedProgressDialog::show(const QString& title, const u64 data_size,
 
   for (const auto* player : client->GetPlayers())
   {
-    if (!Common::Contains(players, player->pid))
+    if (std::find(players.begin(), players.end(), player->pid) == players.end())
       continue;
 
     m_progress_bars[player->pid] = new QProgressBar;
@@ -142,7 +141,7 @@ void ChunkedProgressDialog::SetProgress(const int pid, const u64 progress)
 
 void ChunkedProgressDialog::reject()
 {
-  const auto server = Settings::Instance().GetNetPlayServer();
+  auto server = Settings::Instance().GetNetPlayServer();
 
   if (server)
     server->AbortGameStart();

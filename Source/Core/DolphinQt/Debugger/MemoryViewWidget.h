@@ -2,9 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #pragma once
-#include <mutex>
 
-#include <QStyledItemDelegate>
 #include <QWidget>
 
 #include "Common/CommonTypes.h"
@@ -23,21 +21,6 @@ namespace Core
 class CPUThreadGuard;
 class System;
 }  // namespace Core
-
-// Captures direct editing of the table.
-class TableEditDelegate : public QStyledItemDelegate
-{
-  Q_OBJECT
-
-public:
-  explicit TableEditDelegate(QObject* parent) : QStyledItemDelegate(parent) {}
-
-  void setModelData(QWidget* editor, QAbstractItemModel* model,
-                    const QModelIndex& index) const override;
-
-signals:
-  void editFinished(const int row, const int column, const QString& text) const;
-};
 
 class MemoryViewTable;
 
@@ -71,21 +54,10 @@ public:
     WriteOnly
   };
 
-  enum class UpdateType
-  {
-    Full,
-    Addresses,
-    Values,
-    Auto,
-  };
-
   explicit MemoryViewWidget(Core::System& system, QWidget* parent = nullptr);
 
   void CreateTable();
-  void UpdateDispatcher(UpdateType type = UpdateType::Addresses);
   void Update();
-  void UpdateOnFrameEnd();
-  void GetValues();
   void UpdateFont(const QFont& font);
   void ToggleBreakpoint(u32 addr, bool row);
 
@@ -93,8 +65,6 @@ public:
   void SetAddressSpace(AddressSpace::Type address_space);
   AddressSpace::Type GetAddressSpace() const;
   void SetDisplay(Type type, int bytes_per_row, int alignment, bool dual_view);
-  void ToggleHighlights(bool enabled);
-  void SetHighlightColor();
   void SetBPType(BPType type);
   void SetAddress(u32 address);
   void SetFocus() const;
@@ -102,21 +72,19 @@ public:
   void SetBPLoggingEnabled(bool enabled);
 
 signals:
-  void AutoUpdate();
   void ShowCode(u32 address);
   void RequestWatch(QString name, u32 address);
-  void ActivateSearch();
 
 private:
   void OnContextMenu(const QPoint& pos);
   void OnCopyAddress(u32 addr);
   void OnCopyHex(u32 addr);
   void UpdateBreakpointTags();
-  void TriggerActivateSearch();
   void UpdateColumns();
+  void UpdateColumns(const Core::CPUThreadGuard* guard);
   void ScrollbarActionTriggered(int action);
   void ScrollbarSliderReleased();
-  std::optional<QString> ValueToString(const Core::CPUThreadGuard& guard, u32 address, Type type);
+  QString ValueToString(const Core::CPUThreadGuard& guard, u32 address, Type type);
 
   Core::System& m_system;
 
@@ -127,9 +95,6 @@ private:
   BPType m_bp_type = BPType::ReadWrite;
   bool m_do_log = true;
   u32 m_address = 0x80000000;
-  std::pair<u32, u32> m_address_range;
-  std::map<u32, std::optional<QString>> m_values;
-  std::map<u32, std::optional<QString>> m_values_dual_view;
   u32 m_address_highlight = 0;
   int m_font_width = 0;
   int m_font_vspace = 0;
@@ -137,8 +102,6 @@ private:
   int m_alignment = 16;
   int m_data_columns;
   bool m_dual_view = false;
-  std::mutex m_updating;
-  QColor m_highlight_color = QColor(120, 255, 255, 100);
 
   friend class MemoryViewTable;
 };

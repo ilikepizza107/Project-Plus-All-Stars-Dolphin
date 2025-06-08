@@ -115,20 +115,19 @@ public:
   TMemChecksStr GetStrings() const;
   void AddFromStrings(const TMemChecksStr& mc_strings);
 
-  void Add(TMemCheck memory_check, bool update = true);
+  void Add(TMemCheck memory_check);
 
   bool ToggleEnable(u32 address);
 
   TMemCheck* GetMemCheck(u32 address, size_t size = 1);
   bool OverlapsMemcheck(u32 address, u32 length) const;
-  bool Remove(u32 address, bool update = true);
+  // Remove Breakpoint. Returns whether it was removed.
+  bool Remove(u32 address);
 
-  void Update();
   void Clear();
   bool HasAny() const { return !m_mem_checks.empty(); }
 
 private:
   TMemChecks m_mem_checks;
   Core::System& m_system;
-  bool m_mem_breakpoints_set = false;
 };

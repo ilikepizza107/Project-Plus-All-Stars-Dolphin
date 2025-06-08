@@ -41,5 +41,3 @@ CMakeLists.txt.user
 .idea/
 # Ignore Visual Studio Code's working dir
 /.vscode/
-# Ignore flatpak-builder's cache dir
-.flatpak-builder

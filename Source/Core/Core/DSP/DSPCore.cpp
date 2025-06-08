@@ -109,18 +109,7 @@ public:
 protected:
   u8 ReadMemory(u32 address) override { return Host::ReadHostMemory(address); }
   void WriteMemory(u32 address, u8 value) override { Host::WriteHostMemory(value, address); }
-  void OnRawReadEndException() override
-  {
-    m_dsp.SetException(ExceptionType::AcceleratorRawReadOverflow);
-  }
-  void OnRawWriteEndException() override
-  {
-    m_dsp.SetException(ExceptionType::AcceleratorRawWriteOverflow);
-  }
-  void OnSampleReadEndException() override
-  {
-    m_dsp.SetException(ExceptionType::AcceleratorSampleReadOverflow);
-  }
+  void OnEndException() override { m_dsp.SetException(ExceptionType::AcceleratorOverflow); }
 
 private:
   SDSP& m_dsp;

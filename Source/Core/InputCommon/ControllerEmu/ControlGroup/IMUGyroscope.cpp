@@ -4,6 +4,7 @@
 #include "InputCommon/ControllerEmu/ControlGroup/IMUGyroscope.h"
 
 #include <algorithm>
+#include <memory>
 
 #include "Common/Common.h"
 #include "Common/MathUtil.h"
@@ -89,8 +90,8 @@ void IMUGyroscope::UpdateCalibration(const StateData& state)
     // Check for required calibration update frequency
     // and if current data is within deadzone distance of mean stable value.
     if (calibration_freq < WORST_ACCEPTABLE_CALIBRATION_UPDATE_FREQUENCY ||
-        std::ranges::any_of(current_difference.data,
-                            [&](auto c) { return std::abs(c) > deadzone; }))
+        std::any_of(current_difference.data.begin(), current_difference.data.end(),
+                    [&](auto c) { return std::abs(c) > deadzone; }))
     {
       RestartCalibration();
     }
@@ -122,8 +123,8 @@ auto IMUGyroscope::GetRawState() const -> StateData
 
 bool IMUGyroscope::AreInputsBound() const
 {
-  return std::ranges::any_of(
-      controls, [](const auto& control) { return control->control_ref->BoundCount() > 0; });
+  return std::all_of(controls.begin(), controls.end(),
+                     [](const auto& control) { return control->control_ref->BoundCount() > 0; });
 }
 
 bool IMUGyroscope::CanCalibrate() const

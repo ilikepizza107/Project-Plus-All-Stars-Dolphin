@@ -39,7 +39,6 @@
 #include "Common/MsgHandler.h"
 
 #include "Core/ARDecrypt.h"
-#include "Core/AchievementManager.h"
 #include "Core/CheatCodes.h"
 #include "Core/Config/MainSettings.h"
 #include "Core/PowerPC/MMU.h"
@@ -113,7 +112,7 @@ struct ARAddr
 
 // ----------------------
 // AR Remote Functions
-void ApplyCodes(std::span<const ARCode> codes, const std::string& game_id, u16 revision)
+void ApplyCodes(std::span<const ARCode> codes)
 {
   if (!Config::AreCheatsEnabled())
     return;
@@ -122,10 +121,7 @@ void ApplyCodes(std::span<const ARCode> codes, const std::string& game_id, u16 r
   s_disable_logging = false;
   s_active_codes.clear();
   std::copy_if(codes.begin(), codes.end(), std::back_inserter(s_active_codes),
-               [&game_id, &revision](const ARCode& code) {
-                 return code.enabled && AchievementManager::GetInstance().CheckApprovedARCode(
-                                            code, game_id, revision);
-               });
+               [](const ARCode& code) { return code.enabled; });
   s_active_codes.shrink_to_fit();
 }
 
@@ -173,10 +169,9 @@ void AddCode(ARCode code)
   }
 }
 
-void LoadAndApplyCodes(const Common::IniFile& global_ini, const Common::IniFile& local_ini,
-                       const std::string& game_id, u16 revision)
+void LoadAndApplyCodes(const Common::IniFile& global_ini, const Common::IniFile& local_ini)
 {
-  ApplyCodes(LoadCodes(global_ini, local_ini), game_id, revision);
+  ApplyCodes(LoadCodes(global_ini, local_ini));
 }
 
 // Parses the Action Replay section of a game ini file.

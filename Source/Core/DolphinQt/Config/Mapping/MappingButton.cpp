@@ -9,10 +9,13 @@
 #include <QString>
 
 #include "DolphinQt/Config/Mapping/IOWindow.h"
+#include "DolphinQt/Config/Mapping/MappingCommon.h"
 #include "DolphinQt/Config/Mapping/MappingWidget.h"
 #include "DolphinQt/Config/Mapping/MappingWindow.h"
+#include "DolphinQt/QtUtils/SetWindowDecorations.h"
 
 #include "InputCommon/ControlReference/ControlReference.h"
+#include "InputCommon/ControllerEmu/ControlGroup/Buttons.h"
 #include "InputCommon/ControllerEmu/ControllerEmu.h"
 #include "InputCommon/ControllerInterface/ControllerInterface.h"
 
@@ -65,11 +68,15 @@ static QString RefToDisplayString(ControlReference* ref)
   return expression;
 }
 
-MappingButton::MappingButton(MappingWidget* parent, ControlReference* ref, ControlType control_type)
-    : ElidedButton{RefToDisplayString(ref)}, m_mapping_window{parent->GetParent()},
-      m_reference{ref}, m_control_type{control_type}
+bool MappingButton::IsInput() const
 {
-  if (m_reference->IsInput())
+  return m_reference->IsInput();
+}
+
+MappingButton::MappingButton(MappingWidget* parent, ControlReference* ref, bool indicator)
+    : ElidedButton(RefToDisplayString(ref)), m_parent(parent), m_reference(ref)
+{
+  if (IsInput())
   {
     setToolTip(
         tr("Left-click to detect input.\nMiddle-click to clear.\nRight-click for more options."));
@@ -81,21 +88,21 @@ MappingButton::MappingButton(MappingWidget* parent, ControlReference* ref, Contr
 
   connect(this, &MappingButton::clicked, this, &MappingButton::Clicked);
 
+  if (indicator)
+    connect(parent, &MappingWidget::Update, this, &MappingButton::UpdateIndicator);
+
   connect(parent, &MappingWidget::ConfigChanged, this, &MappingButton::ConfigChanged);
-  connect(this, &MappingButton::ConfigChanged,
-          [this] { setText(RefToDisplayString(m_reference)); });
 }
 
 void MappingButton::AdvancedPressed()
 {
-  m_mapping_window->CancelMapping();
-
-  IOWindow io(m_mapping_window, m_mapping_window->GetController(), m_reference,
+  IOWindow io(m_parent, m_parent->GetController(), m_reference,
               m_reference->IsInput() ? IOWindow::Type::Input : IOWindow::Type::Output);
+  SetQWidgetWindowDecorations(&io);
   io.exec();
 
   ConfigChanged();
-  m_mapping_window->Save();
+  m_parent->SaveSettings();
 }
 
 void MappingButton::Clicked()
@@ -106,7 +113,31 @@ void MappingButton::Clicked()
     return;
   }
 
-  m_mapping_window->QueueInputDetection(this);
+  const auto default_device_qualifier = m_parent->GetController()->GetDefaultDevice();
+
+  QString expression;
+
+  if (m_parent->GetParent()->IsMappingAllDevices())
+  {
+    expression = MappingCommon::DetectExpression(this, g_controller_interface,
+                                                 g_controller_interface.GetAllDeviceStrings(),
+                                                 default_device_qualifier);
+  }
+  else
+  {
+    expression = MappingCommon::DetectExpression(this, g_controller_interface,
+                                                 {default_device_qualifier.ToString()},
+                                                 default_device_qualifier);
+  }
+
+  if (expression.isEmpty())
+    return;
+
+  m_reference->SetExpression(expression.toStdString());
+  m_parent->GetController()->UpdateSingleControlReference(g_controller_interface, m_reference);
+
+  ConfigChanged();
+  m_parent->SaveSettings();
 }
 
 void MappingButton::Clear()
@@ -114,12 +145,33 @@ void MappingButton::Clear()
   m_reference->range = 100.0 / SLIDER_TICK_COUNT;
 
   m_reference->SetExpression("");
-  m_mapping_window->GetController()->UpdateSingleControlReference(g_controller_interface,
-                                                                  m_reference);
+  m_parent->GetController()->UpdateSingleControlReference(g_controller_interface, m_reference);
 
-  m_mapping_window->Save();
+  m_parent->SaveSettings();
+  ConfigChanged();
+}
 
-  m_mapping_window->UnQueueInputDetection(this);
+void MappingButton::UpdateIndicator()
+{
+  if (!isActiveWindow())
+    return;
+
+  QFont f = m_parent->font();
+
+  // If the input state is "true" (we can't know the state of outputs), show it in bold.
+  if (m_reference->IsInput() && m_reference->GetState<bool>())
+    f.setBold(true);
+  // If the expression has failed to parse, show it in italic.
+  // Some expressions still work even the failed to parse so don't prevent the GetState() above.
+  if (m_reference->GetParseStatus() == ciface::ExpressionParser::ParseStatus::SyntaxError)
+    f.setItalic(true);
+
+  setFont(f);
+}
+
+void MappingButton::ConfigChanged()
+{
+  setText(RefToDisplayString(m_reference));
 }
 
 void MappingButton::mouseReleaseEvent(QMouseEvent* event)
@@ -136,14 +188,4 @@ void MappingButton::mouseReleaseEvent(QMouseEvent* event)
     QPushButton::mouseReleaseEvent(event);
     return;
   }
-}
-
-ControlReference* MappingButton::GetControlReference()
-{
-  return m_reference;
-}
-
-auto MappingButton::GetControlType() const -> ControlType
-{
-  return m_control_type;
 }

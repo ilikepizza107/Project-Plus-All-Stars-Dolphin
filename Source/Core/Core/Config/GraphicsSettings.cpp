@@ -45,8 +45,6 @@ const Info<bool> GFX_SHOW_VTIMES{{System::GFX, "Settings", "ShowVTimes"}, false}
 const Info<bool> GFX_SHOW_GRAPHS{{System::GFX, "Settings", "ShowGraphs"}, false};
 const Info<bool> GFX_SHOW_SPEED{{System::GFX, "Settings", "ShowSpeed"}, false};
 const Info<bool> GFX_SHOW_SPEED_COLORS{{System::GFX, "Settings", "ShowSpeedColors"}, true};
-const Info<bool> GFX_MOVABLE_PERFORMANCE_METRICS{
-    {System::GFX, "Settings", "MovablePerformanceMetrics"}, false};
 const Info<int> GFX_PERF_SAMP_WINDOW{{System::GFX, "Settings", "PerfSampWindowMS"}, 1000};
 const Info<bool> GFX_SHOW_NETPLAY_PING{{System::GFX, "Settings", "ShowNetPlayPing"}, true};
 const Info<bool> GFX_SHOW_NETPLAY_MESSAGES{{System::GFX, "Settings", "ShowNetPlayMessages"}, false};
@@ -65,7 +63,7 @@ const Info<bool> GFX_CACHE_HIRES_TEXTURES{{System::GFX, "Settings", "CacheHiresT
 const Info<bool> GFX_DUMP_EFB_TARGET{{System::GFX, "Settings", "DumpEFBTarget"}, false};
 const Info<bool> GFX_DUMP_XFB_TARGET{{System::GFX, "Settings", "DumpXFBTarget"}, false};
 const Info<bool> GFX_DUMP_FRAMES_AS_IMAGES{{System::GFX, "Settings", "DumpFramesAsImages"}, false};
-const Info<bool> GFX_USE_LOSSLESS{{System::GFX, "Settings", "UseLossless"}, false};
+const Info<bool> GFX_USE_FFV1{{System::GFX, "Settings", "UseFFV1"}, false};
 const Info<std::string> GFX_DUMP_FORMAT{{System::GFX, "Settings", "DumpFormat"}, "avi"};
 const Info<std::string> GFX_DUMP_CODEC{{System::GFX, "Settings", "DumpCodec"}, ""};
 const Info<std::string> GFX_DUMP_PIXEL_FORMAT{{System::GFX, "Settings", "DumpPixelFormat"}, ""};
@@ -128,15 +126,11 @@ const Info<bool> GFX_MODS_ENABLE{{System::GFX, "Settings", "EnableMods"}, false}
 
 const Info<std::string> GFX_DRIVER_LIB_NAME{{System::GFX, "Settings", "DriverLibName"}, ""};
 
-const Info<VertexLoaderType> GFX_VERTEX_LOADER_TYPE{{System::GFX, "Settings", "VertexLoaderType"},
-                                                    VertexLoaderType::Native};
-
 // Graphics.Enhancements
 
 const Info<TextureFilteringMode> GFX_ENHANCE_FORCE_TEXTURE_FILTERING{
     {System::GFX, "Enhancements", "ForceTextureFiltering"}, TextureFilteringMode::Default};
-const Info<AnisotropicFilteringMode> GFX_ENHANCE_MAX_ANISOTROPY{
-    {System::GFX, "Enhancements", "MaxAnisotropy"}, AnisotropicFilteringMode::Default};
+const Info<int> GFX_ENHANCE_MAX_ANISOTROPY{{System::GFX, "Enhancements", "MaxAnisotropy"}, 0};
 const Info<OutputResamplingMode> GFX_ENHANCE_OUTPUT_RESAMPLING{
     {System::GFX, "Enhancements", "OutputResampling"}, OutputResamplingMode::Default};
 const Info<std::string> GFX_ENHANCE_POST_SHADER{

@@ -23,7 +23,8 @@ namespace DX12
 static bool UsesDynamicVertexLoader(const AbstractPipeline* pipeline)
 {
   const AbstractPipelineUsage usage = static_cast<const DXPipeline*>(pipeline)->GetUsage();
-  return (g_backend_info.bSupportsDynamicVertexLoader && usage == AbstractPipelineUsage::GXUber) ||
+  return (g_ActiveConfig.backend_info.bSupportsDynamicVertexLoader &&
+          usage == AbstractPipelineUsage::GXUber) ||
          (g_ActiveConfig.UseVSForLinePointExpand() && usage != AbstractPipelineUsage::Utility);
 }
 
@@ -577,8 +578,9 @@ bool Gfx::ApplyState()
 
     if (dirty_bits & DirtyState_PS_CUS_CBV)
     {
-      cmdlist->SetGraphicsRootConstantBufferView(ROOT_PARAMETER_PS_CUS_CBV,
-                                                 m_state.constant_buffers[2]);
+      cmdlist->SetGraphicsRootConstantBufferView(
+          g_ActiveConfig.bBBoxEnable ? ROOT_PARAMETER_PS_CUS_CBV : ROOT_PARAMETER_PS_CBV2,
+          m_state.constant_buffers[2]);
     }
 
     if (dirty_bits & DirtyState_VS_SRV_Descriptor && UsesDynamicVertexLoader(pipeline))

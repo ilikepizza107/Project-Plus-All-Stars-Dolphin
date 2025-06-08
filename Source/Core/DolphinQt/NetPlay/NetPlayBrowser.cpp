@@ -289,7 +289,7 @@ void NetPlayBrowser::accept()
 
   const int index = m_table_widget->selectedItems()[0]->row();
 
-  const NetPlaySession& session = m_sessions[index];
+  NetPlaySession& session = m_sessions[index];
 
   std::string server_id = session.server_id;
 
@@ -309,7 +309,7 @@ void NetPlayBrowser::accept()
 
     const std::string password = dialog.textValue().toStdString();
 
-    const auto decrypted_id = session.DecryptID(password);
+    auto decrypted_id = session.DecryptID(password);
 
     if (!decrypted_id)
     {

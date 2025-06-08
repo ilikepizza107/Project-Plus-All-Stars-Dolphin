@@ -31,7 +31,7 @@ enum class Language;
 enum class Region;
 enum class Platform;
 
-class VolumeWii final : public VolumeDisc
+class VolumeWii : public VolumeDisc
 {
 public:
   static constexpr size_t AES_KEY_SIZE = Common::AES::Context::KEY_SIZE;

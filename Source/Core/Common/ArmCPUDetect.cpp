@@ -18,18 +18,13 @@
 #elif defined(__linux__)
 #include <asm/hwcap.h>
 #include <sys/auxv.h>
-#elif defined(HAVE_ELF_AUX_INFO)
+#elif defined(__FreeBSD__)
 #include <sys/auxv.h>
 #elif defined(__OpenBSD__)
 #include <machine/armreg.h>
 #include <machine/cpu.h>
-#endif
-
-#ifdef __OpenBSD__
-// clang-format off
-#include <sys/types.h>
 #include <sys/sysctl.h>
-// clang-format on
+#include <sys/types.h>
 #endif
 
 #include <fmt/format.h>
@@ -147,13 +142,13 @@ static bool Read_MIDR_EL1_Sysfs(u64* value)
 
 #endif
 
-#if defined(__linux__) || defined(HAVE_ELF_AUX_INFO)
+#if defined(__linux__) || defined(__FreeBSD__)
 
 static u32 ReadHwCap(u32 type)
 {
 #if defined(__linux__)
   return getauxval(type);
-#elif defined(HAVE_ELF_AUX_INFO)
+#elif defined(__FreeBSD__)
   u_long hwcap = 0;
   elf_aux_info(type, &hwcap, sizeof(hwcap));
   return hwcap;
@@ -194,7 +189,7 @@ static bool Read_MIDR_EL1(u64* value)
 
 #endif
 
-#if defined(_WIN32) || defined(__linux__) || defined(HAVE_ELF_AUX_INFO)
+#if defined(_WIN32) || defined(__linux__) || defined(__FreeBSD__)
 
 static std::string MIDRToString(u64 midr)
 {
@@ -259,21 +254,11 @@ void CPUInfo::Detect()
   {
     cpu_id = MIDRToString(reg);
   }
-#elif defined(__linux__) || defined(HAVE_ELF_AUX_INFO)
-  // Linux, Android, FreeBSD and OpenBSD with elf_aux_info
+#elif defined(__linux__) || defined(__FreeBSD__)
+  // Linux, Android, and FreeBSD
 
 #if defined(__FreeBSD__)
   SysctlByName(&model_name, "hw.model");
-#elif defined(__OpenBSD__)
-  int mib[2];
-  size_t len;
-  char hwmodel[256];
-
-  mib[0] = CTL_HW;
-  mib[1] = HW_MODEL;
-  len = std::size(hwmodel);
-  if (sysctl(mib, 2, &hwmodel, &len, nullptr, 0) != -1)
-    model_name = std::string(hwmodel, len - 1);
 #elif defined(__linux__)
   if (!ReadDeviceTree(&model_name, "model"))
   {

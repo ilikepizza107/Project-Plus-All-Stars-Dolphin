@@ -14,6 +14,7 @@
 #include "AudioCommon/OpenSLESStream.h"
 #include "AudioCommon/PulseAudioStream.h"
 #include "AudioCommon/WASAPIStream.h"
+#include "Common/Common.h"
 #include "Common/FileUtil.h"
 #include "Common/Logging/Log.h"
 #include "Core/Config/MainSettings.h"
@@ -27,7 +28,7 @@ constexpr int AUDIO_VOLUME_MAX = 100;
 
 static std::unique_ptr<SoundStream> CreateSoundStreamForBackend(std::string_view backend)
 {
-  if (backend == BACKEND_CUBEB && CubebStream::IsValid())
+  if (backend == BACKEND_CUBEB)
     return std::make_unique<CubebStream>();
   else if (backend == BACKEND_OPENAL && OpenALStream::IsValid())
     return std::make_unique<OpenALStream>();
@@ -93,19 +94,18 @@ void ShutdownSoundStream(Core::System& system)
 
 std::string GetDefaultSoundBackend()
 {
-#if defined(ANDROID)
-  return BACKEND_OPENSLES;
-#else
-  if (CubebStream::IsValid())
-    return BACKEND_CUBEB;
-#endif
-
-#if defined(__linux__)
+  std::string backend = BACKEND_NULLSOUND;
+#if defined ANDROID
+  backend = BACKEND_OPENSLES;
+#elif defined __linux__
   if (AlsaSound::IsValid())
-    return BACKEND_ALSA;
+    backend = BACKEND_ALSA;
+  else
+    backend = BACKEND_CUBEB;
+#elif defined(__APPLE__) || defined(_WIN32) || defined(__OpenBSD__)
+  backend = BACKEND_CUBEB;
 #endif
-
-  return BACKEND_NULLSOUND;
+  return backend;
 }
 
 DPL2Quality GetDefaultDPL2Quality()
@@ -118,8 +118,7 @@ std::vector<std::string> GetSoundBackends()
   std::vector<std::string> backends;
 
   backends.emplace_back(BACKEND_NULLSOUND);
-  if (CubebStream::IsValid())
-    backends.emplace_back(BACKEND_CUBEB);
+  backends.emplace_back(BACKEND_CUBEB);
   if (AlsaSound::IsValid())
     backends.emplace_back(BACKEND_ALSA);
   if (PulseAudio::IsValid())

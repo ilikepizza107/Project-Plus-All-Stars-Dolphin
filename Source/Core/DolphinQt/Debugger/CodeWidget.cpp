@@ -100,22 +100,16 @@ void CodeWidget::showEvent(QShowEvent* event)
 
 void CodeWidget::CreateWidgets()
 {
-  auto* layout = new QHBoxLayout;
+  auto* layout = new QGridLayout;
 
   layout->setContentsMargins(2, 2, 2, 2);
   layout->setSpacing(0);
 
-  auto* top_layout = new QHBoxLayout;
   m_search_address = new QLineEdit;
-  m_search_address->setPlaceholderText(tr("Search Address"));
   m_branch_watch = new QPushButton(tr("Branch Watch"));
-  top_layout->addWidget(m_search_address);
-  top_layout->addWidget(m_branch_watch);
-
-  auto* right_layout = new QVBoxLayout;
   m_code_view = new CodeViewWidget;
-  right_layout->addLayout(top_layout);
-  right_layout->addWidget(m_code_view);
+
+  m_search_address->setPlaceholderText(tr("Search Address"));
 
   m_box_splitter = new QSplitter(Qt::Vertical);
   m_box_splitter->setStyleSheet(BOX_SPLITTER_STYLESHEET);
@@ -152,23 +146,12 @@ void CodeWidget::CreateWidgets()
 
   m_code_splitter = new QSplitter(Qt::Horizontal);
 
-  // right_layout is the searchbar area and the codeview.
-  QWidget* right_widget = new QWidget;
-  right_widget->setLayout(right_layout);
-
   m_code_splitter->addWidget(m_box_splitter);
-  m_code_splitter->addWidget(right_widget);
+  m_code_splitter->addWidget(m_code_view);
 
-  layout->addWidget(m_code_splitter);
-
-  // Corrects button height mis-aligning the layout. Note: Margin only populates values after this
-  // point.
-  const int height_fix =
-      m_branch_watch->sizeHint().height() - m_search_address->sizeHint().height();
-  auto margins = right_layout->contentsMargins();
-  margins.setTop(margins.top() - height_fix / 2);
-  right_layout->setContentsMargins(margins);
-  right_layout->setSpacing(right_layout->spacing() - height_fix / 2);
+  layout->addWidget(m_search_address, 0, 0);
+  layout->addWidget(m_branch_watch, 0, 2);
+  layout->addWidget(m_code_splitter, 1, 0, -1, -1);
 
   QWidget* widget = new QWidget(this);
   widget->setLayout(layout);
@@ -212,7 +195,6 @@ void CodeWidget::ConnectWidgets()
   connect(m_code_view, &CodeViewWidget::RequestPPCComparison, this,
           &CodeWidget::RequestPPCComparison);
   connect(m_code_view, &CodeViewWidget::ShowMemory, this, &CodeWidget::ShowMemory);
-  connect(m_code_view, &CodeViewWidget::ActivateSearch, this, &CodeWidget::ActivateSearchAddress);
 }
 
 void CodeWidget::OnBranchWatchDialog()
@@ -242,12 +224,6 @@ void CodeWidget::OnPPCSymbolsChanged()
     UpdateFunctionCalls(symbol);
     UpdateFunctionCallers(symbol);
   }
-}
-
-void CodeWidget::ActivateSearchAddress()
-{
-  m_search_address->setFocus();
-  m_search_address->selectAll();
 }
 
 void CodeWidget::OnSearchAddress()
@@ -403,12 +379,6 @@ void CodeWidget::UpdateSymbols()
   {
     QString name = QString::fromStdString(symbol.second.name);
 
-    // If the symbol has an object name, add it to the entry name.
-    if (!symbol.second.object_name.empty())
-    {
-      name += QString::fromStdString(fmt::format(" ({})", symbol.second.object_name));
-    }
-
     auto* item = new QListWidgetItem(name);
     if (name == selection)
       item->setSelected(true);
@@ -438,17 +408,8 @@ void CodeWidget::UpdateFunctionCalls(const Common::Symbol* symbol)
 
     if (call_symbol)
     {
-      QString name;
-
-      if (!call_symbol->object_name.empty())
-      {
-        name = QString::fromStdString(
-            fmt::format("< {} ({}, {:08x})", call_symbol->name, call_symbol->object_name, addr));
-      }
-      else
-      {
-        name = QString::fromStdString(fmt::format("< {} ({:08x})", call_symbol->name, addr));
-      }
+      const QString name =
+          QString::fromStdString(fmt::format("> {} ({:08x})", call_symbol->name, addr));
 
       if (!name.contains(filter, Qt::CaseInsensitive))
         continue;
@@ -472,17 +433,8 @@ void CodeWidget::UpdateFunctionCallers(const Common::Symbol* symbol)
 
     if (caller_symbol)
     {
-      QString name;
-
-      if (!caller_symbol->object_name.empty())
-      {
-        name = QString::fromStdString(fmt::format("< {} ({}, {:08x})", caller_symbol->name,
-                                                  caller_symbol->object_name, addr));
-      }
-      else
-      {
-        name = QString::fromStdString(fmt::format("< {} ({:08x})", caller_symbol->name, addr));
-      }
+      const QString name =
+          QString::fromStdString(fmt::format("< {} ({:08x})", caller_symbol->name, addr));
 
       if (!name.contains(filter, Qt::CaseInsensitive))
         continue;
@@ -567,8 +519,8 @@ void CodeWidget::StepOut()
   clock::time_point timeout = clock::now() + std::chrono::seconds(5);
 
   auto& power_pc = m_system.GetPowerPC();
+  auto& ppc_state = power_pc.GetPPCState();
   {
-    auto& ppc_state = power_pc.GetPPCState();
     Core::CPUThreadGuard guard(m_system);
 
     PowerPC::CoreMode old_mode = power_pc.GetMode();

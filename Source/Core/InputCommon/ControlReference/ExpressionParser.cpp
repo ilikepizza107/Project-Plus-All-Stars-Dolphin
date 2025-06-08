@@ -4,9 +4,9 @@
 #include "InputCommon/ControlReference/ExpressionParser.h"
 
 #include <algorithm>
-#include <cassert>
 #include <cmath>
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <regex>
@@ -14,6 +14,7 @@
 #include <utility>
 #include <vector>
 
+#include "Common/Assert.h"
 #include "Common/MsgHandler.h"
 #include "Common/StringUtil.h"
 
@@ -24,45 +25,6 @@ namespace ciface::ExpressionParser
 using namespace ciface::Core;
 
 class ControlExpression;
-
-// Check if operator is usable with assignment, e.g. += -= *=
-static bool IsCompoundAssignmentUsableBinaryOperator(TokenType type)
-{
-  return type >= TOK_COMPOUND_ASSIGN_OPS_BEGIN && type < TOK_COMPOUND_ASSIGN_OPS_END;
-}
-
-static TokenType GetBinaryOperatorTokenTypeFromChar(char c)
-{
-  switch (c)
-  {
-  case '+':
-    return TOK_ADD;
-  case '-':
-    return TOK_SUB;
-  case '*':
-    return TOK_MUL;
-  case '/':
-    return TOK_DIV;
-  case '%':
-    return TOK_MOD;
-  case '=':
-    return TOK_ASSIGN;
-  case '<':
-    return TOK_LTHAN;
-  case '>':
-    return TOK_GTHAN;
-  case ',':
-    return TOK_COMMA;
-  case '^':
-    return TOK_XOR;
-  case '&':
-    return TOK_AND;
-  case '|':
-    return TOK_OR;
-  default:
-    return TOK_INVALID;
-  }
-}
 
 class HotkeySuppressions
 {
@@ -130,15 +92,12 @@ Lexer::Lexer(std::string expr_) : expr(std::move(expr_))
   it = expr.begin();
 }
 
-Token Lexer::GetDelimitedToken(TokenType type, char delimeter)
+std::string Lexer::FetchDelimString(char delim)
 {
-  const std::string value = FetchCharsWhile([&](char c) { return c != delimeter && c != '\n'; });
-
-  if (it == expr.end() || *it != delimeter)
-    return Token(TOK_INVALID);
-
-  ++it;
-  return Token(type, value);
+  const std::string result = FetchCharsWhile([delim](char c) { return c != delim; });
+  if (it != expr.end())
+    ++it;
+  return result;
 }
 
 std::string Lexer::FetchWordChars()
@@ -151,7 +110,7 @@ std::string Lexer::FetchWordChars()
 
 Token Lexer::GetDelimitedLiteral()
 {
-  return GetDelimitedToken(TOK_LITERAL, '\'');
+  return Token(TOK_LITERAL, FetchDelimString('\''));
 }
 
 Token Lexer::GetVariable()
@@ -161,7 +120,7 @@ Token Lexer::GetVariable()
 
 Token Lexer::GetFullyQualifiedControl()
 {
-  return GetDelimitedToken(TOK_CONTROL, '`');
+  return Token(TOK_CONTROL, FetchDelimString('`'));
 }
 
 Token Lexer::GetBareword(char first_char)
@@ -195,32 +154,7 @@ Token Lexer::NextToken()
   if (it == expr.end())
     return Token(TOK_EOF);
 
-  const char c = *it++;
-
-  // Handle /* */ style comments.
-  if (c == '/' && it != expr.end() && *it == '*')
-  {
-    ++it;
-    const auto end_of_comment = expr.find("*/", it - expr.begin());
-    if (end_of_comment == std::string::npos)
-      return Token(TOK_INVALID);
-    it = expr.begin() + end_of_comment + 2;
-    return Token(TOK_COMMENT);
-  }
-
-  const auto tok_type = GetBinaryOperatorTokenTypeFromChar(c);
-  if (tok_type != TOK_INVALID)
-  {
-    // Check for compound assignment op, e.g. + immediately followed by =.
-    if (IsCompoundAssignmentUsableBinaryOperator(tok_type) && it != expr.end() && *it == '=')
-    {
-      ++it;
-      return Token(TOK_ASSIGN, std::string{c});
-    }
-
-    return Token(tok_type);
-  }
-
+  char c = *it++;
   switch (c)
   {
   case ' ':
@@ -234,12 +168,32 @@ Token Lexer::NextToken()
     return Token(TOK_RPAREN);
   case '@':
     return Token(TOK_HOTKEY);
-  case '?':
-    return Token(TOK_QUESTION);
-  case ':':
-    return Token(TOK_COLON);
+  case '&':
+    return Token(TOK_AND);
+  case '|':
+    return Token(TOK_OR);
   case '!':
     return Token(TOK_NOT);
+  case '+':
+    return Token(TOK_ADD);
+  case '-':
+    return Token(TOK_SUB);
+  case '*':
+    return Token(TOK_MUL);
+  case '/':
+    return Token(TOK_DIV);
+  case '%':
+    return Token(TOK_MOD);
+  case '=':
+    return Token(TOK_ASSIGN);
+  case '<':
+    return Token(TOK_LTHAN);
+  case '>':
+    return Token(TOK_GTHAN);
+  case ',':
+    return Token(TOK_COMMA);
+  case '^':
+    return Token(TOK_XOR);
   case '\'':
     return GetDelimitedLiteral();
   case '$':
@@ -260,10 +214,26 @@ ParseStatus Lexer::Tokenize(std::vector<Token>& tokens)
 {
   while (true)
   {
-    const std::string::iterator prev_it = it;
+    const std::size_t string_position = it - expr.begin();
     Token tok = NextToken();
-    tok.string_position = prev_it - expr.begin();
-    tok.string_length = it - prev_it;
+
+    tok.string_position = string_position;
+    tok.string_length = it - expr.begin();
+
+    // Handle /* */ style comments.
+    if (tok.type == TOK_DIV && PeekToken().type == TOK_MUL)
+    {
+      const auto end_of_comment = expr.find("*/", it - expr.begin());
+
+      if (end_of_comment == std::string::npos)
+        return ParseStatus::SyntaxError;
+
+      tok.type = TOK_COMMENT;
+      tok.string_length = end_of_comment + 4;
+
+      it = expr.begin() + end_of_comment + 2;
+    }
+
     tokens.push_back(tok);
 
     if (tok.type == TOK_INVALID)
@@ -275,17 +245,12 @@ ParseStatus Lexer::Tokenize(std::vector<Token>& tokens)
   return ParseStatus::Successful;
 }
 
-Expression* Expression::GetLValue()
-{
-  return this;
-}
-
 class ControlExpression : public Expression
 {
 public:
   explicit ControlExpression(ControlQualifier qualifier) : m_qualifier(std::move(qualifier)) {}
 
-  ControlState GetValue() override
+  ControlState GetValue() const override
   {
     if (s_hotkey_suppressions.IsSuppressed(m_input))
       return 0;
@@ -340,10 +305,9 @@ bool HotkeySuppressions::IsSuppressedIgnoringModifiers(Device::Input* input,
     return i1 && i2 && (i1 == i2 || i1->IsChild(i2) || i2->IsChild(i1));
   };
 
-  return std::any_of(it, it_end, [&](const auto& s) {
-    return std::ranges::none_of(ignore_modifiers, [&](const auto& m) {
-      return is_same_modifier(m->GetInput(), s.first.second);
-    });
+  return std::any_of(it, it_end, [&](auto& s) {
+    return std::none_of(begin(ignore_modifiers), end(ignore_modifiers),
+                        [&](auto& m) { return is_same_modifier(m->GetInput(), s.first.second); });
   });
 }
 
@@ -380,72 +344,55 @@ public:
   {
   }
 
-  ControlState GetValue() override
-  {
-    if (op == TOK_ASSIGN || op == TOK_COMMA)
-    {
-      return GetLValue()->GetValue();
-    }
-
-    // Strict evaluation order of lhs,rhs in case of side effects.
-    const ControlState lhs_value = lhs->GetValue();
-    const ControlState rhs_value = rhs->GetValue();
-
-    return CalculateValue(op, lhs_value, rhs_value);
-  }
-
-  static ControlState CalculateValue(TokenType op, ControlState lhs_value, ControlState rhs_value)
+  ControlState GetValue() const override
   {
     switch (op)
     {
     case TOK_AND:
-      return std::min(lhs_value, rhs_value);
+      return std::min(lhs->GetValue(), rhs->GetValue());
     case TOK_OR:
-      return std::max(lhs_value, rhs_value);
+      return std::max(lhs->GetValue(), rhs->GetValue());
     case TOK_ADD:
-      return lhs_value + rhs_value;
+      return lhs->GetValue() + rhs->GetValue();
     case TOK_SUB:
-      return lhs_value - rhs_value;
+      return lhs->GetValue() - rhs->GetValue();
     case TOK_MUL:
-      return lhs_value * rhs_value;
+      return lhs->GetValue() * rhs->GetValue();
     case TOK_DIV:
     {
-      const ControlState result = lhs_value / rhs_value;
+      const ControlState result = lhs->GetValue() / rhs->GetValue();
       return std::isinf(result) ? 0.0 : result;
     }
     case TOK_MOD:
     {
-      const ControlState result = std::fmod(lhs_value, rhs_value);
+      const ControlState result = std::fmod(lhs->GetValue(), rhs->GetValue());
       return std::isnan(result) ? 0.0 : result;
     }
-    case TOK_LTHAN:
-      return lhs_value < rhs_value;
-    case TOK_GTHAN:
-      return lhs_value > rhs_value;
-    case TOK_XOR:
-      return std::max(std::min(1 - lhs_value, rhs_value), std::min(lhs_value, 1 - rhs_value));
-    default:
-      assert(false);
-      return 0;
-    }
-  }
-
-  Expression* GetLValue() override
-  {
-    switch (op)
-    {
     case TOK_ASSIGN:
     {
-      Expression* const lvalue = lhs->GetLValue();
-      const ControlState rvalue = rhs->GetValue();
-      lvalue->SetValue(rvalue);
-      return lvalue;
+      // Use this carefully as it's extremely powerful and can end up in unforeseen situations
+      lhs->SetValue(rhs->GetValue());
+      return lhs->GetValue();
     }
+    case TOK_LTHAN:
+      return lhs->GetValue() < rhs->GetValue();
+    case TOK_GTHAN:
+      return lhs->GetValue() > rhs->GetValue();
     case TOK_COMMA:
+    {
+      // Eval and discard lhs:
       lhs->GetValue();
-      return rhs->GetLValue();
+      return rhs->GetValue();
+    }
+    case TOK_XOR:
+    {
+      const auto lval = lhs->GetValue();
+      const auto rval = rhs->GetValue();
+      return std::max(std::min(1 - lval, rval), std::min(lval, 1 - rval));
+    }
     default:
-      return this;
+      ASSERT(false);
+      return 0;
     }
   }
 
@@ -466,23 +413,6 @@ public:
   {
     lhs->UpdateReferences(env);
     rhs->UpdateReferences(env);
-  }
-};
-
-class CompoundAssignmentExpression : public BinaryExpression
-{
-public:
-  using BinaryExpression::BinaryExpression;
-
-  ControlState GetValue() override { return GetLValue()->GetValue(); }
-
-  Expression* GetLValue() override
-  {
-    Expression* const lvalue = lhs->GetLValue();
-    const ControlState lhs_value = lvalue->GetValue();
-    const ControlState rhs_value = rhs->GetValue();
-    lvalue->SetValue(CalculateValue(op, lhs_value, rhs_value));
-    return lvalue;
   }
 };
 
@@ -510,7 +440,7 @@ class LiteralReal : public LiteralExpression
 public:
   explicit LiteralReal(ControlState value) : m_value(value) {}
 
-  ControlState GetValue() override { return m_value; }
+  ControlState GetValue() const override { return m_value; }
 
   std::string GetName() const override { return ValueToString(m_value); }
 
@@ -532,7 +462,7 @@ class VariableExpression : public Expression
 public:
   explicit VariableExpression(std::string name) : m_name(std::move(name)) {}
 
-  ControlState GetValue() override { return m_variable_ptr ? *m_variable_ptr : 0; }
+  ControlState GetValue() const override { return m_variable_ptr ? *m_variable_ptr : 0; }
 
   void SetValue(ControlState value) override
   {
@@ -562,11 +492,13 @@ public:
     m_modifiers.pop_back();
   }
 
-  ControlState GetValue() override
+  ControlState GetValue() const override
   {
     // True if we have no modifiers
-    const bool modifiers_pressed = std::ranges::all_of(
-        m_modifiers, [](const auto& input) { return input->GetValue() > CONDITION_THRESHOLD; });
+    const bool modifiers_pressed = std::all_of(m_modifiers.begin(), m_modifiers.end(),
+                                               [](const std::unique_ptr<ControlExpression>& input) {
+                                                 return input->GetValue() > CONDITION_THRESHOLD;
+                                               });
 
     const auto final_input_state = m_final_input->GetValueIgnoringSuppression();
 
@@ -623,7 +555,7 @@ public:
   }
 
 private:
-  void EnableSuppression(bool force = false)
+  void EnableSuppression(bool force = false) const
   {
     if (!m_suppressor || force)
       m_suppressor = s_hotkey_suppressions.MakeSuppressor(&m_modifiers, &m_final_input);
@@ -631,8 +563,8 @@ private:
 
   HotkeySuppressions::Modifiers m_modifiers;
   std::unique_ptr<ControlExpression> m_final_input;
-  HotkeySuppressions::Suppressor m_suppressor;
-  bool m_is_blocked = false;
+  mutable HotkeySuppressions::Suppressor m_suppressor;
+  mutable bool m_is_blocked = false;
 };
 
 // This class proxies all methods to its either left-hand child if it has bound controls, or its
@@ -648,7 +580,7 @@ public:
   {
   }
 
-  ControlState GetValue() override { return GetActiveChild()->GetValue(); }
+  ControlState GetValue() const override { return GetActiveChild()->GetValue(); }
   void SetValue(ControlState value) override { GetActiveChild()->SetValue(value); }
 
   int CountNumControls() const override { return GetActiveChild()->CountNumControls(); }
@@ -744,11 +676,6 @@ ParseResult ParseResult::MakeErrorResult(Token token, std::string description)
   return result;
 }
 
-static bool IsInertToken(const Token& tok)
-{
-  return tok.type == TOK_COMMENT || tok.type == TOK_WHITESPACE;
-}
-
 class Parser
 {
 public:
@@ -778,12 +705,7 @@ private:
     return tok;
   }
 
-  Token Peek()
-  {
-    while (IsInertToken(*m_it))
-      ++m_it;
-    return *m_it;
-  }
+  Token Peek() { return *m_it; }
 
   bool Expects(TokenType type)
   {
@@ -823,7 +745,7 @@ private:
         {
           // Read one argument.
           // Grab an expression, but stop at comma.
-          auto arg = ParseInfixOperations(OperatorPrecedence(TOK_COMMA));
+          auto arg = ParseBinary(BinaryOperatorPrecedence(TOK_COMMA));
           if (ParseStatus::Successful != arg.status)
             return arg;
 
@@ -836,13 +758,12 @@ private:
 
           // Comma before the next argument.
           if (TOK_COMMA != tok.type)
-            return ParseResult::MakeErrorResult(tok, Common::GetStringT("Expected closing paren."));
+            return ParseResult::MakeErrorResult(tok, Common::GetStringT("Expected comma."));
         };
       }
     }
 
-    func->SetArguments(std::move(args));
-    const auto argument_validation = func->ValidateArguments();
+    const auto argument_validation = func->SetArguments(std::move(args));
 
     if (std::holds_alternative<FunctionExpression::ExpectedArguments>(argument_validation))
     {
@@ -923,7 +844,7 @@ private:
     }
   }
 
-  static constexpr int OperatorPrecedence(TokenType type = TOK_EOF)
+  static int BinaryOperatorPrecedence(TokenType type)
   {
     switch (type)
     {
@@ -944,28 +865,16 @@ private:
     case TOK_OR:
       return 6;
     case TOK_ASSIGN:
-    case TOK_QUESTION:
       return 7;
     case TOK_COMMA:
       return 8;
     default:
-      return 999;
+      ASSERT(false);
+      return 0;
     }
   }
 
-  static bool IsRTLBinaryOp(TokenType type) { return type == TOK_ASSIGN; }
-
-  static bool IsBinaryOpWithPrecedence(Token tok, int precedence)
-  {
-    if (!tok.IsBinaryOperator())
-      return false;
-
-    const int tok_precedence = OperatorPrecedence(tok.type);
-    return (tok_precedence < precedence) ||
-           (IsRTLBinaryOp(tok.type) && tok_precedence <= precedence);
-  }
-
-  ParseResult ParseInfixOperations(int precedence = OperatorPrecedence())
+  ParseResult ParseBinary(int precedence = 999)
   {
     ParseResult lhs = ParseAtom(Chew());
 
@@ -974,58 +883,19 @@ private:
 
     std::unique_ptr<Expression> expr = std::move(lhs.expr);
 
-    while (true)
+    // TODO: handle LTR/RTL associativity?
+    while (Peek().IsBinaryOperator() && BinaryOperatorPrecedence(Peek().type) < precedence)
     {
-      const Token op = Peek();
-      if (IsBinaryOpWithPrecedence(op, precedence))
+      const Token tok = Chew();
+      ParseResult rhs = ParseBinary(BinaryOperatorPrecedence(tok.type));
+      if (rhs.status == ParseStatus::SyntaxError)
       {
-        Chew();
-        ParseResult rhs = ParseInfixOperations(OperatorPrecedence(op.type));
-        if (rhs.status == ParseStatus::SyntaxError)
-          return rhs;
-
-        // Compound assignment token has operator in the data string.
-        if (op.type == TOK_ASSIGN && !op.data.empty())
-        {
-          const TokenType op_type = GetBinaryOperatorTokenTypeFromChar(op.data[0]);
-          expr = std::make_unique<CompoundAssignmentExpression>(op_type, std::move(expr),
-                                                                std::move(rhs.expr));
-        }
-        else
-        {
-          expr = std::make_unique<BinaryExpression>(op.type, std::move(expr), std::move(rhs.expr));
-        }
+        return rhs;
       }
-      else if (op.type == TOK_QUESTION && OperatorPrecedence(TOK_QUESTION) <= precedence)
-      {
-        // Handle conditional operator: (a ? b : c)
-        Chew();
-        auto true_result = ParseInfixOperations(OperatorPrecedence(op.type));
-        if (true_result.status != ParseStatus::Successful)
-          return true_result;
 
-        const Token should_be_colon = Chew();
-        if (should_be_colon.type != TOK_COLON)
-          return ParseResult::MakeErrorResult(should_be_colon,
-                                              Common::GetStringT("Expected colon."));
-
-        auto false_result = ParseInfixOperations(OperatorPrecedence(op.type));
-        if (false_result.status != ParseStatus::Successful)
-          return false_result;
-
-        auto conditional = MakeFunctionExpression("if");
-        std::vector<std::unique_ptr<Expression>> args;
-        args.emplace_back(std::move(expr));
-        args.emplace_back(std::move(true_result.expr));
-        args.emplace_back(std::move(false_result.expr));
-        conditional->SetArguments(std::move(args));
-        expr = std::move(conditional);
-      }
-      else
-      {
-        break;
-      }
+      expr = std::make_unique<BinaryExpression>(tok.type, std::move(expr), std::move(rhs.expr));
     }
+
     return ParseResult::MakeSuccessfulResult(std::move(expr));
   }
 
@@ -1078,7 +948,7 @@ private:
     return ParseResult::MakeSuccessfulResult(std::make_unique<HotkeyExpression>(std::move(inputs)));
   }
 
-  ParseResult ParseToplevel() { return ParseInfixOperations(); }
+  ParseResult ParseToplevel() { return ParseBinary(); }
 };  // namespace ExpressionParser
 
 ParseResult ParseTokens(const std::vector<Token>& tokens)
@@ -1094,7 +964,16 @@ static ParseResult ParseComplexExpression(const std::string& str)
   if (tokenize_status != ParseStatus::Successful)
     return ParseResult::MakeErrorResult(Token(TOK_INVALID),
                                         Common::GetStringT("Tokenizing failed."));
+
+  RemoveInertTokens(&tokens);
   return ParseTokens(tokens);
+}
+
+void RemoveInertTokens(std::vector<Token>* tokens)
+{
+  std::erase_if(*tokens, [](const Token& tok) {
+    return tok.type == TOK_COMMENT || tok.type == TOK_WHITESPACE;
+  });
 }
 
 static std::unique_ptr<Expression> ParseBarewordExpression(const std::string& str)

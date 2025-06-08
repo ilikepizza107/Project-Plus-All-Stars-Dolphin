@@ -21,7 +21,8 @@ public:
   // Run the SI Buffer
   int RunBuffer(u8* buffer, int request_length) override;
 
-  DataResponse GetData(u32& hi, u32& low) override;
+  // Return true on new data
+  bool GetData(u32& hi, u32& low) override;
 
   KeyboardStatus GetKeyboardStatus() const;
 

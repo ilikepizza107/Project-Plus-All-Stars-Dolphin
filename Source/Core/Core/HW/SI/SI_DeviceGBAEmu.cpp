@@ -78,8 +78,7 @@ int CSIDevice_GBAEmu::RunBuffer(u8* buffer, int request_length)
 
   case NextAction::WaitTransferTime:
   {
-    const int elapsed_time =
-        static_cast<int>(m_system.GetCoreTiming().GetTicks() - m_timestamp_sent);
+    int elapsed_time = static_cast<int>(m_system.GetCoreTiming().GetTicks() - m_timestamp_sent);
     // Tell SI to ask again after TransferInterval() cycles
     if (TransferInterval() > elapsed_time)
       return 0;
@@ -121,7 +120,7 @@ int CSIDevice_GBAEmu::TransferInterval()
   return SIDevice_GetGBATransferTime(m_system.GetSystemTimers(), m_last_cmd);
 }
 
-DataResponse CSIDevice_GBAEmu::GetData(u32& hi, u32& low)
+bool CSIDevice_GBAEmu::GetData(u32& hi, u32& low)
 {
   GCPadStatus pad_status{};
   if (!NetPlay::IsNetPlayRunning())
@@ -150,7 +149,7 @@ DataResponse CSIDevice_GBAEmu::GetData(u32& hi, u32& low)
   if (pad_status.button & PadButton::PAD_BUTTON_X)
     m_core->Reset();
 
-  return DataResponse::NoData;
+  return false;
 }
 
 void CSIDevice_GBAEmu::SendCommand(u32 command, u8 poll)

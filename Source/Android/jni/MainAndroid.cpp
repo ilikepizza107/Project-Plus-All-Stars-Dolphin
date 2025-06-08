@@ -1,22 +1,19 @@
 // Copyright 2003 Dolphin Emulator Project
 // SPDX-License-Identifier: GPL-2.0-or-later
 
-#include <condition_variable>
+#include <EGL/egl.h>
+#include <android/log.h>
+#include <android/native_window_jni.h>
 #include <cstdio>
 #include <cstdlib>
+#include <fmt/format.h>
+#include <jni.h>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <string>
 #include <thread>
 #include <utility>
-#include <vector>
-
-#include <EGL/egl.h>
-#include <android/log.h>
-#include <android/native_window_jni.h>
-#include <fmt/format.h>
-#include <jni.h>
 
 #include "Common/AndroidAnalytics.h"
 #include "Common/Assert.h"
@@ -80,8 +77,6 @@ Common::Event s_update_main_frame_event;
 // This exists to prevent surfaces from being destroyed during the boot process,
 // as that can lead to the boot process dereferencing nullptr.
 std::mutex s_surface_lock;
-std::condition_variable s_surface_cv;
-
 bool s_need_nonblocking_alert_msg;
 
 Common::Flag s_is_booting;
@@ -487,8 +482,6 @@ JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_SurfaceChang
 
   if (g_presenter)
     g_presenter->ChangeSurface(s_surf);
-
-  s_surface_cv.notify_all();
 }
 
 JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_SurfaceDestroyed(JNIEnv*,
@@ -522,8 +515,6 @@ JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_SurfaceDestr
     ANativeWindow_release(s_surf);
     s_surf = nullptr;
   }
-
-  s_surface_cv.notify_all();
 }
 
 JNIEXPORT jboolean JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_HasSurface(JNIEnv*, jclass)
@@ -615,13 +606,11 @@ static void Run(JNIEnv* env, std::unique_ptr<BootParameters>&& boot, bool riivol
                                           volume.GetDiscNumber()));
   }
 
-  s_need_nonblocking_alert_msg = true;
-  std::unique_lock<std::mutex> surface_guard(s_surface_lock);
-
-  s_surface_cv.wait(surface_guard, []() { return s_surf != nullptr; });
-
   WindowSystemInfo wsi(WindowSystemType::Android, nullptr, s_surf, s_surf);
   wsi.render_surface_scale = GetRenderSurfaceScale(env);
+
+  s_need_nonblocking_alert_msg = true;
+  std::unique_lock<std::mutex> surface_guard(s_surface_lock);
 
   if (BootManager::BootCore(Core::System::GetInstance(), std::move(boot), wsi))
   {
@@ -692,25 +681,27 @@ JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_ChangeDisc(J
   system.GetDVDInterface().ChangeDisc(Core::CPUThreadGuard{system}, path);
 }
 
-JNIEXPORT jobjectArray JNICALL
-Java_org_dolphinemu_dolphinemu_NativeLibrary_GetLogTypeNames(JNIEnv* env, jclass)
+JNIEXPORT jobject JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_GetLogTypeNames(JNIEnv* env,
+                                                                                       jclass)
 {
-  using LogManager = Common::Log::LogManager;
+  std::map<std::string, std::string> map = Common::Log::LogManager::GetInstance()->GetLogTypes();
 
-  return VectorToJObjectArray(
-      env, LogManager::GetInstance()->GetLogTypes(), IDCache::GetPairClass(),
-      [](JNIEnv* env_, const LogManager::LogContainer& log_container) {
-        jstring short_name = ToJString(env_, log_container.m_short_name);
-        jstring full_name = ToJString(env_, log_container.m_full_name);
+  auto map_size = static_cast<jsize>(map.size());
+  jobject linked_hash_map =
+      env->NewObject(IDCache::GetLinkedHashMapClass(), IDCache::GetLinkedHashMapInit(), map_size);
+  for (const auto& entry : map)
+  {
+    jstring key = ToJString(env, entry.first);
+    jstring value = ToJString(env, entry.second);
 
-        jobject pair = env_->NewObject(IDCache::GetPairClass(), IDCache::GetPairConstructor(),
-                                       short_name, full_name);
+    jobject result =
+        env->CallObjectMethod(linked_hash_map, IDCache::GetLinkedHashMapPut(), key, value);
 
-        env_->DeleteLocalRef(short_name);
-        env_->DeleteLocalRef(full_name);
-
-        return pair;
-      });
+    env->DeleteLocalRef(key);
+    env->DeleteLocalRef(value);
+    env->DeleteLocalRef(result);
+  }
+  return linked_hash_map;
 }
 
 JNIEXPORT void JNICALL Java_org_dolphinemu_dolphinemu_NativeLibrary_ReloadLoggerConfig(JNIEnv*,

@@ -318,8 +318,8 @@ void Wiimote::Read()
     if (m_balance_board_dump_port > 0 && m_index == WIIMOTE_BALANCE_BOARD)
     {
       static sf::UdpSocket Socket;
-      (void)Socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost,
-                        m_balance_board_dump_port);
+      Socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost,
+                  m_balance_board_dump_port);
     }
 
     // Add it to queue
@@ -339,8 +339,7 @@ bool Wiimote::Write()
   if (m_balance_board_dump_port > 0 && m_index == WIIMOTE_BALANCE_BOARD)
   {
     static sf::UdpSocket Socket;
-    (void)Socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost,
-                      m_balance_board_dump_port);
+    Socket.send((char*)rpt.data(), rpt.size(), sf::IpAddress::LocalHost, m_balance_board_dump_port);
   }
   int ret = IOWrite(rpt.data(), rpt.size());
 
@@ -614,7 +613,8 @@ void WiimoteScanner::SetScanMode(WiimoteScanMode scan_mode)
 bool WiimoteScanner::IsReady() const
 {
   std::lock_guard lg(m_backends_mutex);
-  return std::ranges::any_of(m_backends, &WiimoteScannerBackend::IsReady);
+  return std::any_of(m_backends.begin(), m_backends.end(),
+                     [](const auto& backend) { return backend->IsReady(); });
 }
 
 static void CheckForDisconnectedWiimotes()

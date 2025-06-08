@@ -115,7 +115,7 @@ NetPlayDialog::NetPlayDialog(const GameListModel& game_list_model,
   LoadSettings();
   ConnectWidgets();
 
-  const auto& settings = Settings::Instance().GetQSettings();
+  auto& settings = Settings::Instance().GetQSettings();
 
   restoreGeometry(settings.value(QStringLiteral("netplaydialog/geometry")).toByteArray());
   m_splitter->restoreState(settings.value(QStringLiteral("netplaydialog/splitter")).toByteArray());
@@ -233,7 +233,6 @@ void NetPlayDialog::CreateMainLayout()
     Settings::Instance().GetNetPlayServer()->ComputeGameDigest(
         NetPlay::NetPlayClient::GetSDCardIdentifier());
   });
-
   m_game_digest_menu->addAction(tr("Save file"), this, [] {
     Settings::Instance().GetNetPlayServer()->ComputeGameDigest(
         NetPlay::NetPlayClient::GetBrawlFileIdentifier());
@@ -347,12 +346,12 @@ void NetPlayDialog::ConnectWidgets()
       QApplication::clipboard()->setText(m_hostcode_label->text());
   });
   connect(m_players_list, &QTableWidget::itemSelectionChanged, [this] {
-    const int row = m_players_list->currentRow();
+    int row = m_players_list->currentRow();
     m_kick_button->setEnabled(row > 0 &&
                               !m_players_list->currentItem()->data(Qt::UserRole).isNull());
   });
   connect(m_kick_button, &QPushButton::clicked, [this] {
-    const auto id = m_players_list->currentItem()->data(Qt::UserRole).toInt();
+    auto id = m_players_list->currentItem()->data(Qt::UserRole).toInt();
     Settings::Instance().GetNetPlayServer()->KickPlayer(id);
   });
   connect(m_assign_ports_button, &QPushButton::clicked, [this] {
@@ -375,8 +374,8 @@ void NetPlayDialog::ConnectWidgets()
     if (value == m_minimum_buffer_size)
       return;
 
-    const auto client = Settings::Instance().GetNetPlayClient();
-    const auto server = Settings::Instance().GetNetPlayServer();
+    auto client = Settings::Instance().GetNetPlayClient();
+    auto server = Settings::Instance().GetNetPlayServer();
     if (server && !m_host_input_authority)
       server->AdjustMinimumPadBufferSize(value);
     else
@@ -392,7 +391,7 @@ void NetPlayDialog::ConnectWidgets()
   const auto hia_function = [this](bool enable) {
     if (m_host_input_authority != enable)
     {
-      const auto server = Settings::Instance().GetNetPlayServer();
+      auto server = Settings::Instance().GetNetPlayServer();
       if (server)
         server->SetHostInputAuthority(enable);
     }
@@ -485,7 +484,7 @@ bool NetPlayDialog::IsMusicOff()
 void NetPlayDialog::OnChat()
 {
   QueueOnObject(this, [this] {
-    const auto msg = m_chat_type_edit->text().toStdString();
+    auto msg = m_chat_type_edit->text().toStdString();
 
     if (msg.empty())
       return;
@@ -571,7 +570,7 @@ void NetPlayDialog::show(std::string nickname, bool use_traversal)
   m_chat_edit->clear();
   m_chat_type_edit->clear();
 
-  const bool is_hosting = Settings::Instance().GetNetPlayServer() != nullptr;
+  bool is_hosting = Settings::Instance().GetNetPlayServer() != nullptr;
 
   if (is_hosting)
   {
@@ -671,8 +670,8 @@ void NetPlayDialog::UpdateDiscordPresence()
 
 void NetPlayDialog::UpdateGUI()
 {
-  const auto client = Settings::Instance().GetNetPlayClient();
-  const auto server = Settings::Instance().GetNetPlayServer();
+  auto client = Settings::Instance().GetNetPlayClient();
+  auto server = Settings::Instance().GetNetPlayServer();
   if (!client)
     return;
 
@@ -684,9 +683,9 @@ void NetPlayDialog::UpdateGUI()
 
   m_player_count = static_cast<int>(players.size());
 
-  const int selection_pid = m_players_list->currentItem() ?
-                                m_players_list->currentItem()->data(Qt::UserRole).toInt() :
-                                -1;
+  int selection_pid = m_players_list->currentItem() ?
+                          m_players_list->currentItem()->data(Qt::UserRole).toInt() :
+                          -1;
 
   m_players_list->clear();
   m_players_list->setHorizontalHeaderLabels(
@@ -863,10 +862,9 @@ void NetPlayDialog::DisplayMessage(const QString& msg, const std::string& color,
                             .arg(QString::fromStdString(color), msg.toHtmlEscaped()));
   });
 
-  const QColor c(color.empty() ? QStringLiteral("white") : QString::fromStdString(color));
+  QColor c(color.empty() ? QStringLiteral("white") : QString::fromStdString(color));
 
-  if (Config::Get(Config::GFX_SHOW_NETPLAY_MESSAGES) &&
-      Core::IsRunning(Core::System::GetInstance()))
+  if (g_ActiveConfig.bShowNetPlayMessages && Core::IsRunning(Core::System::GetInstance()))
   {
     g_netplay_chat_ui->AppendChat(msg.toStdString(),
                                   {static_cast<float>(c.redF()), static_cast<float>(c.greenF()),
@@ -948,11 +946,11 @@ void NetPlayDialog::OnMsgStartGame()
   }
 
   QueueOnObject(this, [this] {
-    const auto client = Settings::Instance().GetNetPlayClient();
+    auto client = Settings::Instance().GetNetPlayClient();
 
     if (client)
     {
-      if (const auto game = FindGameFile(m_current_game_identifier))
+      if (auto game = FindGameFile(m_current_game_identifier))
         client->StartGame(game->GetFilePath());
       else
         PanicAlertFmtT("Selected game doesn't exist in game list!");
@@ -1127,7 +1125,7 @@ void NetPlayDialog::OnTtlDetermined(u8 ttl)
 
 bool NetPlayDialog::IsRecording()
 {
-  const std::optional<bool> is_recording = RunOnObject(m_record_input_action, &QAction::isChecked);
+  std::optional<bool> is_recording = RunOnObject(m_record_input_action, &QAction::isChecked);
   if (is_recording)
     return *is_recording;
   return false;
@@ -1143,7 +1141,7 @@ NetPlayDialog::FindGameFile(const NetPlay::SyncIdentifier& sync_identifier,
 
   *found = NetPlay::SyncIdentifierComparison::DifferentGame;
 
-  const std::optional<std::shared_ptr<const UICommon::GameFile>> game_file =
+  std::optional<std::shared_ptr<const UICommon::GameFile>> game_file =
       RunOnObject(this, [this, &sync_identifier, found] {
         for (int i = 0; i < m_game_list_model.rowCount(QModelIndex()); i++)
         {
@@ -1163,7 +1161,7 @@ std::string NetPlayDialog::FindGBARomPath(const std::array<u8, 20>& hash, std::s
                                           int device_number)
 {
 #ifdef HAS_LIBMGBA
-  const auto result = RunOnObject(this, [&, this] {
+  auto result = RunOnObject(this, [&, this] {
     std::string rom_path;
     std::array<u8, 20> rom_hash;
     std::string rom_title;
@@ -1363,7 +1361,7 @@ void NetPlayDialog::SetChunkedProgress(const int pid, const u64 progress)
 
 void NetPlayDialog::SetHostWiiSyncData(std::vector<u64> titles, std::string redirect_folder)
 {
-  const auto client = Settings::Instance().GetNetPlayClient();
+  auto client = Settings::Instance().GetNetPlayClient();
   if (client)
     client->SetWiiSyncData(nullptr, std::move(titles), std::move(redirect_folder));
 }

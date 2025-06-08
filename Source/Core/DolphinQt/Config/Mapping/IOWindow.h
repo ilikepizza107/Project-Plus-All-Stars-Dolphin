@@ -10,11 +10,13 @@
 #include <QComboBox>
 #include <QDialog>
 #include <QString>
+#include <QSyntaxHighlighter>
 
+#include "Common/Flag.h"
 #include "InputCommon/ControllerInterface/CoreDevice.h"
 
 class ControlReference;
-class MappingWindow;
+class MappingWidget;
 class QAbstractButton;
 class QDialogButtonBox;
 class QLineEdit;
@@ -25,7 +27,6 @@ class QPlainTextEdit;
 class QPushButton;
 class QSlider;
 class QSpinBox;
-class QTextDocument;
 
 namespace ControllerEmu
 {
@@ -34,14 +35,14 @@ class EmulatedController;
 
 class InputStateLineEdit;
 
-class ControlExpressionSyntaxHighlighter final : public QObject
+class ControlExpressionSyntaxHighlighter final : public QSyntaxHighlighter
 {
   Q_OBJECT
 public:
   explicit ControlExpressionSyntaxHighlighter(QTextDocument* parent);
 
-private:
-  void Highlight(QTextDocument* text_edit);
+protected:
+  void highlightBlock(const QString& text) final override;
 };
 
 class QComboBoxWithMouseWheelDisabled : public QComboBox
@@ -65,12 +66,8 @@ public:
     Output
   };
 
-  explicit IOWindow(MappingWindow* window, ControllerEmu::EmulatedController* m_controller,
+  explicit IOWindow(MappingWidget* parent, ControllerEmu::EmulatedController* m_controller,
                     ControlReference* ref, Type type);
-
-signals:
-  void DetectInputComplete();
-  void TestOutputComplete();
 
 private:
   std::shared_ptr<ciface::Core::Device> GetSelectedDevice() const;
@@ -82,6 +79,8 @@ private:
 
   void OnDialogButtonPressed(QAbstractButton* button);
   void OnDeviceChanged();
+  void OnDetectButtonPressed();
+  void OnTestButtonPressed();
   void OnRangeChanged(int range);
 
   void AppendSelectedOption();
@@ -116,12 +115,10 @@ private:
 
   // Input actions
   QPushButton* m_detect_button;
-  std::unique_ptr<ciface::Core::InputDetector> m_input_detector;
   QComboBox* m_functions_combo;
 
   // Output actions
   QPushButton* m_test_button;
-  QTimer* m_output_test_timer;
 
   // Textarea
   QPlainTextEdit* m_expression_text;

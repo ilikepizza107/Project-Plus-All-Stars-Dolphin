@@ -138,9 +138,10 @@ void GraphicsModListWidget::RefreshModList()
   for (const GraphicsModConfig& mod : m_mod_group.GetMods())
   {
     // If no group matches the mod's features, or if the mod has no features, skip it
-    if (std::ranges::none_of(mod.m_features, [&groups](const GraphicsModFeatureConfig& feature) {
-          return groups.contains(feature.m_group);
-        }))
+    if (std::none_of(mod.m_features.begin(), mod.m_features.end(),
+                     [&groups](const GraphicsModFeatureConfig& feature) {
+                       return groups.contains(feature.m_group);
+                     }))
     {
       continue;
     }

@@ -35,20 +35,18 @@ private:
   ConfigBool* m_enable_mmu_checkbox;
   ConfigBool* m_pause_on_panic_checkbox;
   ConfigBool* m_accurate_cpu_cache_checkbox;
-  ConfigBool* m_cpu_clock_override_checkbox;
+  QCheckBox* m_cpu_clock_override_checkbox;
   QSlider* m_cpu_clock_override_slider;
   QLabel* m_cpu_clock_override_slider_label;
+  QLabel* m_cpu_clock_override_description;
 
-  ConfigBool* m_vi_rate_override_checkbox;
-  QSlider* m_vi_rate_override_slider;
-  QLabel* m_vi_rate_override_slider_label;
-
-  ConfigBool* m_custom_rtc_checkbox;
+  QCheckBox* m_custom_rtc_checkbox;
   QDateTimeEdit* m_custom_rtc_datetime;
 
-  ConfigBool* m_ram_override_checkbox;
+  QCheckBox* m_ram_override_checkbox;
   QSlider* m_mem1_override_slider;
   QLabel* m_mem1_override_slider_label;
   QSlider* m_mem2_override_slider;
   QLabel* m_mem2_override_slider_label;
+  QLabel* m_ram_override_description;
 };

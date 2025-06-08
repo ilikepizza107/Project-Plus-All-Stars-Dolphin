@@ -644,20 +644,6 @@ void Jit64::fselx(UGeckoInstruction inst)
 
   if (cpu_info.bAVX)
   {
-    // Prefer BLENDVPD over VBLENDVPD if the latter doesn't save any
-    // instructions.
-    //
-    // VBLENDVPD allows separate source and destination registers, which can
-    // eliminate a MOVAPD/MOVSD. However, on Intel since Skylake, VBLENDVPD
-    // takes additional uops to execute compared to BLENDVPD (according to
-    // https://uops.info). On AMD and older Intel microarchitectures there is no
-    // difference.
-    if (d == c)
-    {
-      BLENDVPD(Rd, Rb);
-      return;
-    }
-
     X64Reg src1 = XMM1;
     if (Rc.IsSimpleReg())
     {
@@ -668,7 +654,7 @@ void Jit64::fselx(UGeckoInstruction inst)
       MOVAPD(XMM1, Rc);
     }
 
-    if (packed)
+    if (d == c || packed)
     {
       VBLENDVPD(Rd, src1, Rb, XMM0);
       return;

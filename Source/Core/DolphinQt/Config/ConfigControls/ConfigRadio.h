@@ -3,17 +3,15 @@
 
 #pragma once
 
-#include "DolphinQt/Config/ConfigControls/ConfigControl.h"
 #include "DolphinQt/Config/ToolTipControls/ToolTipRadioButton.h"
 
-#include "Common/Config/ConfigInfo.h"
+#include "Common/Config/Config.h"
 
-class ConfigRadioInt final : public ConfigControl<ToolTipRadioButton>
+class ConfigRadioInt : public ToolTipRadioButton
 {
   Q_OBJECT
 public:
-  ConfigRadioInt(const QString& label, const Config::Info<int>& setting, int value,
-                 Config::Layer* layer = nullptr);
+  ConfigRadioInt(const QString& label, const Config::Info<int>& setting, int value);
 
 signals:
   // Since selecting a new radio button deselects the old one, ::toggled will generate two signals.
@@ -21,12 +19,9 @@ signals:
   void OnSelected(int new_value);
   void OnDeselected(int old_value);
 
-protected:
-  void OnConfigChanged() override;
-
 private:
   void Update();
 
-  const Config::Info<int> m_setting;
+  Config::Info<int> m_setting;
   int m_value;
 };

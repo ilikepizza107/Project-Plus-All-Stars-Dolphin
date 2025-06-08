@@ -3,29 +3,28 @@
 
 #pragma once
 
-#include "DolphinQt/Config/ConfigControls/ConfigControl.h"
 #include "DolphinQt/Config/ToolTipControls/ToolTipSlider.h"
 
-#include "Common/Config/ConfigInfo.h"
+namespace Config
+{
+template <typename T>
+class Info;
+}
 
 // Automatically converts an int slider into a float one.
 // Do not read the int values or ranges directly from it.
-class ConfigFloatSlider final : public ConfigControl<ToolTipSlider>
+class ConfigFloatSlider : public ToolTipSlider
 {
   Q_OBJECT
 public:
-  ConfigFloatSlider(float minimum, float maximum, const Config::Info<float>& setting, float step,
-                    Config::Layer* layer = nullptr);
+  ConfigFloatSlider(float minimum, float maximum, const Config::Info<float>& setting, float step);
   void Update(int value);
 
   // Returns the adjusted float value
   float GetValue() const;
 
-protected:
-  void OnConfigChanged() override;
-
 private:
   float m_minimum;
   float m_step;
-  const Config::Info<float> m_setting;
+  const Config::Info<float>& m_setting;
 };

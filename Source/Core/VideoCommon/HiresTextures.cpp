@@ -77,6 +77,11 @@ std::pair<std::string, bool> GetNameArbPair(const TextureInfo& texture_info)
 }
 }  // namespace
 
+void HiresTexture::Init()
+{
+  Update();
+}
+
 void HiresTexture::Shutdown()
 {
   Clear();

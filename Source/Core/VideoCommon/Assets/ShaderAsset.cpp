@@ -54,7 +54,8 @@ bool ParseNumeric(const CustomAssetLibrary::AssetID& asset_id, const picojson::v
       return false;
     }
 
-    if (!std::ranges::all_of(json_data, &picojson::value::is<double>))
+    if (!std::all_of(json_data.begin(), json_data.end(),
+                     [](const picojson::value& v) { return v.is<double>(); }))
     {
       ERROR_LOG_FMT(VIDEO,
                     "Asset id '{}' shader has attribute '{}' where "

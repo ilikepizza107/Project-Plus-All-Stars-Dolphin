@@ -100,7 +100,6 @@ AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
   QHBoxLayout* h_layout = new QHBoxLayout;
 
   setLayout(main_layout);
-  main_layout->setSizeConstraint(QLayout::SetFixedSize);
   main_layout->addLayout(h_layout);
   main_layout->addWidget(copyright);
   copyright->setAlignment(Qt::AlignCenter);

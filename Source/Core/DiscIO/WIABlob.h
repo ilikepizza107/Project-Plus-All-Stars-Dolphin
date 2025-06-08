@@ -41,7 +41,7 @@ constexpr u32 WIA_MAGIC = 0x01414957;  // "WIA\x1" (byteswapped to little endian
 constexpr u32 RVZ_MAGIC = 0x015A5652;  // "RVZ\x1" (byteswapped to little endian)
 
 template <bool RVZ>
-class WIARVZFileReader final : public BlobReader
+class WIARVZFileReader : public BlobReader
 {
 public:
   ~WIARVZFileReader();
@@ -359,8 +359,7 @@ private:
                                      std::mutex* reusable_groups_mutex, GroupEntry* group_entry,
                                      u64* bytes_written);
   static ConversionResultCode RunCallback(size_t groups_written, u64 bytes_read, u64 bytes_written,
-                                          u32 total_groups, u64 iso_size,
-                                          const CompressCB& callback);
+                                          u32 total_groups, u64 iso_size, CompressCB callback);
 
   bool m_valid;
   WIARVZCompressionType m_compression_type;

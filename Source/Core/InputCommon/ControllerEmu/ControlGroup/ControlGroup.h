@@ -13,6 +13,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "Common/CommonTypes.h"
 #include "Common/IniFile.h"
 #include "InputCommon/ControllerEmu/Control/Control.h"
 #include "InputCommon/ControllerInterface/CoreDevice.h"
@@ -68,10 +69,10 @@ public:
                DefaultValue default_value = DefaultValue::AlwaysEnabled);
   virtual ~ControlGroup();
 
-  virtual void LoadConfig(Common::IniFile::Section* sec, const std::string& base);
-  virtual void SaveConfig(Common::IniFile::Section* sec, const std::string& base);
-
-  virtual void UpdateReferences(ciface::ExpressionParser::ControlEnvironment& env);
+  virtual void LoadConfig(Common::IniFile::Section* sec, const std::string& defdev = "",
+                          const std::string& base = "");
+  virtual void SaveConfig(Common::IniFile::Section* sec, const std::string& defdev = "",
+                          const std::string& base = "");
 
   void SetControlExpression(int index, const std::string& expression);
 

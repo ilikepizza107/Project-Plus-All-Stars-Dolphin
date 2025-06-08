@@ -27,7 +27,6 @@
 
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
 #include "DolphinQt/QtUtils/SetWindowDecorations.h"
-#include "DolphinQt/Resources.h"
 #include "DolphinQt/Settings.h"
 
 // Qt is not guaranteed to keep track of file paths using native file pickers, so we use this
@@ -40,7 +39,6 @@ InfinityBaseWindow::InfinityBaseWindow(QWidget* parent) : QWidget(parent)
 {
   // i18n: Window for managing Disney Infinity figures
   setWindowTitle(tr("Infinity Manager"));
-  setWindowIcon(Resources::GetAppIcon());
   setObjectName(QStringLiteral("infinity_manager"));
   setMinimumSize(QSize(700, 200));
 

@@ -3,28 +3,31 @@
 
 #include "DolphinQt/Config/ConfigControls/ConfigBool.h"
 
+#include <QEvent>
+#include <QFont>
+#include <QSignalBlocker>
+
+#include "Common/Config/Config.h"
+
+#include "DolphinQt/Settings.h"
+
 ConfigBool::ConfigBool(const QString& label, const Config::Info<bool>& setting, bool reverse)
-    : ConfigBool(label, setting, nullptr, reverse)
+    : ToolTipCheckBox(label), m_setting(setting), m_reverse(reverse)
 {
-}
-
-ConfigBool::ConfigBool(const QString& label, const Config::Info<bool>& setting,
-                       Config::Layer* layer, bool reverse)
-    : ConfigControl(label, setting.GetLocation(), layer), m_setting(setting), m_reverse(reverse)
-{
-  setChecked(ReadValue(setting) ^ reverse);
-
   connect(this, &QCheckBox::toggled, this, &ConfigBool::Update);
+  setChecked(Config::Get(m_setting) ^ reverse);
+
+  connect(&Settings::Instance(), &Settings::ConfigChanged, this, [this] {
+    QFont bf = font();
+    bf.setBold(Config::GetActiveLayerForConfig(m_setting) != Config::LayerType::Base);
+    setFont(bf);
+
+    const QSignalBlocker blocker(this);
+    setChecked(Config::Get(m_setting) ^ m_reverse);
+  });
 }
 
 void ConfigBool::Update()
 {
-  const bool value = static_cast<bool>(isChecked() ^ m_reverse);
-
-  SaveValue(m_setting, value);
-}
-
-void ConfigBool::OnConfigChanged()
-{
-  setChecked(ReadValue(m_setting) ^ m_reverse);
+  Config::SetBaseOrCurrent(m_setting, static_cast<bool>(isChecked() ^ m_reverse));
 }

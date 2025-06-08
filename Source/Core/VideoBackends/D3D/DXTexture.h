@@ -3,12 +3,11 @@
 
 #pragma once
 
-#include <d3d11_4.h>
+#include <d3d11.h>
 #include <memory>
 #include <string>
 #include <string_view>
 #include <vector>
-
 #include "Common/CommonTypes.h"
 
 #include "VideoBackends/D3D/D3DBase.h"
@@ -16,6 +15,7 @@
 #include "VideoCommon/AbstractGfx.h"
 #include "VideoCommon/AbstractStagingTexture.h"
 #include "VideoCommon/AbstractTexture.h"
+#include "VideoCommon/RenderBase.h"
 
 namespace DX11
 {
