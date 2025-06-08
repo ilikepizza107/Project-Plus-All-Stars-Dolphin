@@ -22,6 +22,7 @@
 #include "AudioCommon/AudioCommon.h"
 
 #include "Common/Config/Config.h"
+#include "Common/Contains.h"
 #include "Common/FileUtil.h"
 #include "Common/StringUtil.h"
 
@@ -58,7 +59,7 @@ Settings::Settings()
     });
   });
 
-  Config::AddConfigChangedCallback([this] {
+  m_config_changed_callback_id = Config::AddConfigChangedCallback([this] {
     static std::atomic<bool> do_once{true};
     if (do_once.exchange(false))
     {
@@ -93,7 +94,10 @@ Settings::Settings()
   });
 }
 
-Settings::~Settings() = default;
+Settings::~Settings()
+{
+  Config::RemoveConfigChangedCallback(m_config_changed_callback_id);
+}
 
 void Settings::UnregisterDevicesChangedCallback()
 {
@@ -296,7 +300,7 @@ void Settings::AddPath(const QString& qpath)
   std::string path = qpath.toStdString();
   std::vector<std::string> paths = Config::GetIsoPaths();
 
-  if (std::find(paths.begin(), paths.end(), path) != paths.end())
+  if (Common::Contains(paths, path))
     return;
 
   paths.emplace_back(path);
@@ -309,11 +313,9 @@ void Settings::RemovePath(const QString& qpath)
   std::string path = qpath.toStdString();
   std::vector<std::string> paths = Config::GetIsoPaths();
 
-  auto new_end = std::remove(paths.begin(), paths.end(), path);
-  if (new_end == paths.end())
+  if (std::erase(paths, path) == 0)
     return;
 
-  paths.erase(new_end, paths.end());
   Config::SetIsoPaths(paths);
   emit PathRemoved(qpath);
 }
@@ -439,22 +441,17 @@ int Settings::GetVolume() const
 void Settings::SetVolume(int volume)
 {
   if (GetVolume() != volume)
-  {
     Config::SetBaseOrCurrent(Config::MAIN_AUDIO_VOLUME, volume);
-    emit VolumeChanged(volume);
-  }
 }
 
 void Settings::IncreaseVolume(int volume)
 {
   AudioCommon::IncreaseVolume(Core::System::GetInstance(), volume);
-  emit VolumeChanged(GetVolume());
 }
 
 void Settings::DecreaseVolume(int volume)
 {
   AudioCommon::DecreaseVolume(Core::System::GetInstance(), volume);
-  emit VolumeChanged(GetVolume());
 }
 
 bool Settings::IsLogVisible() const
@@ -609,14 +606,14 @@ void Settings::SetMemoryVisible(bool enabled)
 {
   if (IsMemoryVisible() == enabled)
     return;
-  QSettings().setValue(QStringLiteral("debugger/showmemory"), enabled);
+  GetQSettings().setValue(QStringLiteral("debugger/showmemory"), enabled);
 
   emit MemoryVisibilityChanged(enabled);
 }
 
 bool Settings::IsMemoryVisible() const
 {
-  return QSettings().value(QStringLiteral("debugger/showmemory")).toBool();
+  return GetQSettings().value(QStringLiteral("debugger/showmemory")).toBool();
 }
 
 void Settings::SetNetworkVisible(bool enabled)
@@ -637,28 +634,28 @@ void Settings::SetJITVisible(bool enabled)
 {
   if (IsJITVisible() == enabled)
     return;
-  QSettings().setValue(QStringLiteral("debugger/showjit"), enabled);
+  GetQSettings().setValue(QStringLiteral("debugger/showjit"), enabled);
 
   emit JITVisibilityChanged(enabled);
 }
 
 bool Settings::IsJITVisible() const
 {
-  return QSettings().value(QStringLiteral("debugger/showjit")).toBool();
+  return GetQSettings().value(QStringLiteral("debugger/showjit")).toBool();
 }
 
 void Settings::SetAssemblerVisible(bool enabled)
 {
   if (IsAssemblerVisible() == enabled)
     return;
-  QSettings().setValue(QStringLiteral("debugger/showassembler"), enabled);
+  GetQSettings().setValue(QStringLiteral("debugger/showassembler"), enabled);
 
   emit AssemblerVisibilityChanged(enabled);
 }
 
 bool Settings::IsAssemblerVisible() const
 {
-  return QSettings().value(QStringLiteral("debugger/showassembler")).toBool();
+  return GetQSettings().value(QStringLiteral("debugger/showassembler")).toBool();
 }
 
 void Settings::RefreshWidgetVisibility()
@@ -796,6 +793,20 @@ void Settings::SetUSBKeyboardConnected(bool connected)
     Config::SetBaseOrCurrent(Config::MAIN_WII_KEYBOARD, connected);
     emit USBKeyboardConnectionChanged(connected);
   }
+}
+
+bool Settings::IsWiiSpeakMuted() const
+{
+  return Config::Get(Config::MAIN_WII_SPEAK_MUTED);
+}
+
+void Settings::SetWiiSpeakMuted(bool muted)
+{
+  if (IsWiiSpeakMuted() == muted)
+    return;
+
+  Config::SetBaseOrCurrent(Config::MAIN_WII_SPEAK_MUTED, muted);
+  emit WiiSpeakMuteChanged(muted);
 }
 
 void Settings::SetIsContinuouslyFrameStepping(bool is_stepping)

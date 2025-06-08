@@ -10,6 +10,11 @@ import org.dolphinemu.dolphinemu.R
 import org.dolphinemu.dolphinemu.features.input.model.MappingCommon
 import java.io.Closeable
 
+/**
+ * Represents a set of settings stored in the native part of Dolphin.
+ *
+ * A set of settings can be either the global settings, or game settings for a particular game.
+ */
 class Settings : Closeable {
     private var gameId: String = ""
     private var revision = 0
@@ -124,7 +129,7 @@ class Settings : Closeable {
         const val SECTION_INI_DSP = "DSP"
         const val SECTION_LOGGER_LOGS = "Logs"
         const val SECTION_LOGGER_OPTIONS = "Options"
-        const val SECTION_GFX_HARDWARE = "Settings"
+        const val SECTION_GFX_HARDWARE = "Hardware"
         const val SECTION_GFX_SETTINGS = "Settings"
         const val SECTION_GFX_ENHANCEMENTS = "Enhancements"
         const val SECTION_GFX_COLOR_CORRECTION = "ColorCorrection"
