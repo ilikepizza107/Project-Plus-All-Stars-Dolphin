@@ -378,7 +378,7 @@ void GeneralPane::AddDescriptions()
       "Enables the use of AR and Gecko cheat codes which can be used to modify games' behavior. "
       "These codes can be configured with the Cheats Manager in the Tools menu."
       "<br><br>This setting cannot be changed while emulation is active."
-      "<br><br><dolphin_emphasis>If unsure, leave this unchecked.</dolphin_emphasis>");
+      "<br><br><dolphin_emphasis>If unsure, leave this checked.</dolphin_emphasis>");
   static constexpr char TR_OVERRIDE_REGION_SETTINGS_DESCRIPTION[] =
       QT_TR_NOOP("Lets you use languages and other region-related settings that the game may not "
                  "be designed for. May cause various crashes and bugs."
