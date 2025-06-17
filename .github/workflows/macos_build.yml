@@ -149,7 +149,7 @@ jobs:
           else
             SUFFIX="sha[$(git rev-parse --short HEAD)]"
           fi
-          APPNAME="PrimeHack-$SUFFIX"
+          APPNAME="ProjectPlus-$SUFFIX"
           mv build/Binaries/DolphinQt.app "$APPNAME.app"
           tar --options xz:compression-level=9 -cvJf "$APPNAME.tar.xz" "$APPNAME.app"
           echo "name=$APPNAME" >> "$GITHUB_OUTPUT"
