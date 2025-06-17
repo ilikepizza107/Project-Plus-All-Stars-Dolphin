@@ -122,7 +122,7 @@ jobs:
         chmod a+x ./squashfs-root/runtime
         chmod a+x ./squashfs-root/AppRun-patched
         chmod a+x ./squashfs-root/update.sh
-        export UPD_INFO="gh-releases-zsync|qurious-pixel|dolphin|continuous|Dolphin_Emulator-x86_64.AppImage.zsync"
+        export UPD_INFO="gh-releases-zsync|Motobug|Project-Plus-Dolphin|continuous|Dolphin_Emulator-x86_64.AppImage.zsync"
         /tmp/squashfs-root/AppRun --appdir="$GITHUB_WORKSPACE"/squashfs-root/ --plugin qt -d "$GITHUB_WORKSPACE"/squashfs-root/dolphin-emu.desktop -i "$GITHUB_WORKSPACE"/squashfs-root/dolphin-emu.svg \
         --exclude-library=libglib* --output appimage
         ls . | grep *.AppImage
@@ -145,7 +145,7 @@ jobs:
           ls -al artifacts/
           wget -c https://github.com/tcnksm/ghr/releases/download/v0.17.0/ghr_v0.17.0_linux_amd64.tar.gz
           tar xfv ghr_v0.17.0_linux_amd64.tar.gz
-          ghr_v0.17.0_linux_amd64/ghr -u qurious-pixel -r dolphin -recreate -n 'Continuous build' -b "$(printf "DOLPHIN Build ${{ env.DOLPHINVER }}\nGitHub https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")" continuous artifacts/
+          ghr_v0.17.0_linux_amd64/ghr -u Motobug -r Project-Plus-Dolphin -recreate -n 'Continuous build' -b "$(printf "DOLPHIN Build ${{ env.DOLPHINVER }}\nGitHub https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")" continuous artifacts/
       env:
         DEFAULT_BRANCH: git-actions
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
