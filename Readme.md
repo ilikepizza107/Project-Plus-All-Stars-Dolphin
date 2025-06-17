@@ -25,6 +25,7 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
     
 * To-Do
   * Overwrite Dolphin updater functions with our own
+  * Sub-Frame Netplay Buffer Support
 
 # Dolphin - A GameCube and Wii Emulator
 
