@@ -22,10 +22,10 @@ This is a work-in-progress version of the Dolphin Emulator built for usage with 
   * Client side music toggle in netplay window
   * Gamecube adapter polling rate in controller settings
   * Spectator button in netplay window
+  * Overwrite Dolphin updater functions with our own
     
 * To-Do
-  * Overwrite Dolphin updater functions with our own
-  * Sub-Frame Netplay Buffer Support
+  * Bug fixes and miscellaneous improvements
 
 # Dolphin - A GameCube and Wii Emulator
 
