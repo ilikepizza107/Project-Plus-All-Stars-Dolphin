@@ -138,8 +138,8 @@ void PerformanceMetrics::DrawImGuiStats(const float backbuffer_scale)
   const ImGuiCond set_next_position_condition =
       (display_size_changed || !movable_overlays) ? ImGuiCond_Always : ImGuiCond_FirstUseEver;
 
-  float window_y = window_padding;
-  float window_x = display_size.x - window_padding;
+  float window_y = window_padding + 40.0f * backbuffer_scale;
+  float window_x = window_padding;
 
   const auto clamp_window_position = [&]() {
     const ImVec2 position = ImGui::GetWindowPos();
@@ -173,10 +173,10 @@ void PerformanceMetrics::DrawImGuiStats(const float backbuffer_scale)
   {
     ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 4.f * backbuffer_scale));
 
-    // Position in the top-right corner of the screen.
+    // Position in the top-left corner of the screen.
 
     ImGui::SetNextWindowPos(ImVec2(window_x, window_y), set_next_position_condition,
-                            ImVec2(1.0f, 0.0f));
+                            ImVec2(0.0f, 0.0f));
     ImGui::SetNextWindowSize(ImVec2(graph_width, graph_height));
     ImGui::SetNextWindowBgAlpha(bg_alpha);
     window_y += graph_height + window_padding;
@@ -249,18 +249,18 @@ void PerformanceMetrics::DrawImGuiStats(const float backbuffer_scale)
 
   if (g_ActiveConfig.bShowSpeed)
   {
-    // Position in the top-right corner of the screen.
+    // Position in the top-left corner of the screen.
     float window_height = 47.f * backbuffer_scale;
 
     ImGui::SetNextWindowPos(ImVec2(window_x, window_y), set_next_position_condition,
-                            ImVec2(1.0f, 0.0f));
+                            ImVec2(0.0f, 0.0f));
     ImGui::SetNextWindowSize(ImVec2(window_width, window_height));
     ImGui::SetNextWindowBgAlpha(bg_alpha);
 
     if (stack_vertically)
       window_y += window_height + window_padding;
     else
-      window_x -= window_width + window_padding;
+      window_x += window_width + window_padding;
 
     if (ImGui::Begin("SpeedStats", nullptr, imgui_flags))
     {
@@ -276,16 +276,16 @@ void PerformanceMetrics::DrawImGuiStats(const float backbuffer_scale)
     int count = g_ActiveConfig.bShowFPS + 2 * g_ActiveConfig.bShowFTimes;
     float window_height = (12.f + 17.f * count) * backbuffer_scale;
 
-    // Position in the top-right corner of the screen.
+    // Position in the top-left corner of the screen.
     ImGui::SetNextWindowPos(ImVec2(window_x, window_y), set_next_position_condition,
-                            ImVec2(1.0f, 0.0f));
+                            ImVec2(0.0f, 0.0f));
     ImGui::SetNextWindowSize(ImVec2(window_width, window_height));
     ImGui::SetNextWindowBgAlpha(bg_alpha);
 
     if (stack_vertically)
       window_y += window_height + window_padding;
     else
-      window_x -= window_width + window_padding;
+      window_x += window_width + window_padding;
 
     if (ImGui::Begin("FPSStats", nullptr, imgui_flags))
     {
@@ -308,16 +308,16 @@ void PerformanceMetrics::DrawImGuiStats(const float backbuffer_scale)
     int count = g_ActiveConfig.bShowVPS + 2 * g_ActiveConfig.bShowVTimes;
     float window_height = (12.f + 17.f * count) * backbuffer_scale;
 
-    // Position in the top-right corner of the screen.
+    // Position in the top-left corner of the screen.
     ImGui::SetNextWindowPos(ImVec2(window_x, window_y), set_next_position_condition,
-                            ImVec2(1.0f, 0.0f));
+                            ImVec2(0.0f, 0.0f));
     ImGui::SetNextWindowSize(ImVec2(window_width, (12.f + 17.f * count) * backbuffer_scale));
     ImGui::SetNextWindowBgAlpha(bg_alpha);
 
     if (stack_vertically)
       window_y += window_height + window_padding;
     else
-      window_x -= window_width + window_padding;
+      window_x += window_width + window_padding;
 
     if (ImGui::Begin("VPSStats", nullptr, imgui_flags))
     {
