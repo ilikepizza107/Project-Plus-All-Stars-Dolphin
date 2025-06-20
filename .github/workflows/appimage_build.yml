@@ -140,12 +140,6 @@ jobs:
       with:
         name: Project-Plus-Dolphin_${{ env.DOLPHINVER }}
         path: uploads/
-    - name: Upload Dolphin
-      run: |
-          ls -al artifacts/
-          wget -c https://github.com/tcnksm/ghr/releases/download/v0.17.0/ghr_v0.17.0_linux_amd64.tar.gz
-          tar xfv ghr_v0.17.0_linux_amd64.tar.gz
-          ghr_v0.17.0_linux_amd64/ghr -u Motobug -r Project-Plus-Dolphin -recreate -n 'Continuous build' -b "$(printf "DOLPHIN Build ${{ env.DOLPHINVER }}\nGitHub https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID")" continuous artifacts/
       env:
         DEFAULT_BRANCH: git-actions
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
