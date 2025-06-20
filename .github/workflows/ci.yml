@@ -13,7 +13,7 @@
     steps:
     - uses: actions/checkout@v2
     - name: Purge .git for space reasons
-      run: rm -rf /home/runner/work/Dolphin-MPN-src/Dolphin-MPN-src/.git
+      run: rm -rf /home/runner/work/Project-Plus-Dolphin/Project-Plus-Dolphin/.git
     - name: Setup Packages
       run: |
         flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
@@ -72,7 +72,7 @@
         name: Project-Plus-Dolphin-windows-x86_64
         path: Binary/x64/
   
-  dolphin-appimage:
+  build_appimage:
     name: Project Plus Dolphin bundled as appimage
     runs-on: ubuntu-24.04
     env:
