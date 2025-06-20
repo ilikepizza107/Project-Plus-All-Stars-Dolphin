@@ -52,25 +52,68 @@
 
 
   build_windows:
-    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [ Netplay ]
+        include:
+          - build_type: Netplay
+            artifact_name: windows64-netplay
+            build_config: -G "Ninja" -DCMAKE_SYSTEM_VERSION="10.0.22621" -DCMAKE_BUILD_TYPE="Release" -DQt6_DIR:STRING="D:\a\dolphin\dolphin\Externals\Qt\Qt6.3.0\x64\lib\cmake\Qt6\"
+    env:
+      DXSDK_DIR: "C:\\Program Files (x86)\\Microsoft DirectX SDK (June 2010)\\"
+    name: "Windows ${{ matrix.build_type }}"
+    runs-on: windows-2022
     steps:
-    - uses: actions/checkout@v2
-    - name: Setup Submodules
-      run: git config --global --add safe.directory . && git submodule update --init --recursive
-    - name: Setup MSBuild
-      uses: microsoft/setup-msbuild@v1.0.2
-      with:
-        vs-version: '16.6.2'
-    - name: Build
-      run: msbuild "Source\dolphin-emu.sln" /verbosity:minimal /property:Configuration=Release /property:Platform=x64
-      with:
-        files-folder: Binary/x64/
-        files-folder-filter: exe,dll
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Project-Plus-Dolphin-windows-x86_64
-        path: Binary/x64/
+      - name: "Checkout"
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+      - name: 'Fetch Git Tags'
+        shell: bash
+        if: success()
+        run: |
+          git fetch --prune --unshallow
+          echo "GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
+          echo "GIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "GIT_TAG=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+          echo "CURR_DATE=$(date +%Y-%m-%d)" >> $GITHUB_ENV
+      - uses: seanmiddleditch/gha-setup-ninja@master
+      - uses: egor-tensin/vs-shell@v2
+      # - name: "Install Windows SDK"
+      #   shell: pwsh
+      #   working-directory: ${{ github.workspace }}
+      #   run: | 
+      #     powershell -NoLogo -Sta -NoProfile -NonInteractive -ExecutionPolicy Unrestricted -Command ./install-windows-sdk.ps1 22621
+      - name: "Build ${{ matrix.build_type }} Dolphin"
+        shell: cmd
+        working-directory: ${{ github.workspace }}
+        run: |
+          SET PATH=%PATH%;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x64;C:\Program Files (x86)\Windows Kits\10\bin\10.0.22621.0\x86;C:\Program Files\7-Zip;C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin;C:\Python27\;C:\Python27\Scripts;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin;C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\Ninja;C:\Program Files\Microsoft VS Code\bin;C:\Program Files\Git\cmd
+          cd ./Source
+          msbuild.exe /v:m /p:Platform=x64 /p:Configuration=Release dolphin-emu.sln
+      - name: "Package ${{ matrix.build_type }}"
+        working-directory: ${{ github.workspace }}
+        run: |
+          Xcopy /Y /E /I .\Data\Sys .\Binary\x64\Sys
+          cd .\Binary\x64\
+          fsutil file createnew FIX-VCRUNTIME140-ERROR.txt 0
+          echo "Download and install this: https://aka.ms/vs/16/release/vc_redist.x64.exe" > .\FIX-VCRUNTIME140-ERROR.txt
+      - name: Package Artifact
+        working-directory: ${{ github.workspace }}
+        run: |
+          $FILE_NAME="${{ env.CURR_DATE }}-${{ env.GIT_HASH }}-${{ env.GIT_TAG }}-${{ matrix.artifact_name }}.zip"
+          mkdir artifact
+          cd .\Binary\x64\
+          fsutil file createnew portable.txt 0
+          7z a $FILE_NAME .\*
+          move $FILE_NAME ..\..\artifact\
+      - name: "Publish"
+        if: success()
+        uses: actions/upload-artifact@v2-preview
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: "./artifact/"
   
   build_appimage:
     name: Project Plus Dolphin bundled as appimage
