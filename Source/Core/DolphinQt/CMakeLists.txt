@@ -298,6 +298,8 @@ add_executable(dolphin-emu
   NKitWarningDialog.h
   ProjectPlus/DownloadUpdateDialog.cpp
   ProjectPlus/DownloadUpdateDialog.h
+  ProjectPlus/DownloadWorker.cpp
+  ProjectPlus/DownloadWorker.h
   ProjectPlus/InstallUpdateDialog.cpp
   ProjectPlus/InstallUpdateDialog.h
   ProjectPlus/UpdateDialog.cpp
