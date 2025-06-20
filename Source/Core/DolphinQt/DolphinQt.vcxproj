@@ -5,6 +5,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{FA3FA62B-6F58-4B86-9453-4D149940A066}</ProjectGuid>
     <ProjectName>Dolphin</ProjectName>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <Import Project="$(VSPropsDir)Configuration.Application.props" />
@@ -17,6 +18,12 @@
     <Import Project="$(VSPropsDir)QtCompile.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetName>Dolphin-MPN</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetName>Dolphin-MPN</TargetName>
+  </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
       <AdditionalIncludeDirectories>$(ProjectDir)Config\Graphics;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -32,16 +39,22 @@
       <AdditionalIncludeDirectories>$(ProjectDir)TAS;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalIncludeDirectories>$(ProjectDir)VideoInterface;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <!--Qt 6.3.0 headers use std::aligned_storage instead of alignas-->
-      <PreprocessorDefinitions>_SILENCE_CXX23_ALIGNED_STORAGE_DEPRECATION_WARNING;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_SILENCE_CXX23_ALIGNED_STORAGE_DEPRECATION_WARNING;CURL_STATICLIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <!--Jump through some hoops to generate a pch file local to this project-->
       <AdditionalIncludeDirectories>$(SourceDir)PCH;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch_qt.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch_qt.h</ForcedIncludeFiles>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
     </ClCompile>
     <Manifest>
       <AdditionalManifestFiles>DolphinQt.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>
     </Manifest>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <TreatWarningAsError>false</TreatWarningAsError>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AboutDialog.cpp" />
@@ -174,8 +187,8 @@
     <ClCompile Include="InfinityBase/InfinityBaseWindow.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-	<ClCompile Include="ProjectPlus/DownloadUpdateDialog.cpp" />
-	<ClCompile Include="ProjectPlus/DownloadWorker.cpp" />
+    <ClCompile Include="ProjectPlus/DownloadUpdateDialog.cpp" />
+    <ClCompile Include="ProjectPlus/DownloadWorker.cpp" />
     <ClCompile Include="ProjectPlus/InstallUpdateDialog.cpp" />
     <ClCompile Include="ProjectPlus/UpdateDialog.cpp" />
     <ClCompile Include="MenuBar.cpp" />
@@ -395,8 +408,8 @@
     <QtMoc Include="HotkeyScheduler.h" />
     <QtMoc Include="InfinityBase/InfinityBaseWindow.h" />
     <QtMoc Include="MainWindow.h" />
-	<QtMoc Include="ProjectPlus/DownloadUpdateDialog.h" />
-	<QtMoc Include="ProjectPlus/DownloadWorker.h" />
+    <QtMoc Include="ProjectPlus/DownloadUpdateDialog.h" />
+    <QtMoc Include="ProjectPlus/DownloadWorker.h" />
     <QtMoc Include="ProjectPlus/InstallUpdateDialog.h" />
     <QtMoc Include="ProjectPlus/UpdateDialog.h" />
     <QtMoc Include="MenuBar.h" />
@@ -463,9 +476,6 @@
     <ProjectReference Include="$(CoreDir)DolphinLib.vcxproj">
       <Project>{D79392F7-06D6-4B4B-A39F-4D587C215D3A}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(CoreDir)Common\SCMRevGen.vcxproj">
-      <Project>{41279555-f94f-4ebc-99de-af863c10c5c4}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(DolphinRootDir)Languages\Languages.vcxproj">
       <Project>{0e033be3-2e08-428e-9ae9-bc673efa12b5}</Project>
     </ProjectReference>
@@ -501,20 +511,21 @@
   <ImportGroup Label="ExtensionTargets" />
   <!--Copy Exe, Data directory and DLLs which should be located in the executable directory-->
   <ItemGroup>
+    <!---<DataSysFiles Include="$(DolphinRootDir)Data\**\Extras\**\*.*" />-->
     <DataSysFiles Include="$(DolphinRootDir)Data\**\Games\**\*.*" />
 	<DataSysFiles Include="$(DolphinRootDir)Data\**\Launcher\**\*.*" />
-	<DataSysFiles Include="$(DolphinRootDir)Data\**\Sys\**\*.*" />
-	<DataUserFiles Include="$(DolphinRootDir)Data\**\User\**\*.*" />
+    <DataSysFiles Include="$(DolphinRootDir)Data\**\Sys\**\*.*" />
+    <DataUserFiles Include="$(DolphinRootDir)Data\**\User\**\*.*" />
     <DataTxtFiles Include="$(DolphinRootDir)Data\license.txt" />
-	<DataTxtFiles Include="$(DolphinRootDir)Data\portable.txt" />
+    <DataTxtFiles Include="$(DolphinRootDir)Data\portable.txt" />
     <BinaryFiles Include="$(TargetPath)" />
-    <AllInputFiles Include="@(DataSysFiles);@(DataTxtFiles);@(BinaryFiles)" />
+    <AllInputFiles Include="@(DataSysFiles);@(DataUserFiles);@(DataTxtFiles);@(BinaryFiles)" />
   </ItemGroup>
   <Target Name="AfterBuild" Inputs="@(AllInputFiles)" Outputs="@(AllInputFiles -> '$(BinaryOutputDir)%(RecursiveDir)%(Filename)%(Extension)')">
     <Message Text="Copying Data directory..." Importance="High" />
-    <RemoveDir Directories="$(BinaryOutputDir)Sys" />
-    <Copy SourceFiles="@(DataSysFiles)" DestinationFolder="$(BinaryOutputDir)%(RecursiveDir)" SkipUnchangedFiles="True" />
-    <Copy SourceFiles="@(DataTxtFiles)" DestinationFolder="$(BinaryOutputDir)" SkipUnchangedFiles="True" />
+    <Copy SourceFiles="@(DataSysFiles)" DestinationFolder="$(BinaryOutputDir)%(RecursiveDir)" Condition="!Exists('$(BinaryOutputDir)%(RecursiveDir)%(Filename)%(DataSysFiles.Extension)') OR $([System.DateTime]::Parse('%(ModifiedTime)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(BinaryOutputDir)%(RecursiveDir)%(Filename)%(DataSysFiles.Extension)').Ticks)" />
+    <Copy SourceFiles="@(DataUserFiles)" DestinationFolder="$(BinaryOutputDir)%(RecursiveDir)" Condition="!Exists('$(BinaryOutputDir)%(RecursiveDir)%(Filename)%(DataSysFiles.Extension)') OR $([System.DateTime]::Parse('%(ModifiedTime)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(BinaryOutputDir)%(RecursiveDir)%(Filename)%(DataSysFiles.Extension)').Ticks)" />
+    <Copy SourceFiles="@(DataTxtFiles)" DestinationFolder="$(BinaryOutputDir)" Condition="!Exists('$(BinaryOutputDir)%(Filename)%(DataTxtFiles.Extension)') OR $([System.DateTime]::Parse('%(ModifiedTime)').Ticks) &gt; $([System.IO.File]::GetLastWriteTime('$(BinaryOutputDir)%(RecursiveDir)%(Filename)%(DataTxtFiles.Extension)').Ticks)" />
     <Message Text="Copy: @(BinaryFiles) -&gt; $(BinaryOutputDir)" Importance="High" />
     <Copy SourceFiles="@(BinaryFiles)" DestinationFolder="$(BinaryOutputDir)" />
   </Target>
