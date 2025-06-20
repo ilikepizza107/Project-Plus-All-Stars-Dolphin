@@ -17,6 +17,9 @@
 #include <QStyleHints>
 #include <QVBoxLayout>
 #include <QWindow>
+#include <QMessageBox>
+#include <QByteArray>
+#include <QJsonDocument>
 
 #include <fmt/format.h>
 
@@ -38,6 +41,10 @@
 #include "Common/ScopeGuard.h"
 #include "Common/Version.h"
 #include "Common/WindowSystemInfo.h"
+#include "Common/HttpRequest.h"
+#include "Common/scmrev.h"
+#include "Common/ScopeGuard.h"
+#include "Common/StringUtil.h"
 
 #include "Core/AchievementManager.h"
 #include "Core/Boot/Boot.h"
@@ -107,6 +114,9 @@
 #include "DolphinQt/NetPlay/NetPlayBrowser.h"
 #include "DolphinQt/NetPlay/NetPlayDialog.h"
 #include "DolphinQt/NetPlay/NetPlaySetupDialog.h"
+#include "DolphinQt/ProjectPlus/DownloadUpdateDialog.h"
+#include "DolphinQt/ProjectPlus/InstallUpdateDialog.h"
+#include "DolphinQt/ProjectPlus/UpdateDialog.h"
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
 #include "DolphinQt/QtUtils/FileOpenEventFilter.h"
 #include "DolphinQt/QtUtils/ModalMessageBox.h"
@@ -274,6 +284,8 @@ MainWindow::MainWindow(Core::System& system, std::unique_ptr<BootParameters> boo
   InitCoreCallbacks();
 
   NetPlayInit();
+  
+  CheckForUpdatesAuto();
 
 #ifdef USE_RETRO_ACHIEVEMENTS
   AchievementManager::GetInstance().Init(reinterpret_cast<void*>(winId()));
@@ -612,6 +624,7 @@ void MainWindow::ConnectMenuBar()
           &GameList::OnGameListVisibilityChanged);
 
   connect(m_menu_bar, &MenuBar::ShowAboutDialog, this, &MainWindow::ShowAboutDialog);
+  connect(m_menu_bar, &MenuBar::ShowUpdateDialog, this, &MainWindow::ShowUpdateDialog);
 
   connect(m_game_list, &GameList::SelectionChanged, m_menu_bar, &MenuBar::SelectionChanged);
   connect(this, &MainWindow::ReadOnlyModeChanged, m_menu_bar, &MenuBar::ReadOnlyModeChanged);
@@ -710,7 +723,7 @@ void MainWindow::ConnectToolBar()
   connect(m_tool_bar, &ToolBar::SettingsPressed, this, &MainWindow::ShowSettingsWindow);
   connect(m_tool_bar, &ToolBar::ControllersPressed, this, &MainWindow::ShowControllersWindow);
   connect(m_tool_bar, &ToolBar::GraphicsPressed, this, &MainWindow::ShowGraphicsWindow);
-  connect(m_tool_bar, &ToolBar::InstallUpdateManuallyPressed, this, &MainWindow::InstallUpdateManually);  
+  connect(m_tool_bar, &ToolBar::InstallUpdateManuallyPressed, this, &MainWindow::ShowUpdateDialog);  
 
   connect(m_tool_bar, &ToolBar::StepPressed, m_code_widget, &CodeWidget::Step);
   connect(m_tool_bar, &ToolBar::StepOverPressed, m_code_widget, &CodeWidget::StepOver);
@@ -1350,6 +1363,80 @@ void MainWindow::ShowAboutDialog()
   about.exec();
 }
 
+// P+ change: New updater; credit to RainbowTabitha and the Mario Party Netplay team for the base code!
+
+void MainWindow::ShowUpdateDialog()
+{
+    Common::HttpRequest httpRequest;
+
+    // Make the GET request
+    auto response = httpRequest.Get("https://api.github.com/repos/jlambert360/PPlusReleases/releases/latest");
+
+    if (response)
+    {
+        // Access the underlying vector and convert it to QByteArray
+        QByteArray responseData(reinterpret_cast<const char*>(response->data()), response->size());
+
+        // Parse the JSON response
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+        QJsonObject jsonObject = jsonDoc.object();
+      
+        QString currentVersion = QString::fromStdString(SCM_DESC_STR);
+        QString latestVersion = jsonObject.value(QStringLiteral("tag_name")).toString();
+
+        if (currentVersion != latestVersion)
+        {
+          // Create and show the UpdateDialog with the fetched data
+          bool forced = false; // Set this based on your logic
+          UserInterface::Dialog::UpdateDialog updater(this, jsonObject, forced);
+          SetQWidgetWindowDecorations(&updater);
+          updater.exec();
+        } else {
+          QMessageBox::information(this, tr("Info"), tr("You are already up to date."));
+        }
+    }
+    else
+    {
+        // Handle error
+        QMessageBox::critical(this, tr("Error"), tr("Failed to fetch update information."));
+    }
+}
+
+void MainWindow::CheckForUpdatesAuto()
+{
+    Common::HttpRequest httpRequest;
+
+    // Make the GET request
+    auto response = httpRequest.Get("https://api.github.com/repos/jlambert360/PPlusReleases/releases/latest");
+
+    if (response)
+    {
+        // Access the underlying vector and convert it to QByteArray
+        QByteArray responseData(reinterpret_cast<const char*>(response->data()), response->size());
+
+        // Parse the JSON response
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(responseData);
+        QJsonObject jsonObject = jsonDoc.object();
+      
+        QString currentVersion = QString::fromStdString(SCM_DESC_STR);
+        QString latestVersion = jsonObject.value(QStringLiteral("tag_name")).toString();
+
+        if (currentVersion != latestVersion)
+        {
+          // Create and show the UpdateDialog with the fetched data
+          bool forced = false; // Set this based on your logic
+          UserInterface::Dialog::UpdateDialog updater(this, jsonObject, forced);
+          SetQWidgetWindowDecorations(&updater);
+          updater.exec();
+        }
+    }
+    else
+    {
+        // Handle error
+        QMessageBox::critical(this, tr("Error"), tr("Failed to fetch update information."));
+    }
+}
+
 void MainWindow::ShowHotkeyDialog()
 {
   if (!m_hotkey_window)
@@ -1385,16 +1472,6 @@ void MainWindow::ShowGraphicsWindow()
   m_graphics_window->show();
   m_graphics_window->raise();
   m_graphics_window->activateWindow();
-}
-
-void MainWindow::InstallUpdateManually()
-{
-  const std::string autoupdate_track = Config::Get(Config::MAIN_AUTOUPDATE_UPDATE_TRACK);
-  const std::string manual_track = autoupdate_track.empty() ? "dev" : autoupdate_track;
-  auto* const updater = new Updater(this->parentWidget(), manual_track,
-                                    Config::Get(Config::MAIN_AUTOUPDATE_HASH_OVERRIDE));
-
-  updater->CheckForUpdate();
 }
 
 void MainWindow::ShowNetPlaySetupDialog()

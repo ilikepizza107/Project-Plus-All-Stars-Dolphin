@@ -276,6 +276,14 @@ add_executable(dolphin-emu
   Main.cpp
   MainWindow.cpp
   MainWindow.h
+  ProjectPlus/DownloadUpdateDialog.cpp
+  ProjectPlus/DownloadUpdateDialog.h
+  ProjectPlus/DownloadWorker.cpp
+  ProjectPlus/DownloadWorker.h
+  ProjectPlus/InstallUpdateDialog.cpp
+  ProjectPlus/InstallUpdateDialog.h
+  ProjectPlus/UpdateDialog.cpp
+  ProjectPlus/UpdateDialog.h
   MenuBar.cpp
   MenuBar.h
   NetPlay/ChunkedProgressDialog.cpp
