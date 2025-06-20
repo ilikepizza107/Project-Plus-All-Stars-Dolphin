@@ -296,6 +296,12 @@ add_executable(dolphin-emu
   NANDRepairDialog.h
   NKitWarningDialog.cpp
   NKitWarningDialog.h
+  ProjectPlus/DownloadUpdateDialog.cpp
+  ProjectPlus/DownloadUpdateDialog.h
+  ProjectPlus/InstallUpdateDialog.cpp
+  ProjectPlus/InstallUpdateDialog.h
+  ProjectPlus/UpdateDialog.cpp
+  ProjectPlus/UpdateDialog.h
   QtUtils/AspectRatioWidget.cpp
   QtUtils/AspectRatioWidget.h
   QtUtils/BlockUserInputFilter.cpp

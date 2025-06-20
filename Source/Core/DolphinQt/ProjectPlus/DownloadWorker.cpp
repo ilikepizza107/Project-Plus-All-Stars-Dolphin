@@ -1,0 +1,56 @@
+/*
+*  Project+ Dolphin Self-Updater
+*  Credit to the Mario Party Netplay team for the base code of this updater
+*  Copyright (C) 2025 Tabitha Hanegan <tabithahanegan.com>
+*/
+
+#include "DownloadWorker.h"
+#include "Common/HttpRequest.h"
+#include <QFile>
+#include <QMessageBox>
+
+DownloadWorker::DownloadWorker(const QString& url, const QString& filename)
+    : url(url), filename(filename) {}
+
+void DownloadWorker::startDownload()
+{
+    Common::HttpRequest httpRequest;
+
+    // Set the progress callback
+    httpRequest.SetProgressCallback([this](s64 dltotal, s64 dlnow, s64 ultotal, s64 ulnow) {
+        QMetaObject::invokeMethod(this, "updateProgress", Qt::QueuedConnection, Q_ARG(s64, dlnow), Q_ARG(s64, dltotal));
+        return true; // Continue the download
+    });
+
+    httpRequest.FollowRedirects();
+    
+    Common::HttpRequest::Headers headers;
+    headers["User-Agent"] = "Dolphin-MPN/1.0";
+
+    // Perform the GET request
+    auto response = httpRequest.Get(url.toStdString(), headers);
+
+    // Check the response
+    if (response)
+    {
+        QFile file(filename);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        {
+            emit errorOccurred(QStringLiteral("Failed to open file for writing."));
+            return;
+        }
+        QByteArray byteArray(reinterpret_cast<const char*>(response->data()), response->size());
+        file.write(byteArray);
+        file.close();
+        emit finished(); // Emit finished signal
+    }
+    else
+    {
+        emit errorOccurred(QStringLiteral("Failed to download update file.")); // This should also work
+    }
+}
+
+void DownloadWorker::updateProgress(qint64 dlnow, qint64 dltotal) // Change s64 to qint64
+{
+    emit progressUpdated(dlnow, dltotal); // Emit progress signal
+}

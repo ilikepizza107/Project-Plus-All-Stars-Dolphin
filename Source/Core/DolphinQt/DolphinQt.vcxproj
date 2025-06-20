@@ -184,6 +184,9 @@
     <ClCompile Include="NetPlay\PadMappingDialog.cpp" />
     <ClCompile Include="NANDRepairDialog.cpp" />
     <ClCompile Include="NKitWarningDialog.cpp" />
+	<ClCompile Include="ProjectPlus/DownloadUpdateDialog.cpp" />
+    <ClCompile Include="ProjectPlus/InstallUpdateDialog.cpp" />
+    <ClCompile Include="ProjectPlus/UpdateDialog.cpp" />
     <ClCompile Include="pch_qt.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -401,6 +404,9 @@
     <QtMoc Include="NetPlay\PadMappingDialog.h" />
     <QtMoc Include="NANDRepairDialog.h" />
     <QtMoc Include="NKitWarningDialog.h" />
+	<QtMoc Include="ProjectPlus/DownloadUpdateDialog.h" />
+    <QtMoc Include="ProjectPlus/InstallUpdateDialog.h" />
+    <QtMoc Include="ProjectPlus/UpdateDialog.h" />
     <QtMoc Include="QtUtils\AspectRatioWidget.h" />
     <QtMoc Include="QtUtils\BlockUserInputFilter.h" />
     <QtMoc Include="QtUtils\DoubleClickEventFilter.h" />
@@ -474,6 +480,7 @@
   </ItemGroup>
   <Import Project="$(ExternalsDir)bzip2\exports.props" />
   <Import Project="$(ExternalsDir)cpp-optparse\exports.props" />
+  <Import Project="$(ExternalsDir)curl\exports.props" />
   <Import Project="$(ExternalsDir)discord-rpc\exports.props" />
   <Import Project="$(ExternalsDir)enet\exports.props" />
   <Import Project="$(ExternalsDir)fmt\exports.props" />
@@ -482,6 +489,7 @@
   <Import Project="$(ExternalsDir)liblzma\exports.props" />
   <Import Project="$(ExternalsDir)mbedtls\exports.props" />
   <Import Project="$(ExternalsDir)mGBA\exports.props" />
+  <Import Project="$(ExternalsDir)minizip-ng\exports.props" />
   <Import Project="$(ExternalsDir)picojson\exports.props" />
   <Import Project="$(ExternalsDir)rcheevos\exports.props" />
   <Import Project="$(ExternalsDir)SFML\exports.props" />

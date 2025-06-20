@@ -172,7 +172,8 @@ private:
   void ShowGraphicsWindow();
   void ShowFreeLookWindow();
   void ShowAboutDialog();
-  void InstallUpdateManually();
+  void ShowUpdateDialog();
+  void CheckForUpdatesAuto();
   void ShowHotkeyDialog();
   void ShowNetPlaySetupDialog();
   void ShowNetPlayBrowser();

@@ -112,9 +112,13 @@ HttpRequest::Response HttpRequest::Post(const std::string& url, const std::strin
 int HttpRequest::Impl::CurlProgressCallback(Impl* impl, curl_off_t dltotal, curl_off_t dlnow,
                                             curl_off_t ultotal, curl_off_t ulnow)
 {
-  // Abort if callback isn't true
-  return !impl->m_callback(static_cast<s64>(dltotal), static_cast<s64>(dlnow),
-                           static_cast<s64>(ultotal), static_cast<s64>(ulnow));
+    // Call the progress callback with the current download progress
+    if (impl->m_callback)
+    {
+        return !impl->m_callback(static_cast<s64>(dltotal), static_cast<s64>(dlnow),
+                                 static_cast<s64>(ultotal), static_cast<s64>(ulnow));
+    }
+    return 0; // If no callback, continue
 }
 
 HttpRequest::Impl::Impl(std::chrono::milliseconds timeout_ms, ProgressCallback callback)
@@ -147,6 +151,13 @@ HttpRequest::Impl::Impl(std::chrono::milliseconds timeout_ms, ProgressCallback c
       m_curl.get(), CURLOPT_LOW_SPEED_TIME,
       static_cast<long>(std::chrono::duration_cast<std::chrono::seconds>(timeout_ms).count()));
   curl_easy_setopt(m_curl.get(), CURLOPT_LOW_SPEED_LIMIT, 1);
+  // Add SSL option to disable revocation checking
+  curl_easy_setopt(m_curl.get(), CURLOPT_SSL_OPTIONS, CURLSSLOPT_NO_REVOKE);
+
+#ifdef _WIN32
+  // ALPN support is enabled by default but requires Windows >= 8.1.
+  curl_easy_setopt(m_curl.get(), CURLOPT_SSL_ENABLE_ALPN, false);
+#endif
 }
 
 bool HttpRequest::Impl::IsValid() const
@@ -267,6 +278,9 @@ HttpRequest::Response HttpRequest::Impl::Fetch(const std::string& url, Method me
     else
       list = curl_slist_append(list, (name + ": " + *value).c_str());
   }
+  
+  list = curl_slist_append(list, "User-Agent: Dolphin-PPN/1.0");
+  
   curl_easy_setopt(m_curl.get(), CURLOPT_HTTPHEADER, list);
 
   curl_easy_setopt(m_curl.get(), CURLOPT_HEADERFUNCTION, header_callback);
