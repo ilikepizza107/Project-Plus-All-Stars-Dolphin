@@ -95,10 +95,12 @@
       - name: "Package ${{ matrix.build_type }}"
         working-directory: ${{ github.workspace }}
         run: |
+          Xcopy /Y /E /I .\Data\Games .\Binary\x64\Games
+          Xcopy /Y /E /I .\Data\Launcher .\Binary\x64\Launcher
+          Xcopy /Y /E /I .\Data\User .\Binary\x64\User
           Xcopy /Y /E /I .\Data\Sys .\Binary\x64\Sys
           cd .\Binary\x64\
-          fsutil file createnew FIX-VCRUNTIME140-ERROR.txt 0
-          echo "Download and install this: https://aka.ms/vs/16/release/vc_redist.x64.exe" > .\FIX-VCRUNTIME140-ERROR.txt
+          fsutil file createnew portable.txt 0
       - name: Package Artifact
         working-directory: ${{ github.workspace }}
         run: |
@@ -110,7 +112,7 @@
           move $FILE_NAME ..\..\artifact\
       - name: "Publish"
         if: success()
-        uses: actions/upload-artifact@v2-preview
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: "./artifact/"

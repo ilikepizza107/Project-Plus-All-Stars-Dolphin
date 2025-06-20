@@ -602,7 +602,7 @@ if(UNIX)
 endif()
 
 if(ENABLE_SDL)
-  dolphin_find_optional_system_library(SDL2 Externals/SDL 2.30.9)
+  dolphin_find_optional_system_library(SDL2 Externals/SDL 2.28.5)
 endif()
 
 if(ENABLE_ANALYTICS)
@@ -818,7 +818,7 @@ endif()
 add_custom_target(
 	dolphin_scmrev
 	${CMAKE_COMMAND} -DPROJECT_SOURCE_DIR=${PROJECT_SOURCE_DIR} -DPROJECT_BINARY_DIR=${PROJECT_BINARY_DIR} -DDISTRIBUTOR=${DISTRIBUTOR} -DDOLPHIN_DEFAULT_UPDATE_TRACK=${DOLPHIN_DEFAULT_UPDATE_TRACK} -DGIT_FOUND=${GIT_FOUND} -DGIT_EXECUTABLE=${GIT_EXECUTABLE} -DDOLPHIN_WC_REVISION=${DOLPHIN_WC_REVISION} -DDOLPHIN_WC_DESCRIBE=${DOLPHIN_WC_DESCRIBE} -DDOLPHIN_WC_BRANCH=${DOLPHIN_WC_BRANCH} -DCMAKE_OSX_DEPLOYMENT_TARGET=${CMAKE_OSX_DEPLOYMENT_TARGET} -P ${CMAKE_CURRENT_SOURCE_DIR}/CMake/ScmRevGen.cmake
-	BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/Common/scmrev.h" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/DolphinQt/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/MacUpdater/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Flatpak/org.DolphinEmu.dolphin-emu.metainfo.xml"
+	BYPRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/Common/scmrev.h" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/DolphinQt/Info.plist" "${CMAKE_CURRENT_BINARY_DIR}/Source/Core/MacUpdater/Info.plist" 
 	VERBATIM
 )
 
@@ -895,11 +895,61 @@ set(CPACK_RPM_PACKAGE_LICENSE GPL-2.0)
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_SECTION "Games")
 
+set(CPACK_DEB_COMPONENT_INSTALL ON)
 set(CPACK_SET_DESTDIR ON)
-set(CPACK_SOURCE_GENERATOR "TGZ;TBZ2;ZIP")
-set(CPACK_SOURCE_IGNORE_FILES  "\\\\.#;/#;.*~;\\\\.swp;/\\\\.git")
-list(APPEND CPACK_SOURCE_IGNORE_FILES "${CMAKE_BINARY_DIR}")
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Tabitha Hanegan <info@tabithahanegan.com>")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS 
+    "libasound2t64, libavcodec61, libavformat61, libavutil59, libbluetooth3, 
+    libbz2-1.0, libc6, libcubeb0, libcurl4t64, libegl1, libenet7, libevdev2, 
+    libfmt10, libgcc-s1, libglx0, libhidapi-hidraw0, liblz4-1, liblzma5, 
+    liblzo2-2, libmgba0.10t64, libminiupnpc18, libopengl0, libpugixml1v5, 
+    libpulse0, libqt6core6t64, libqt6dbus6, libqt6gui6, libqt6widgets6, 
+    libsdl2-2.0-0, libsfml-network2.6, libsfml-system2.6, libspng0, libstb0t64, 
+    libstdc++6, libswscale8, libtinygltf6d, libudev1, libusb-1.0-0, libx11-6, 
+    libxi6, libxrandr2, libxxhash0, libzstd1, zlib1g")
+# Check for Debian-based systems
+if(EXISTS "/etc/debian_version")
+    set(CPACK_GENERATOR "DEB")
+    if(EXISTS "/etc/os-release")
+        # Read Ubuntu version
+        file(STRINGS "/etc/os-release" OS_RELEASE_CONTENTS REGEX "^VERSION_ID=")
+        string(REGEX REPLACE "VERSION_ID=\"([0-9]+)\\.([0-9]+)\"" "\\1_\\2" UBUNTU_VERSION "${OS_RELEASE_CONTENTS}")
+    endif()
+    
+    # Ensure a default value if detection fails
+    if(NOT UBUNTU_VERSION)
+        set(UBUNTU_VERSION "unknown")
+    endif()
+    
+    set(CPACK_PACKAGE_FILE_NAME "DolphinMPN-ubuntu${UBUNTU_VERSION}")
+endif()
+
+# Arch Linux Specific
+set(CPACK_ARCHIVE_COMPONENT_INSTALL ON)
+set(CPACK_PACKAGE_CONTACT "Tabitha Hanegan <info@tabithahanegan.com>")
+# Check for Debian-based systems
+if(EXISTS "/etc/arch-release")
+    set(CPACK_GENERATOR "TGZ")
+    set(CPACK_PACKAGE_FILE_NAME "DolphinMPN-archLinux")
+endif()
+
+# Resource files (TODO items)
+set(CPACK_RESOURCE_FILE_README ${PROJECT_SOURCE_DIR}/Readme.md)
+set(CPACK_PACKAGE_ICON ${PROJECT_SOURCE_DIR}/Data/dolphin-mpn.png)
+
+# Disable MGBA Hack
+set(CPACK_ARCHIVE_COMPONENT_INSTALL OFF)
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
 
 # CPack must be included after the CPACK_* variables are set in order for those
 # variables to take effect.
-Include(CPack)
+include(InstallRequiredSystemLibraries)
+include(CPack)
+
+# Unhijack version from MGBA
+execute_process(
+    COMMAND git rev-parse --short=7 HEAD
+    OUTPUT_VARIABLE GIT_COMMIT_HASH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+set(VERSION "${GIT_COMMIT_HASH}")
