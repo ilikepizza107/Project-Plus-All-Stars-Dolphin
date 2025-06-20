@@ -99,7 +99,7 @@ void InstallUpdateDialog::install()
   this->label->setText(QStringLiteral("Extracting %1...").arg(this->filename));
   this->progressBar->setValue(50);
 
-  QString extractDirectory = this->temporaryDirectory + QDir::separator() + QStringLiteral("Dolphin-MPN");
+  QString extractDirectory = this->temporaryDirectory + QDir::separator() + QStringLiteral("Dolphin");
 
   // Hack to remove stuck directory
   QDir extractDirectoryHack(extractDirectory);
@@ -111,7 +111,7 @@ void InstallUpdateDialog::install()
   QDir dir(this->temporaryDirectory);
   if (!QDir(extractDirectory).exists())
   {
-    if (!dir.mkdir(QStringLiteral("Dolphin-MPN")))
+    if (!dir.mkdir(QStringLiteral("Dolphin")))
     {
       QMessageBox::critical(this, QStringLiteral("Error"),
                             QStringLiteral("Failed to create extract directory."));
@@ -145,7 +145,7 @@ void InstallUpdateDialog::install()
       QStringLiteral("cp -r \"") + extractDirectory + QStringLiteral("/\"* \"") + appPath +
           QStringLiteral("\""),
       QStringLiteral("echo '== Launching the updated application'"),
-      QStringLiteral("open \"") + appPath + QStringLiteral("/Dolphin-MPN.app\""),
+      QStringLiteral("open \"") + appPath + QStringLiteral("/Dolphin.app\""),
       QStringLiteral("echo '== Cleaning up temporary files'"),
       QStringLiteral("rm -rf \"") + this->temporaryDirectory + QStringLiteral("\""),
       QStringLiteral("exit 0")};
@@ -165,8 +165,8 @@ void InstallUpdateDialog::install()
       QStringLiteral("   xcopy /S /Y /I \"") + extractDirectory + QStringLiteral("\\*\" \"") +
           appPath + QStringLiteral("\""),
       QStringLiteral("   echo == Attempting to start '") + appPath +
-          QStringLiteral("\\Dolphin-MPN.exe'"),
-      QStringLiteral("   start \"\" \"") + appPath + QStringLiteral("\\Dolphin-MPN.exe\""),
+          QStringLiteral("\\Dolphin.exe'"),
+      QStringLiteral("   start \"\" \"") + appPath + QStringLiteral("\\Dolphin.exe\""),
       QStringLiteral(")"),
       QStringLiteral("IF NOT ERRORLEVEL 0 ("),
       QStringLiteral("   start \"\" cmd /c \"echo Update failed && pause\""),
