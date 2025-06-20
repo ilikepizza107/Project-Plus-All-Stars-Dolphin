@@ -174,6 +174,10 @@
     <ClCompile Include="InfinityBase/InfinityBaseWindow.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
+	<ClCompile Include="ProjectPlus/DownloadUpdateDialog.cpp" />
+	<ClCompile Include="ProjectPlus/DownloadWorker.cpp" />
+    <ClCompile Include="ProjectPlus/InstallUpdateDialog.cpp" />
+    <ClCompile Include="ProjectPlus/UpdateDialog.cpp" />
     <ClCompile Include="MenuBar.cpp" />
     <ClCompile Include="NetPlay\ChunkedProgressDialog.cpp" />
     <ClCompile Include="NetPlay\GameDigestDialog.cpp" />
@@ -184,9 +188,6 @@
     <ClCompile Include="NetPlay\PadMappingDialog.cpp" />
     <ClCompile Include="NANDRepairDialog.cpp" />
     <ClCompile Include="NKitWarningDialog.cpp" />
-	<ClCompile Include="ProjectPlus/DownloadUpdateDialog.cpp" />
-    <ClCompile Include="ProjectPlus/InstallUpdateDialog.cpp" />
-    <ClCompile Include="ProjectPlus/UpdateDialog.cpp" />
     <ClCompile Include="pch_qt.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -394,6 +395,10 @@
     <QtMoc Include="HotkeyScheduler.h" />
     <QtMoc Include="InfinityBase/InfinityBaseWindow.h" />
     <QtMoc Include="MainWindow.h" />
+	<QtMoc Include="ProjectPlus/DownloadUpdateDialog.h" />
+	<QtMoc Include="ProjectPlus/DownloadWorker.h" />
+    <QtMoc Include="ProjectPlus/InstallUpdateDialog.h" />
+    <QtMoc Include="ProjectPlus/UpdateDialog.h" />
     <QtMoc Include="MenuBar.h" />
     <QtMoc Include="NetPlay\ChunkedProgressDialog.h" />
     <QtMoc Include="NetPlay\GameDigestDialog.h" />
@@ -404,9 +409,6 @@
     <QtMoc Include="NetPlay\PadMappingDialog.h" />
     <QtMoc Include="NANDRepairDialog.h" />
     <QtMoc Include="NKitWarningDialog.h" />
-	<QtMoc Include="ProjectPlus/DownloadUpdateDialog.h" />
-    <QtMoc Include="ProjectPlus/InstallUpdateDialog.h" />
-    <QtMoc Include="ProjectPlus/UpdateDialog.h" />
     <QtMoc Include="QtUtils\AspectRatioWidget.h" />
     <QtMoc Include="QtUtils\BlockUserInputFilter.h" />
     <QtMoc Include="QtUtils\DoubleClickEventFilter.h" />

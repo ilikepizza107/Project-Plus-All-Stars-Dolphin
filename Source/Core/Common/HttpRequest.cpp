@@ -279,7 +279,7 @@ HttpRequest::Response HttpRequest::Impl::Fetch(const std::string& url, Method me
       list = curl_slist_append(list, (name + ": " + *value).c_str());
   }
   
-  list = curl_slist_append(list, "User-Agent: Dolphin-PPN/1.0");
+  list = curl_slist_append(list, "User-Agent: Dolphin-MPN/1.0");
   
   curl_easy_setopt(m_curl.get(), CURLOPT_HTTPHEADER, list);
 
