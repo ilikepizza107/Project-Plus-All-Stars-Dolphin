@@ -910,7 +910,6 @@ void NetPlayClient::OnStartGame(sf::Packet& packet)
     packet >> m_net_settings.oc_factor;
     packet >> m_net_settings.vi_oc_enable;
     packet >> m_net_settings.vi_oc_factor;
-    packet >> m_net_settings.brawlmusic_off;
     packet >> m_net_settings.is_spectator;
 
     for (auto slot : ExpansionInterface::SLOTS)

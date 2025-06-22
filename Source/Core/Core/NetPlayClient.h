@@ -76,7 +76,6 @@ public:
   virtual void OnTtlDetermined(u8 ttl) = 0;
 
   virtual bool IsRecording() = 0;
-  virtual bool IsMusicOff() = 0;
   virtual bool IsSpectator() = 0;
   virtual std::shared_ptr<const UICommon::GameFile>
   FindGameFile(const SyncIdentifier& sync_identifier,

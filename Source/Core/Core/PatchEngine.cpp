@@ -27,6 +27,7 @@
 #include "Core/ActionReplay.h"
 #include "Core/CheatCodes.h"
 #include "Core/Config/SessionSettings.h"
+#include "Core/Config/NetplaySettings.h"
 #include "Core/ConfigManager.h"
 #include "Core/NetPlayProto.h"
 #include "Core/Core.h"
@@ -36,6 +37,8 @@
 #include "Core/PowerPC/MMU.h"
 #include "Core/PowerPC/PowerPC.h"
 #include "Core/System.h"
+
+
 
 namespace PatchEngine
 {
@@ -102,7 +105,7 @@ std::string SerializeLine(const PatchEntry& entry)
 
 static bool IsEnabledMusicCode(const Patch& patch)
 {
-  if (NetPlay::IsNetPlayRunning() && patch.name == "[P+] Music Off")
+  if (NetPlay::IsNetPlayRunning() && patch.name == "[P+] Music Off" && Config::Get(Config::NETPLAY_BRAWL_MUSIC_OFF))
   {
     return SConfig::GetInstance().bBrawlMusicOff;
   }

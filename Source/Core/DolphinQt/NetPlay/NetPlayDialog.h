@@ -79,7 +79,6 @@ public:
   void OnIndexRefreshFailed(const std::string error) override;
 
   bool IsRecording() override;
-  bool IsMusicOff() override;
   bool IsSpectator() override;
   void IsSpectatorEnabled(bool enabled);
   std::shared_ptr<const UICommon::GameFile>

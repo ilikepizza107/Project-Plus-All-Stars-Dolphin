@@ -1503,7 +1503,6 @@ bool NetPlayServer::SetupNetSettings()
   settings.golf_mode = Config::Get(Config::NETPLAY_NETWORK_MODE) == "golf";
   settings.use_fma = DoAllPlayersHaveHardwareFMA();
   settings.hide_remote_gbas = Config::Get(Config::NETPLAY_HIDE_REMOTE_GBAS);
-  settings.brawlmusic_off = Config::Get(Config::NETPLAY_BRAWL_MUSIC_OFF);
   settings.is_spectator = Config::Get(Config::NETPLAY_IS_SPECTATOR);
 
   // Unload GameINI to restore things to normal
@@ -1650,7 +1649,6 @@ bool NetPlayServer::StartGame()
   spac << m_settings.oc_factor;
   spac << m_settings.vi_oc_enable;
   spac << m_settings.vi_oc_factor;
-  spac << m_settings.brawlmusic_off;
   spac << m_settings.is_spectator;
 
   for (auto slot : ExpansionInterface::SLOTS)

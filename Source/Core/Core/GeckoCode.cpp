@@ -22,7 +22,6 @@
 #include "Core/PowerPC/MMU.h"
 #include "Core/PowerPC/PowerPC.h"
 #include "Core/System.h"
-#include "Core/NetPlayProto.h"
 
 #include <iostream>
 

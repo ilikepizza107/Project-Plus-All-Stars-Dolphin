@@ -49,7 +49,6 @@ struct NetSettings
   float oc_factor = 0;
   bool vi_oc_enable = false;
   float vi_oc_factor = 0;
-  bool brawlmusic_off = false;
   bool is_spectator = false;
   Common::EnumMap<ExpansionInterface::EXIDeviceType, ExpansionInterface::MAX_SLOT> exi_device{};
   int memcard_size_override = -1;

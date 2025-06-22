@@ -473,14 +473,6 @@ bool NetPlayDialog::IsSpectator()
   return false;
 }
 
-bool NetPlayDialog::IsMusicOff()
-{
-  std::optional<bool> brawlmusic_off = RunOnObject(m_brawlmusic_off, &QCheckBox::isChecked);
-  if (brawlmusic_off)
-    return *brawlmusic_off;
-  return false;
-}
-
 void NetPlayDialog::OnChat()
 {
   QueueOnObject(this, [this] {
