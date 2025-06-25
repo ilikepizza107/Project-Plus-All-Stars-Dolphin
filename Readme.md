@@ -149,6 +149,16 @@ Or useful for having multiple distinct Dolphin setups for testing/development/TA
 4. `make -j $(nproc)`
 5. `cp -r ../Data/Sys/ ../Data/User/ ../Data/Launcher/ ../Data/portable.txt Binaries/`
 
+
+### Linux AppImage Build Steps:
+
+Used for distribution of Project+ builds.
+
+1. `mkdir Build`
+2. `cd Build`
+3. `cmake .. -DLINUX_LOCAL_DEV=true -DCMAKE_INSTALL_PREFIX=/usr -GNinja`
+4. `../BuildLinuxAppImage.sh`
+
 ## Building for Android
 
 These instructions assume familiarity with Android development. If you do not have an
