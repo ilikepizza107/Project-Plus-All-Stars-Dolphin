@@ -238,7 +238,11 @@ void ShutdownWiiRoot()
   if (Config::Get(Config::SYSCONF_SAVE_REPLAYS))
   {
     std::string s_brawl_temp_save = File::GetUserPath(D_USER_IDX) + "WiiSession" DIR_SEP + "title" DIR_SEP + "00010000" DIR_SEP + "52534245" DIR_SEP + "data" DIR_SEP;
-    std::string replay_data = "./ReplayData";  
+	#if defined(_WIN32)
+    std::string replay_data = "./ReplayData";
+	#else
+	std::string replay_data = File::GetUserPath(D_USER_IDX) + "ReplayData" DIR_SEP;
+	#endif
   
     if (File::Exists(s_brawl_temp_save + "collect.vff"))
     {
