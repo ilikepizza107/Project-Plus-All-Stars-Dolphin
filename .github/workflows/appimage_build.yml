@@ -16,7 +16,7 @@ jobs:
     - name: Checkout Upstream Repo
       uses: actions/checkout@v4
       with:
-        repository: dolphin-emu/dolphin
+        repository: Motobug/Project-Plus-Dolphin
         ref: master
 
     - name: Checkout Submodules
@@ -61,7 +61,7 @@ jobs:
     - name: Dolphin-Build Number
       run: |
         export LASTCOMMIT=$(git log --pretty=format:%H -1)
-        export DOLPHINVER=$(wget -qO- https://dolphin-emu.org/download/dev/${LASTCOMMIT} | grep '<title>' | awk '{print $NF}' | cut -d '<' -f 1)
+        export DOLPHINVER=v3.1.2
         echo "DOLPHIN Build $DOLPHINVER"
         echo "DOLPHINVER=$DOLPHINVER" >> $GITHUB_ENV
         sed -i "s|\${DOLPHIN_WC_DESCRIBE}|$DOLPHINVER|g" Source/Core/Common/scmrev.h.in
