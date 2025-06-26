@@ -25,7 +25,7 @@ void DownloadWorker::startDownload()
     httpRequest.FollowRedirects();
     
     Common::HttpRequest::Headers headers;
-    headers["User-Agent"] = "Dolphin-MPN/1.0";
+    headers["User-Agent"] = "Dolphin-PPL/1.0";
 
     // Perform the GET request
     auto response = httpRequest.Get(url.toStdString(), headers);
