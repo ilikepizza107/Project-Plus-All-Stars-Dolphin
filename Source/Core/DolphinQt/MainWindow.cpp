@@ -1370,7 +1370,7 @@ void MainWindow::ShowUpdateDialog()
     Common::HttpRequest httpRequest;
 
     // Make the GET request
-    auto response = httpRequest.Get("https://api.github.com/repos/jlambert360/PPlusReleases/releases/latest");
+    auto response = httpRequest.Get("https://api.github.com/repos/Motobug/Project-Plus-Dolphin/releases/latest");
 
     if (response)
     {
@@ -1407,7 +1407,7 @@ void MainWindow::CheckForUpdatesAuto()
     Common::HttpRequest httpRequest;
 
     // Make the GET request
-    auto response = httpRequest.Get("https://api.github.com/repos/jlambert360/PPlusReleases/releases/latest");
+    auto response = httpRequest.Get("https://api.github.com/repos/Motobug/Project-Plus-Dolphin/releases/latest");
 
     if (response)
     {
