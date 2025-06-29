@@ -101,7 +101,7 @@ modules:
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DENABLE_ALSA=OFF
-      - -DENABLE_SDL=ON
+      - -DENABLE_SDL=OFF
       - -DENABLE_EVDEV=ON
       - -DDISTRIBUTOR=Project Plus Development Team
       - -DCPACK_PACKAGE_CONTACT=Project Plus Development Team
