@@ -114,7 +114,6 @@
 #include "DolphinQt/NetPlay/NetPlayBrowser.h"
 #include "DolphinQt/NetPlay/NetPlayDialog.h"
 #include "DolphinQt/NetPlay/NetPlaySetupDialog.h"
-#include "DolphinQt/ProjectPlus/DownloadUpdateDialog.h"
 #include "DolphinQt/ProjectPlus/InstallUpdateDialog.h"
 #include "DolphinQt/ProjectPlus/UpdateDialog.h"
 #include "DolphinQt/QtUtils/DolphinFileDialog.h"
