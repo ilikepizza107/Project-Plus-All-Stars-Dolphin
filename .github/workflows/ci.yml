@@ -160,6 +160,26 @@ jobs:
           name: ${{ steps.create-artifact.outputs.name }}
           path: "*.tar.xz"
           
+  build_flatpak:
+    runs-on: ubuntu-latest
+    container:
+      image: bilelmoussaoui/flatpak-github-actions:gnome-nightly
+      options: --privileged
+    steps:
+    - uses: actions/checkout@v2
+    - name: Purge .git for space reasons
+      run: rm -rf /home/runner/work/Project-Plus-Dolphin-src/Project-Plus-Dolphin-src/.git
+    - name: Setup Packages
+      run: |
+        flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
+        flatpak install org.kde.Sdk//5.15 org.kde.Platform//5.15 -y && \
+        dnf install libusb1-devel cmake git gcc-c++ libXext-devel libgudev qt6-qtbase-devel systemd-devel openal-soft-devel libevdev-devel libao-devel SOIL-devel libXrandr-devel pulseaudio-libs-devel bluez-libs-devel p7zip SDL2-devel make automake gcc gcc-c++ kernel-devel -y
+    - name: Run Flatpak Builder
+      uses: flatpak/flatpak-github-actions/flatpak-builder@v6
+      with:
+        manifest-path: Distribution/flatpak.yml
+        bundle: Project-Plus-Dolphin-flatpak-linux-x86_64.flatpak
+        
   build_appimage:
     name: AppImage Build
     runs-on: ubuntu-24.04
