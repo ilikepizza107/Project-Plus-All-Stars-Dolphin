@@ -161,7 +161,7 @@ jobs:
           path: "*.tar.xz"
           
   build_appimage:
-    name: Project Plus Dolphin bundled as appimage
+    name: AppImage Build
     runs-on: ubuntu-24.04
     env:
       yaqti: 6.7.3
