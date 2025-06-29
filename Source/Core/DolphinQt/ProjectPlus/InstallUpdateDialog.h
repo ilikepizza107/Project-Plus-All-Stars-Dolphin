@@ -8,6 +8,7 @@
 #include <QString>
 #include <QLabel>
 #include <QProgressBar>
+#include <functional>
 
 // Forward declarations
 QT_BEGIN_NAMESPACE
@@ -21,7 +22,7 @@ class InstallUpdateDialog : public QDialog
     Q_OBJECT
 
 public:
-    InstallUpdateDialog(QWidget *parent, QString installationDirectory, QString temporaryDirectory, QString filename);
+    InstallUpdateDialog(QWidget *parent, QString installationDirectory, QString temporaryDirectory, QString filename, QString downloadUrl = QString());
     ~InstallUpdateDialog();
 
     void install(void);
@@ -29,12 +30,17 @@ public:
 private:
     QString installationDirectory;
     QString temporaryDirectory;    
-    QString filename;              
+    QString filename;           
+    QString downloadUrl;
     QLabel* label;                
-    QProgressBar* progressBar;     
+    QProgressBar* progressBar;    // Master progress bar
+    QLabel* stepLabel;            // Unified step label
+    QProgressBar* stepProgressBar;// Unified step progress bar
 
     void writeAndRunScript(QStringList stringList);
     void launchProcess(QString file, QStringList arguments);
     void timerEvent(QTimerEvent* event);
-    bool unzipFile(const std::string& zipFilePath, const std::string& destDir);
+    void download();
+    bool unzipFile(const std::string& zipFilePath, const std::string& destDir, 
+                   std::function<void(int current, int total)> progressCallback = nullptr);
 };

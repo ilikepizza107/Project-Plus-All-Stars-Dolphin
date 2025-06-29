@@ -187,7 +187,6 @@
     <ClCompile Include="InfinityBase/InfinityBaseWindow.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MainWindow.cpp" />
-    <ClCompile Include="ProjectPlus/DownloadUpdateDialog.cpp" />
     <ClCompile Include="ProjectPlus/DownloadWorker.cpp" />
     <ClCompile Include="ProjectPlus/InstallUpdateDialog.cpp" />
     <ClCompile Include="ProjectPlus/UpdateDialog.cpp" />
@@ -408,7 +407,6 @@
     <QtMoc Include="HotkeyScheduler.h" />
     <QtMoc Include="InfinityBase/InfinityBaseWindow.h" />
     <QtMoc Include="MainWindow.h" />
-    <QtMoc Include="ProjectPlus/DownloadUpdateDialog.h" />
     <QtMoc Include="ProjectPlus/DownloadWorker.h" />
     <QtMoc Include="ProjectPlus/InstallUpdateDialog.h" />
     <QtMoc Include="ProjectPlus/UpdateDialog.h" />

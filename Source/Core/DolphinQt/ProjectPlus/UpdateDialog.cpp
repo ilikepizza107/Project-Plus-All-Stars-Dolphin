@@ -5,7 +5,7 @@
 */
 
 #include "UpdateDialog.h"
-#include "DownloadUpdateDialog.h"
+#include "InstallUpdateDialog.h"
 
 #include <QFileInfo>
 #include <QPushButton>
@@ -23,6 +23,8 @@
 #include <QTextEdit>
 #include <QDialogButtonBox>
 #include "../../Common/Logging/Log.h"
+#include <QCoreApplication>
+#include <QDir>
 
 using namespace UserInterface::Dialog;
 
@@ -110,5 +112,9 @@ void UpdateDialog::accept()
     this->filename = filenameToDownload;
     QDialog::accept();
 
-    DownloadUpdateDialog downloadDialog(this, urlToDownload, filenameToDownload);
+    // Use InstallUpdateDialog for both download and extraction
+    QString installationDirectory = QCoreApplication::applicationDirPath();
+    QString temporaryDirectory = QDir::tempPath();
+    InstallUpdateDialog installDialog(this, installationDirectory, temporaryDirectory, filenameToDownload, urlToDownload);
+    installDialog.exec();
 }
