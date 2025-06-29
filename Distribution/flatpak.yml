@@ -1,11 +1,11 @@
-app-id: org.DolphinEmu.dolphin-mpn
+app-id: org.DolphinEmu.project-plus-dolphin
 branch: master
 runtime: org.kde.Platform
 runtime-version: 6.6
 sdk: org.kde.Sdk
-command: dolphin-mpn-wrapper
-rename-desktop-file: dolphin-mpn.desktop
-rename-icon: dolphin-mpn
+command: project-plus-dolphin-wrapper
+rename-desktop-file: project-plus-dolphin.desktop
+rename-icon: project-plus-dolphin
 finish-args:
   - --device=all # need for controllers
   # the file picker uses portals but the set
@@ -96,26 +96,26 @@ modules:
         url: https://github.com/Unrud/xdg-screensaver-shim/archive/0.0.2.tar.gz
         sha256: 0ed2a69fe6ee6cbffd2fe16f85116db737f17fb1e79bfb812d893cf15c728399
 
-  - name: dolphin-mpn
+  - name: project-plus-dolphin
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DENABLE_ALSA=OFF
       - -DENABLE_SDL=ON
       - -DENABLE_EVDEV=ON
-      - -DDISTRIBUTOR=Mario Party Netplay
-      - -DCPACK_PACKAGE_CONTACT=Mario Party Netplay
+      - -DDISTRIBUTOR=Project Plus Development Team
+      - -DCPACK_PACKAGE_CONTACT=Project Plus Development Team
     cleanup:
       - /share/man
     post-install:
-      - install -D -t ${FLATPAK_DEST}/bin/ dolphin-mpn-wrapper
-      - desktop-file-edit --set-key=Exec --set-value='/app/bin/dolphin-mpn-wrapper'
-        /app/share/applications/dolphin-mpn.desktop
-      - desktop-file-edit --set-key=Name --set-value='Dolphin MPN'
-        /app/share/applications/dolphin-mpn.desktop
+      - install -D -t ${FLATPAK_DEST}/bin/ project-plus-dolphin-wrapper
+      - desktop-file-edit --set-key=Exec --set-value='/app/bin/project-plus-dolphin-wrapper'
+        /app/share/applications/project-plus-dolphin.desktop
+      - desktop-file-edit --set-key=Name --set-value='Project Plus Dolphin'
+        /app/share/applications/project-plus-dolphin.desktop
     sources:
       - type: git
-        url: https://github.com/MarioPartyNetplay/Dolphin-MPN-src.git
+        url: https://github.com/Motobug/Project-Plus-Dolphin.git
 
       # detects whether dolphin is running in a flatpak sandbox
       # and makes it use xdg directories if it is.
@@ -129,5 +129,5 @@ modules:
               test -S $XDG_RUNTIME_DIR/discord-ipc-$i ||
                 ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-$i;
             done
-            dolphin-mpn "$@"
-        dest-filename: dolphin-mpn-wrapper
+            project-plus-dolphin "$@"
+        dest-filename: project-plus-dolphin-wrapper
