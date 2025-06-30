@@ -865,6 +865,10 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD")
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps)
   install(FILES Data/dolphin-emu.png
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
+  install(FILES Data/project-plus-dolphin.svg
+          DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps)
+  install(FILES Data/project-plus-dolphin.png
+		  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
   install(FILES Data/dolphin-emu.desktop
 		  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
   install(FILES Data/project-plus-dolphin.desktop
