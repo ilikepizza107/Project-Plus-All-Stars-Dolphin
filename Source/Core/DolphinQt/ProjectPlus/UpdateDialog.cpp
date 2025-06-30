@@ -48,6 +48,8 @@ UpdateDialog::UpdateDialog(QWidget *parent, QJsonObject jsonObject, bool forced)
     textEdit->setText(jsonObject.value(QStringLiteral("body")).toString());
     #elif defined(_WIN32)
     textEdit->setText(jsonObject.value(QStringLiteral("body")).toString());
+    #elif defined(__linux__)
+    textEdit->setText(jsonObject.value(QStringLiteral("body")).toString());
     #else
     textEdit->setText(QStringLiteral("Auto Updater is not supported on your platform."));
     #endif
@@ -105,6 +107,17 @@ void UpdateDialog::accept()
             urlToDownload = downloadUrl;
             break;
         }
+        
+        #endif
+        #ifdef __linux__
+        if (filenameBlob.contains(QStringLiteral("Windows")) || 
+            filenameBlob.contains(QStringLiteral("AppImage")))
+        {
+            filenameToDownload = filenameBlob;
+            urlToDownload = downloadUrl;
+            break;
+        }
+        
         #endif
     }
 

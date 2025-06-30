@@ -71,11 +71,11 @@ cp /lib/x86_64-linux-gnu/libtinfo.so.5 $HOME/squashfs-root/usr/lib/
 cp /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0 $HOME/squashfs-root/usr/lib/
 
 # Package AppImage
-/tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|dolphin|continuous|Dolphin_Emulator-x86_64.AppImage.zsync"
+/tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|dolphin|continuous|Project+_Dolphin-x86_64.AppImage.zsync"
 
 mkdir $HOME/artifacts/
 mkdir -p /dolphin/artifacts/
-mv Dolphin_Emulator-x86_64.AppImage* $HOME/artifacts
+mv Project+_Dolphin-x86_64.AppImage* $HOME/artifacts
 cp -R $HOME/artifacts/ /dolphin/
 cp $BUILDBIN/dolphin-emu /dolphin/artifacts
 chmod -R 777 /dolphin/artifacts

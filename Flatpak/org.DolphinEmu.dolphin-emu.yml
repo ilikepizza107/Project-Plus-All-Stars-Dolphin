@@ -1,10 +1,10 @@
-app-id: org.DolphinEmu.dolphin-emu
+app-id: org.DolphinEmu.project-plus-dolphin
 runtime: org.kde.Platform
 runtime-version: '6.8'
 sdk: org.kde.Sdk
-command: dolphin-emu-wrapper
-rename-desktop-file: dolphin-emu.desktop
-rename-icon: dolphin-emu
+command: project-plus-dolphin-wrapper
+rename-desktop-file: project-plus-dolphin.desktop
+rename-icon: project-plus-dolphin
 finish-args:
   - --device=all
   - --socket=pulseaudio
@@ -41,7 +41,7 @@ modules:
   # build the vendored SDL2 from Externals until the runtime gets 2.30.9
   - SDL2/SDL2.json
 
-  - name: dolphin-emu
+  - name: project-plus-dolphin
     buildsystem: cmake-ninja
     builddir: true
     build-options:
@@ -59,10 +59,10 @@ modules:
     cleanup:
       - /share/man
     post-install:
-      - install -Dm755 -t ${FLATPAK_DEST}/bin/ ../Flatpak/dolphin-emu-wrapper
-      - install -Dm644 -t ${FLATPAK_DEST}/share/metainfo/ Flatpak/org.DolphinEmu.dolphin-emu.metainfo.xml
-      - desktop-file-edit --set-key=Exec --set-value='/app/bin/dolphin-emu-wrapper'
-        /app/share/applications/dolphin-emu.desktop
+      - install -Dm755 -t ${FLATPAK_DEST}/bin/ ../Flatpak/project-plus-dolphin-wrapper
+      - install -Dm644 -t ${FLATPAK_DEST}/share/metainfo/ Flatpak/org.DolphinEmu.project-plus-dolphin.metainfo.xml
+      - desktop-file-edit --set-key=Exec --set-value='/app/bin/project-plus-dolphin-wrapper'
+        /app/share/applications/project-plus-dolphin.desktop
     sources:
       - type: dir
         path: ..
