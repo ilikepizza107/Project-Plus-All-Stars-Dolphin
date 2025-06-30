@@ -19,10 +19,10 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>Dolphin</TargetName>
+    <TargetName>Project-Plus-Dolphin</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>Dolphin</TargetName>
+    <TargetName>Project-Plus-Dolphin</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
