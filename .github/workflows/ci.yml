@@ -117,7 +117,7 @@ jobs:
           ccache -p
           ccache -s
           ccache -z
-          ninja dolphin-emu
+          ninja project-plus-dolphin
           ccache -s
 
       - name: Build Dolphin (arm64)
@@ -126,7 +126,7 @@ jobs:
           ccache -p
           ccache -s
           ccache -z
-          ninja dolphin-emu
+          ninja project-plus-dolphin
           ccache -s
 
       - name: Prepare Build Artifacts
