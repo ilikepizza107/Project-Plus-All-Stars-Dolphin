@@ -28,7 +28,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0.0" CACHE STRING "")
 
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/FlagsOverride.cmake")
 
-project(dolphin-emu)
+project(project-plus-dolphin)
 
 if (MSVC)
   if (POLICY CMP0117)
@@ -177,7 +177,7 @@ include(RemoveCompileFlag)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Set up paths
-set(datadir ${CMAKE_INSTALL_FULL_DATADIR}/dolphin-emu CACHE PATH "datadir")
+set(datadir ${CMAKE_INSTALL_FULL_DATADIR}/project-plus-dolphin CACHE PATH "datadir")
 add_definitions(-DDATA_DIR="${datadir}/")
 
 if(CMAKE_SYSROOT)
@@ -861,15 +861,9 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD|Darwin")
 endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD")
   # Install the application icon and menu item
-  install(FILES Data/dolphin-emu.svg
-          DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps)
-  install(FILES Data/dolphin-emu.png
-          DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
   install(FILES Data/project-plus-dolphin.svg
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps)
   install(FILES Data/project-plus-dolphin.png
-		  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
-  install(FILES Data/dolphin-emu.desktop
 		  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
   install(FILES Data/project-plus-dolphin.desktop
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)

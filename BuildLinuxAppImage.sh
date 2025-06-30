@@ -30,7 +30,7 @@ rm ./AppDir/usr/bin/dolphin-emu-nogui
 rm ./AppDir/usr/bin/dolphin-tool
 mv ./AppDir/usr/share/dolphin-emu/sys ./AppDir/usr/bin/Sys
 rm -rf ./AppDir/usr/share/dolphin-emu
-sed -i 's/env QT_QPA_PLATFORM=xcb dolphin-emu/dolphin-emu/g' ./AppDir/usr/share/applications/dolphin-emu.desktop
+sed -i 's/env QT_QPA_PLATFORM=xcb dolphin-emu/dolphin-emu/g' ./AppDir/usr/share/applications/project-plus-dolphin.desktop
 
 # Prepare Tools for building the AppImage
 wget -N https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-${ARCH}.AppImage

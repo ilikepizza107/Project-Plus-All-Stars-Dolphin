@@ -251,7 +251,7 @@ jobs:
         mkdir -p "$HOME/.ccache"
         mkdir build
         cd build
-        cmake .. -GNinja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc-13 -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++-13 -DCMAKE_PREFIX_PATH="${{github.workspace}}/qt/${{ env.yaqti }}/gcc_64/" -Ddatadir:PATH="share/dolphin-emu" -DBIN_INSTALL_DIR="install/usr/bin" -DCMAKE_INSTALL_PREFIX="install/usr" -DINC_INSTALL_DIR="install/usr/include" -DLIB_INSTALL_DIR="install/usr/lib" -DPKGCONFIG_INSTALL_DIR="install/usr/lib/pkgconfig" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_NOGUI=OFF
+        cmake .. -GNinja -DCMAKE_C_COMPILER=/usr/lib/ccache/gcc-13 -DCMAKE_CXX_COMPILER=/usr/lib/ccache/g++-13 -DCMAKE_PREFIX_PATH="${{github.workspace}}/qt/${{ env.yaqti }}/gcc_64/" -Ddatadir:PATH="share/project-plus-dolphin" -DBIN_INSTALL_DIR="install/usr/bin" -DCMAKE_INSTALL_PREFIX="install/usr" -DINC_INSTALL_DIR="install/usr/include" -DLIB_INSTALL_DIR="install/usr/lib" -DPKGCONFIG_INSTALL_DIR="install/usr/lib/pkgconfig" -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DENABLE_NOGUI=OFF
         ninja
     - name: Install Dolphin
       run: |
@@ -260,7 +260,7 @@ jobs:
     - name: Package Dolphin-Binary
       run: |
         mkdir -p $GITHUB_WORKSPACE/{artifacts,uploads}
-        cp -P build/install/usr/bin/dolphin-emu $GITHUB_WORKSPACE/artifacts
+        cp -P build/install/usr/bin/project-plus-dolphin $GITHUB_WORKSPACE/artifacts
     - name: Package Dolphin-AppImage
       env:
         QT_BASE_DIR: /qt/${{ env.yaqti }}/gcc_64
@@ -284,7 +284,7 @@ jobs:
         cd $GITHUB_WORKSPACE
         mkdir -p squashfs-root
         cp -a build/install/usr $GITHUB_WORKSPACE/squashfs-root/
-        cp Data/dolphin-emu.svg ./squashfs-root/dolphin-emu.svg
+        cp Data/project-plus-dolphin.svg ./squashfs-root/project-plus-dolphin.svg
         cp Data/project-plus-dolphin.desktop ./squashfs-root/project-plus-dolphin.desktop
         curl -sSfL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -o ./squashfs-root/runtime
         curl -sSfL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/AppRun-patched-x86_64" -o ./squashfs-root/AppRun-patched
@@ -296,7 +296,7 @@ jobs:
         chmod a+x ./squashfs-root/AppRun-patched
         chmod a+x ./squashfs-root/update.sh
         export UPD_INFO="gh-releases-zsync|Motobug|Project-Plus-Dolphin|continuous|Project+_Dolphin-x86_64.AppImage.zsync"
-        /tmp/squashfs-root/AppRun --appdir="$GITHUB_WORKSPACE"/squashfs-root/ --plugin qt -d "$GITHUB_WORKSPACE"/squashfs-root/project-plus-dolphin.desktop -i "$GITHUB_WORKSPACE"/squashfs-root/dolphin-emu.svg \
+        /tmp/squashfs-root/AppRun --appdir="$GITHUB_WORKSPACE"/squashfs-root/ --plugin qt -d "$GITHUB_WORKSPACE"/squashfs-root/project-plus-dolphin.desktop -i "$GITHUB_WORKSPACE"/squashfs-root/project-plus-dolphin.svg \
         --exclude-library=libglib* --output appimage
         ls . | grep *.AppImage
         mv $(ls . | grep *.AppImage) $GITHUB_WORKSPACE/artifacts
