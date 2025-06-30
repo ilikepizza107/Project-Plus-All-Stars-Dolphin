@@ -285,7 +285,7 @@ jobs:
         mkdir -p squashfs-root
         cp -a build/install/usr $GITHUB_WORKSPACE/squashfs-root/
         cp Data/dolphin-emu.svg ./squashfs-root/dolphin-emu.svg
-        cp Data/dolphin-emu.desktop ./squashfs-root/dolphin-emu.desktop
+        cp Data/project-plus-dolphin.desktop ./squashfs-root/project-plus-dolphin.desktop
         curl -sSfL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -o ./squashfs-root/runtime
         curl -sSfL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/AppRun-patched-x86_64" -o ./squashfs-root/AppRun-patched
         cp ci/travis/appimage/{AppRun,update.sh} ./squashfs-root/
@@ -296,7 +296,7 @@ jobs:
         chmod a+x ./squashfs-root/AppRun-patched
         chmod a+x ./squashfs-root/update.sh
         export UPD_INFO="gh-releases-zsync|Motobug|Project-Plus-Dolphin|continuous|Dolphin_Emulator-x86_64.AppImage.zsync"
-        /tmp/squashfs-root/AppRun --appdir="$GITHUB_WORKSPACE"/squashfs-root/ --plugin qt -d "$GITHUB_WORKSPACE"/squashfs-root/dolphin-emu.desktop -i "$GITHUB_WORKSPACE"/squashfs-root/dolphin-emu.svg \
+        /tmp/squashfs-root/AppRun --appdir="$GITHUB_WORKSPACE"/squashfs-root/ --plugin qt -d "$GITHUB_WORKSPACE"/squashfs-root/project-plus-dolphin.desktop -i "$GITHUB_WORKSPACE"/squashfs-root/dolphin-emu.svg \
         --exclude-library=libglib* --output appimage
         ls . | grep *.AppImage
         mv $(ls . | grep *.AppImage) $GITHUB_WORKSPACE/artifacts
