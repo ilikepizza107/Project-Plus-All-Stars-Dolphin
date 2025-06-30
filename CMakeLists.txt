@@ -874,9 +874,9 @@ if(CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD")
   install(FILES Data/project-plus-dolphin.desktop
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
   # Install manpages
-  install(FILES Data/dolphin-emu.6
+  install(FILES Data/project-plus-dolphin.6
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
-  install(FILES Data/dolphin-emu-nogui.6
+  install(FILES Data/project-plus-dolphin-nogui.6
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
 endif()
 
