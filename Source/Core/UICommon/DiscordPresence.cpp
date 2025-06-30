@@ -105,7 +105,7 @@ std::string ArtworkForGameId()
   const bool is_wii = Core::System::GetInstance().IsWii();
   const std::string region_code = SConfig::GetInstance().GetGameTDBImageRegionCode(is_wii, region);
 
-  if (SConfig::GetInstance().GetGameTDBID() == "RSBE01")
+  if (SConfig::GetInstance().GetGameTDBID() == "RSBE01" || "ID-Project+ Netplay Launcher")
   {
     static constexpr char cover_url[] = "https://art.gametdb.com/wii/coverB/US/RSBEPL.png";
     return fmt::format(cover_url, region_code, SConfig::GetInstance().GetGameTDBID());
@@ -238,7 +238,7 @@ void UpdateDiscordPresence(int party_size, SecretType type, const std::string& s
   }
   if (title.empty())
     discord_presence.details = "Not in-game";
-  else if (SConfig::GetInstance().GetGameID() == "RSBE01")
+  else if (SConfig::GetInstance().GetGameID() == "RSBE01" || "ID-Project+ Netplay Launcher")
   {
     discord_presence.details = "Project+";
     discord_presence.largeImageText = "Project+";
