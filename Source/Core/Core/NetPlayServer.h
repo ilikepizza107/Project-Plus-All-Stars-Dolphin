@@ -93,7 +93,7 @@ private:
     ENetPeer* socket = nullptr;
     u32 ping = 0;
     u32 current_game = 0;
-    unsigned int m_player_buffer_size = 0;
+    unsigned int buffer;
 
     Common::QoSSession qos_session;
 
