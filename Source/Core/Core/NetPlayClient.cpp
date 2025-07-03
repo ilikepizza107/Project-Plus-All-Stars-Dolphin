@@ -2269,7 +2269,7 @@ bool NetPlayClient::PollLocalPad(const int local_pad, sf::Packet& packet)
   {
     // adjust the buffer either up or down
     // inserting multiple padstates or dropping states
-    while (m_pad_buffer[ingame_pad].Size() <= m_minimum_buffer_size)
+    while (m_pad_buffer[ingame_pad].Size() <= BufferSizeForPort(ingame_pad))
     {
       // add to buffer
       m_pad_buffer[ingame_pad].Push(pad_status);
