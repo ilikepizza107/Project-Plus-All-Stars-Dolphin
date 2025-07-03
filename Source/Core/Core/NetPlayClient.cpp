@@ -79,6 +79,7 @@
 #include "UICommon/GameFile.h"
 #include "VideoCommon/OnScreenDisplay.h"
 #include "VideoCommon/VideoConfig.h"
+#include "NetPlayServer.h"
 
 namespace NetPlay
 {
@@ -334,14 +335,19 @@ void NetPlayClient::AdjustPlayerPadBufferSize(u32 buffer)
   m_local_player->buffer = buffer;
   if (m_local_player->buffer < m_minimum_buffer_size)
     m_local_player->buffer = m_minimum_buffer_size;
-  
-  // need to rewrite this area
-  
-  /* auto spac = std::make_unique<sf::Packet>();
-  *spac << static_cast <MessageID>(OnPadBufferPlayer);
-  *spac << local_player->buffer;
-  SendAsync(std::move(spac)); */ 
 
+
+	 // not needed on clients with host input authority
+  if (!m_host_input_authority)
+  {
+    // tell clients to change buffer size
+    sf::Packet spac;
+    spac << MessageID::PadBufferPlayer;
+    spac << m_local_player->buffer;
+
+    SendAsync(std::move(spac));
+  }
+  
   m_dialog->OnPlayerPadBufferChanged(m_local_player->buffer);
 }
 

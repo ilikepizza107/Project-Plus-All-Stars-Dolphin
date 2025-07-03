@@ -499,6 +499,9 @@ ConnectionError NetPlayServer::OnConnect(ENetPeer* incoming_connection, sf::Pack
 
     SendResponseToPlayer(new_player, MessageID::GameStatus, existing_player.pid,
                          static_cast<u8>(existing_player.game_status));
+						 
+	SendResponseToPlayer(new_player, MessageID::PadBufferPlayer, existing_player.pid,
+                         static_cast<u8>(existing_player.m_player_buffer_size));
   }
 
   if (Config::Get(Config::NETPLAY_ENABLE_QOS))
