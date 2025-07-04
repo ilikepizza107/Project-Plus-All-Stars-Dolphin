@@ -79,7 +79,6 @@
 #include "UICommon/GameFile.h"
 #include "VideoCommon/OnScreenDisplay.h"
 #include "VideoCommon/VideoConfig.h"
-#include "NetPlayServer.h"
 
 namespace NetPlay
 {
