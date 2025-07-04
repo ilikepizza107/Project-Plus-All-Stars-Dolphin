@@ -16,7 +16,7 @@
     </p>
 	</description>
 	<provides>
-		<binary>dolphin-emu</binary>
+		<binary>project-plus-dolphin</binary>
 		<id>com.projectplusgame.project-plus-dolphin.desktop</id>
 	</provides>
 	<releases>
