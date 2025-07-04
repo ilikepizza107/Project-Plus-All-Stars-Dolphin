@@ -192,7 +192,7 @@ jobs:
     - name: Run Flatpak Builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
-        manifest-path: Distribution/flatpak.yml
+        manifest-path: Distribution/flatpak/flatpak.yml
         bundle: Project-Plus-Dolphin-${{ env.DOLPHINVER }}.flatpak
         
   build_appimage:
