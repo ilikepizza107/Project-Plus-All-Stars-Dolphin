@@ -113,7 +113,7 @@ modules:
         
       # Patches Data/user/Config/Dolphin.ini to set proper paths for Flatpak to find stuff
       - type: patch
-        path: Distribution/flatpak/dolphinini.patch
+        path: dolphinini.patch
 
       # TODO: Add x-checker-data
       # Project Plus SD card
@@ -137,11 +137,11 @@ modules:
 
       # Script that is ran everytime the final Flatpak starts
       - type: file
-        path: Distribution/flatpak/project-plus-dolphin-wrapper.sh
+        path: project-plus-dolphin-wrapper.sh
         
       # Metadata file for Flatpak repos
       - type: file
-        path: Distribution/flatpak/com.projectplusgame.project-plus-dolphin.metainfo.xml
+        path: com.projectplusgame.project-plus-dolphin.metainfo.xml
 
       # detects whether dolphin is running in a flatpak sandbox
       # and makes it use xdg directories if it is.
