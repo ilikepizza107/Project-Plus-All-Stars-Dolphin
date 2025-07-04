@@ -165,9 +165,9 @@ modules:
       - desktop-file-edit --set-key=Name --set-value='Project Plus Dolphin'
         /app/share/applications/project-plus-dolphin.desktop
       - rm -r ${FLATPAK_DEST}/share/project-plus-dolphin/sys                                                                                       # Remove preinstalled sys directory
-      - mv Data/Sys ${FLATPAK_DEST}/share/project-plus-dolphin/sys/                                                                                # Move Sys directory to correct location (only use without the -DLINUX_LOCAL_DEV=true flag set)
-			#- tar --transform="s|sd.raw|WiiSD.raw|" -xf sd.tar.gz -C ${FLATPAK_DEST}/share/project-plus-dolphin/sys/Load/                                # Extract, rename and move SD card to correct location
-			- mv Launcher ${FLATPAK_DEST}/share/dolphin-emu/sys/Wii/                                                                            					# Move Launcher directory to correct location
-			- mkdir -p ${FLATPAK_DEST}/share/dolphin-emu/sys/Load/Textures                                                                      					# Make directory for HD textures
-			- mv "ModPack/Full Quality HD Textures" ${FLATPAK_DEST}/share/dolphin-emu/sys/Load/Textures/RSBE01/                               					  # Move HD Textures from ModPack to correct location
-			- install -Dm644 com.projectplusgame.project-plus-dolphin.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/                                    # Install metainfo file
+      - mv Data/Sys ${FLATPAK_DEST}/share/project-plus-dolphin/sys/                                                                                # Move Sys directory to correct location (only use without the -DLINUX_LOCAL_DEV=true flag set
+      #- tar --transform="s|sd.raw|WiiSD.raw|" -xf sd.tar.gz -C ${FLATPAK_DEST}/share/project-plus-dolphin/sys/Load/                                # Extract, rename and move SD card to correct location
+      - mv Launcher ${FLATPAK_DEST}/share/dolphin-emu/sys/Wii/                                                                            					# Move Launcher directory to correct location
+      - mkdir -p ${FLATPAK_DEST}/share/dolphin-emu/sys/Load/Textures                                                                      					# Make directory for HD textures
+      - mv "ModPack/Full Quality HD Textures" ${FLATPAK_DEST}/share/dolphin-emu/sys/Load/Textures/RSBE01/                               					  # Move HD Textures from ModPack to correct location
+      - install -Dm644 com.projectplusgame.project-plus-dolphin.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/                                    # Install metainfo file
