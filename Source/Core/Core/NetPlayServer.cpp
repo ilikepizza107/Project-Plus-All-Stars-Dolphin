@@ -454,6 +454,7 @@ ConnectionError NetPlayServer::OnConnect(ENetPeer* incoming_connection, sf::Pack
   Client new_player{};
   new_player.pid = GiveFirstAvailableIDTo(incoming_connection);
   new_player.socket = incoming_connection;
+  new_player.buffer = m_minimum_buffer_size;
 
   received_packet >> new_player.revision;
   received_packet >> new_player.name;
@@ -499,6 +500,9 @@ ConnectionError NetPlayServer::OnConnect(ENetPeer* incoming_connection, sf::Pack
 
     SendResponseToPlayer(new_player, MessageID::GameStatus, existing_player.pid,
                          static_cast<u8>(existing_player.game_status));
+						 
+	SendResponseToPlayer(new_player, MessageID::PadBufferPlayer, existing_player.pid,
+                         static_cast<u8>(existing_player.buffer));
   }
 
   if (Config::Get(Config::NETPLAY_ENABLE_QOS))
@@ -777,6 +781,22 @@ unsigned int NetPlayServer::OnData(sf::Packet& packet, Client& player)
 
     SendToClients(spac, player.pid);
   }
+  break;
+  
+  case MessageID::PadBufferPlayer:
+  {
+	u32 buffer;
+	packet >> buffer;
+
+	player.buffer = buffer;
+
+	sf::Packet spac;
+	spac << MessageID::PadBufferPlayer;
+	spac << player.pid;
+	spac << buffer;
+
+	SendToClients(spac, player.pid);
+	}
   break;
 
   case MessageID::ChunkedDataProgress:

@@ -334,14 +334,19 @@ void NetPlayClient::AdjustPlayerPadBufferSize(u32 buffer)
   m_local_player->buffer = buffer;
   if (m_local_player->buffer < m_minimum_buffer_size)
     m_local_player->buffer = m_minimum_buffer_size;
-  
-  // need to rewrite this area
-  
-  /* auto spac = std::make_unique<sf::Packet>();
-  *spac << static_cast <MessageID>(OnPadBufferPlayer);
-  *spac << local_player->buffer;
-  SendAsync(std::move(spac)); */ 
 
+
+	 // not needed on clients with host input authority
+  if (!m_host_input_authority)
+  {
+    // tell clients to change buffer size
+    sf::Packet spac;
+    spac << MessageID::PadBufferPlayer;
+    spac << m_local_player->buffer;
+
+    SendAsync(std::move(spac));
+  }
+  
   m_dialog->OnPlayerPadBufferChanged(m_local_player->buffer);
 }
 
@@ -2263,7 +2268,7 @@ bool NetPlayClient::PollLocalPad(const int local_pad, sf::Packet& packet)
   {
     // adjust the buffer either up or down
     // inserting multiple padstates or dropping states
-    while (m_pad_buffer[ingame_pad].Size() <= m_minimum_buffer_size)
+    while (m_pad_buffer[ingame_pad].Size() <= BufferSizeForPort(ingame_pad))
     {
       // add to buffer
       m_pad_buffer[ingame_pad].Push(pad_status);
