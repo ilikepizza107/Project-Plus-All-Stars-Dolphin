@@ -4,14 +4,14 @@ on: [push, pull_request]
 
 jobs: 
   build_flatpak:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     container:
       image: bilelmoussaoui/flatpak-github-actions:gnome-nightly
       options: --privileged
     steps:
     - uses: actions/checkout@v2
     - name: Purge .git for space reasons
-      run: rm -rf /home/runner/work/Project-Plus-Dolphin-src/Project-Plus-Dolphin-src/.git
+      run: rm -rf /home/runner/work/Project-Plus-Dolphin-src/.git
     - name: Setup Packages
       run: |
         flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
