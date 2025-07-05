@@ -148,15 +148,15 @@ modules:
       # prevents dolphin from attempting to write conf files
       # in non-writable paths, typically happens when a user
       # has leftover files from a previous non-flatpak install
-      - type: script
-        commands:
-          - |
-            for i in {0..9}; do
-              test -S $XDG_RUNTIME_DIR/discord-ipc-$i ||
-                ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-$i;
-            done
-            project-plus-dolphin "$@"
-        dest-filename: project-plus-dolphin-wrapper
+      #- type: script
+      #  commands:
+      #    - |
+      #      for i in {0..9}; do
+      #        test -S $XDG_RUNTIME_DIR/discord-ipc-$i ||
+      #          ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-$i;
+      #      done
+      #      project-plus-dolphin "$@"
+      #  dest-filename: project-plus-dolphin-wrapper
     post-install:
       - |
       - install -D -t ${FLATPAK_DEST}/bin/ project-plus-dolphin-wrapper
