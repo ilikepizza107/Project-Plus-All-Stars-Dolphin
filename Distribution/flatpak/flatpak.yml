@@ -159,8 +159,8 @@ modules:
       #  dest-filename: project-plus-dolphin-wrapper
     post-install:
       - |
-      - install -D -t ${FLATPAK_DEST}/bin/ project-plus-dolphin-wrapper
-      - desktop-file-edit --set-key=Exec --set-value='/app/bin/project-plus-dolphin-wrapper'
+      - install -D -t ${FLATPAK_DEST}/bin/ project-plus-dolphin-wrapper.sh
+      - desktop-file-edit --set-key=Exec --set-value='/app/bin/project-plus-dolphin-wrapper.sh'
         /app/share/applications/project-plus-dolphin.desktop
       - desktop-file-edit --set-key=Name --set-value='Project Plus Dolphin'
         /app/share/applications/project-plus-dolphin.desktop
