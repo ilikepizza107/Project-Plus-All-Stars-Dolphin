@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs: 
   build_flatpak:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
       image: bilelmoussaoui/flatpak-github-actions:gnome-nightly
       options: --privileged
