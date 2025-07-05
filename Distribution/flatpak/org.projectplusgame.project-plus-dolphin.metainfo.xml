@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-	<id>com.projectplusgame.project-plus-dolphin</id>
+	<id>org.projectplusgame.project-plus-dolphin</id>
 	<name>Project Plus Dolphin</name>
 	<summary>GameCube / Wii / Triforce Emulator for Project Plus</summary>
 	<metadata_license>CC-BY-SA-3.0</metadata_license>
@@ -17,7 +17,7 @@
 	</description>
 	<provides>
 		<binary>project-plus-dolphin</binary>
-		<id>com.projectplusgame.project-plus-dolphin.desktop</id>
+		<id>org.projectplusgame.project-plus-dolphin.desktop</id>
 	</provides>
 	<releases>
 		<release version="3.1.2" date="2025-05-02"/>
@@ -29,5 +29,5 @@
 		<release version="3.0" date="2024-06-24"/>
 		<release version="2.5.2" date="2024-06-15"/>
 	</releases>
-	<launchable type="desktop-id">com.projectplusgame.project-plus-dolphin.desktop</launchable>
+	<launchable type="desktop-id">org.projectplusgame.project-plus-dolphin.desktop</launchable>
 </component>
