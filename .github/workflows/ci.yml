@@ -3,61 +3,8 @@ name: Project+ Dolphin Builder
 on: [push, pull_request]
 
 jobs: 
-  build_cleanup:
-    runs-on: ubuntu-latest
-    steps:
-      - 
-        name: Check disk space
-        run: df . -h
-      - 
-        name: Free disk space
-        run: |
-          sudo docker rmi $(docker image ls -aq) >/dev/null 2>&1 || true
-          sudo rm -rf \
-            /usr/share/dotnet /usr/local/lib/android /opt/ghc \
-            /usr/local/share/powershell /usr/share/swift /usr/local/.ghcup \
-            /usr/lib/jvm || true
-          echo "some directories deleted"
-          sudo apt install aptitude -y >/dev/null 2>&1
-          sudo aptitude purge aria2 ansible azure-cli shellcheck rpm xorriso zsync \
-            esl-erlang firefox gfortran-8 gfortran-9 google-chrome-stable \
-            google-cloud-sdk imagemagick \
-            libmagickcore-dev libmagickwand-dev libmagic-dev ant ant-optional kubectl \
-            mercurial apt-transport-https mono-complete libmysqlclient \
-            unixodbc-dev yarn chrpath libssl-dev libxft-dev \
-            libfreetype6 libfreetype6-dev libfontconfig1 libfontconfig1-dev \
-            snmp pollinate libpq-dev postgresql-client powershell ruby-full \
-            sphinxsearch subversion mongodb-org azure-cli microsoft-edge-stable \
-            -y -f >/dev/null 2>&1
-          sudo aptitude purge google-cloud-sdk -f -y >/dev/null 2>&1
-          sudo aptitude purge microsoft-edge-stable -f -y >/dev/null 2>&1 || true
-          sudo apt purge microsoft-edge-stable -f -y >/dev/null 2>&1 || true
-          sudo aptitude purge '~n ^mysql' -f -y >/dev/null 2>&1
-          sudo aptitude purge '~n ^php' -f -y >/dev/null 2>&1
-          sudo aptitude purge '~n ^dotnet' -f -y >/dev/null 2>&1
-          sudo apt-get autoremove -y >/dev/null 2>&1
-          sudo apt-get autoclean -y >/dev/null 2>&1
-          echo "some packages purged"
-      - 
-        name: Check disk space
-        run: |
-          sudo dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -nr | head
-          df . -h
-          sudo du /usr/ -hx -d 4 --threshold=1G | sort -hr | head
-      -
-        name: Checkout
-        uses: actions/checkout@v3
-      - 
-        name: Check working space directory
-        run: du ${GITHUB_WORKSPACE} -h -d 1
-      - 
-        name: Get more space
-        run: |
-          df . -h
-          sudo rm -rf ${GITHUB_WORKSPACE}/.git
-          df . -h
   build_flatpak:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     container:
       image: bilelmoussaoui/flatpak-github-actions:gnome-nightly
       options: --privileged
@@ -70,13 +17,6 @@ jobs:
         flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
         flatpak install org.kde.Sdk//5.15 org.kde.Platform//5.15 -y && \
         dnf install libusb1-devel cmake git gcc-c++ libXext-devel libgudev qt6-qtbase-devel systemd-devel openal-soft-devel libevdev-devel libao-devel SOIL-devel libXrandr-devel pulseaudio-libs-devel bluez-libs-devel p7zip SDL2-devel make automake gcc gcc-c++ kernel-devel -y
-    - name: Dolphin-Build Number
-      run: |
-        export LASTCOMMIT=$(git log --pretty=format:%H -1)
-        export DOLPHINVER="v3.1.2-mainline-beta.2"
-        echo "DOLPHIN Build $DOLPHINVER"
-        echo "DOLPHINVER=$DOLPHINVER" >> $GITHUB_ENV
-        sed -i "s|\${DOLPHIN_WC_DESCRIBE}|$DOLPHINVER|g" Source/Core/Common/scmrev.h.in
     - name: Run Flatpak Builder
       uses: flatpak/flatpak-github-actions/flatpak-builder@v6
       with:
