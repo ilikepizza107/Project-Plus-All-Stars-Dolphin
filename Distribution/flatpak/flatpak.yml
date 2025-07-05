@@ -3,7 +3,7 @@ branch: master
 runtime: org.kde.Platform
 runtime-version: 6.6
 sdk: org.kde.Sdk
-command: project-plus-dolphin-wrapper
+command: project-plus-dolphin-wrapper.sh
 rename-desktop-file: project-plus-dolphin.desktop
 rename-icon: project-plus-dolphin
 finish-args:
