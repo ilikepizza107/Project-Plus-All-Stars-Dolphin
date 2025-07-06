@@ -3,7 +3,7 @@ branch: master
 runtime: org.kde.Platform
 runtime-version: 6.6
 sdk: org.kde.Sdk
-command: project-plus-dolphin-wrapper
+command: project-plus-dolphin-wrapper.sh
 rename-desktop-file: project-plus-dolphin.desktop
 rename-icon: project-plus-dolphin
 finish-args:
@@ -96,12 +96,15 @@ modules:
         url: https://github.com/Unrud/xdg-screensaver-shim/archive/0.0.2.tar.gz
         sha256: 0ed2a69fe6ee6cbffd2fe16f85116db737f17fb1e79bfb812d893cf15c728399
 
+  # build the vendored SDL2 from Externals until the runtime gets 2.30.9
+  # - SDL2.json
+  
   - name: project-plus-dolphin
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release
       - -DENABLE_ALSA=OFF
-      - -DENABLE_SDL=OFF
+      - -DENABLE_SDL=OFF #change when SDL is updated
       - -DENABLE_EVDEV=ON
       - -DDISTRIBUTOR=Project Plus Development Team
       - -DCPACK_PACKAGE_CONTACT=Project Plus Development Team
@@ -148,19 +151,19 @@ modules:
       # prevents dolphin from attempting to write conf files
       # in non-writable paths, typically happens when a user
       # has leftover files from a previous non-flatpak install
-      - type: script
-        commands:
-          - |
-            for i in {0..9}; do
-              test -S $XDG_RUNTIME_DIR/discord-ipc-$i ||
-                ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-$i;
-            done
-            project-plus-dolphin "$@"
-        dest-filename: project-plus-dolphin-wrapper
+      #- type: script
+      #  commands:
+      #    - |
+      #      for i in {0..9}; do
+      #        test -S $XDG_RUNTIME_DIR/discord-ipc-$i ||
+      #          ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-$i;
+      #      done
+      #      project-plus-dolphin "$@"
+      #  dest-filename: project-plus-dolphin-wrapper
     post-install:
       - |
-      - install -D -t ${FLATPAK_DEST}/bin/ project-plus-dolphin-wrapper
-      - desktop-file-edit --set-key=Exec --set-value='/app/bin/project-plus-dolphin-wrapper'
+      - install -D -t ${FLATPAK_DEST}/bin/ project-plus-dolphin-wrapper.sh
+      - desktop-file-edit --set-key=Exec --set-value='/app/bin/project-plus-dolphin-wrapper.sh'
         /app/share/applications/project-plus-dolphin.desktop
       - desktop-file-edit --set-key=Name --set-value='Project Plus Dolphin'
         /app/share/applications/project-plus-dolphin.desktop
