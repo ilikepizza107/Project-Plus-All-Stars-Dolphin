@@ -168,7 +168,8 @@ jobs:
           name: ${{ steps.create-artifact.outputs.name }}
           path: "*.tar.xz"
           
-  Windows Build:
+  build_windows_x86_64:
+    name: Windows Build
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v2
@@ -186,7 +187,8 @@ jobs:
         name: DolphinMPN-windows-x86_64
         path: Binary/x64/
         
-  Flatpak Build:
+  build_flatpak:
+    name: Flatpak Build
     runs-on: ubuntu-latest
     container:
       image: bilelmoussaoui/flatpak-github-actions:gnome-nightly
