@@ -179,12 +179,19 @@ jobs:
       uses: microsoft/setup-msbuild@v1.0.2
       with:
         vs-version: '16.6.2'
+    - name: Dolphin-Build Number
+      run: |
+        export LASTCOMMIT=$(git log --pretty=format:%H -1)
+        export DOLPHINVER="v3.1.2-mainline-beta.2"
+        echo "DOLPHIN Build $DOLPHINVER"
+        echo "DOLPHINVER=$DOLPHINVER" >> $GITHUB_ENV
+        sed -i "s|\${DOLPHIN_WC_DESCRIBE}|$DOLPHINVER|g" Source/Core/Common/scmrev.h.in
     - name: Build
       run: msbuild "Source\dolphin-emu.sln" /verbosity:minimal /property:Configuration=Release /property:Platform=x64
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: DolphinMPN-windows-x86_64
+        name: Project-Plus-Dolphin-windows-x86_64
         path: Binary/x64/
         
   build_flatpak:
