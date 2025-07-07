@@ -168,7 +168,25 @@ jobs:
           name: ${{ steps.create-artifact.outputs.name }}
           path: "*.tar.xz"
           
-  build_flatpak:
+  Windows Build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup Submodules
+      run: git config --global --add safe.directory . && git submodule update --init --recursive
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+      with:
+        vs-version: '16.6.2'
+    - name: Build
+      run: msbuild "Source\dolphin-emu.sln" /verbosity:minimal /property:Configuration=Release /property:Platform=x64
+    - name: Upload Build Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: DolphinMPN-windows-x86_64
+        path: Binary/x64/
+        
+  Flatpak Build:
     runs-on: ubuntu-latest
     container:
       image: bilelmoussaoui/flatpak-github-actions:gnome-nightly
