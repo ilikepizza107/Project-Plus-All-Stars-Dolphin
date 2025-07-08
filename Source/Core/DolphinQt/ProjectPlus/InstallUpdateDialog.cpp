@@ -362,6 +362,12 @@ bool InstallUpdateDialog::unzipFile(const std::string& zipFilePath, const std::s
         count_status = mz_zip_reader_goto_next_entry(reader);
     }
     
+	 // Skip User/Config and User/GameSettings directories
+    if (std::string(filename).find("User/Config") == 0 || std::string(filename).find("User/GameSettings") == 0)
+    {
+        continue;  // Skip these directories
+    }
+	
     // Reset to first entry for extraction
     int32_t entry_status = mz_zip_reader_goto_first_entry(reader);
     int current_file = 0;
