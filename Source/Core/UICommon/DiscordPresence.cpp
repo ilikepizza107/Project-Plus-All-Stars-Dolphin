@@ -233,8 +233,8 @@ void UpdateDiscordPresence(int party_size, SecretType type, const std::string& s
   {
     discord_presence.largeImageKey = "https://art.gametdb.com/wii/coverB/US/RSBEPL.png";
     discord_presence.largeImageText = "Project+";
-    discord_presence.smallImageKey = "https://art.gametdb.com/wii/coverB/US/RSBEPL.png";
-    discord_presence.smallImageText = "Project+ is a modification for SSBB with competitive gameplay in mind.";
+    discord_presence.smallImageKey = "dolphin_logo";
+    discord_presence.smallImageText = "Dolphin is an emulator for the GameCube and the Wii.";
   }
   else
   {
