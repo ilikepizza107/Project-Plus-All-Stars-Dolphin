@@ -1,31 +1,26 @@
 # Project+ Dolphin Fork
 
-![image](https://github.com/user-attachments/assets/969b8a0f-e464-44f9-bbdd-7800d821f0ae)
+![Untitled-1](https://github.com/user-attachments/assets/3bfb148a-85d1-489d-96ae-1b7892acdc11)
 
 
-This is a work-in-progress version of the Dolphin Emulator built for usage with Project+. Current progress:
+This fork is a heavily modified version of the Dolphin Emulator designed for usage with Project+. It includes the following features:
 
-* Completed
-  * 2 buffer as default setting (equivalent to 4 in FPM)
-  * Project+ specific aspect ratios
-  * Theming and iconography
-  * Netplay button on toolbar
-  * Update button on toolbar
-  * Brawl rename to "Set me as default! Use the .dol file to play"
-  * HD texture loading with .dol file with GameID workaround
-  * Netplay replay automatic exporting
-  * Auto-copy netplay code on netplay window startup
+  * Branding, theming and iconography updates to match the Project+ aesthetic
+  * Netplay button on the toolbar
+  * Update button on the toolbar
+  * Specific aspect ratios (19:15 and 69:40 for regular and widescreen, respectively)
+  * Discord Rich Presence support for Project+
+  * Gamecube Adapter polling rate listed in controller settings
   * Pre-configured hotkeys for volume up/down and opening netplay chat
-  * Brawl save file MD5 check
-  * Discord Rich Presence support
+  * Automatic copying of netplay lobby code on netplay window startup
+  * 2 buffer as default netplay setting (equivalent to 4 in FPM)
   * Separate Minimum and Player buffers in netplay window
   * Client side music toggle in netplay window
-  * Gamecube adapter polling rate in controller settings
   * Spectator button in netplay window
-  * Overwrite Dolphin updater functions with our own
-    
-* To-Do
-  * Bug fixes and miscellaneous improvements
+  * Automatic export of Brawl vault data at the end of netplay sessions
+  * Alternative implementation for automatic updates that fetch the latest GitHub release
+ 
+This project would not be possible without the work done by the [Faster Melee](https://github.com/FasterMelee/Ishiiruka), [Faster PM](https://github.com/jlambert360/Ishiiruka), [Slippi](https://github.com/project-slippi/dolphin), and [Mario Party Netplay](https://github.com/MarioPartyNetplay/Dolphin-MPN) teams. 
 
 # Dolphin - A GameCube and Wii Emulator
 
@@ -147,7 +142,7 @@ Or useful for having multiple distinct Dolphin setups for testing/development/TA
 2. `cd Build`
 3. `cmake .. -DLINUX_LOCAL_DEV=true`
 4. `make -j $(nproc)`
-5. `cp -r ../Data/Sys/ ../Data/User/ ../Data/Launcher/ ../Data/portable.txt Binaries/`
+5. `cp -r ../Data/Sys/ ../Data/user/ ../Data/Launcher/ ../Data/portable.txt Binaries/`
 
 
 ### Linux AppImage Build Steps:
