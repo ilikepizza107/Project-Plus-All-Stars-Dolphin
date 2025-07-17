@@ -377,6 +377,14 @@ bool InstallUpdateDialog::unzipFile(const std::string& zipFilePath, const std::s
             return false;
         }
         
+        // Skip Dolphin.ini to not wipe a user's config
+        std::string filename_str = file_info->filename;
+        if (filename_str.find("Dolphin.ini") != std::string::npos)
+        {
+          entry_status = mz_zip_reader_goto_next_entry(reader);
+          continue;
+        }
+
         std::string out_path = destDir + "/" + file_info->filename;
         if (file_info->filename[strlen(file_info->filename) - 1] == '/')
         {
