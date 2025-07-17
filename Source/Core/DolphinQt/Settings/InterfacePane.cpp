@@ -198,6 +198,8 @@ void InterfacePane::CreateInGame()
       new ConfigBool(tr("Use Panic Handlers"), Config::MAIN_USE_PANIC_HANDLERS);
   m_checkbox_enable_osd =
       new ConfigBool(tr("Show On-Screen Display Messages"), Config::MAIN_OSD_MESSAGES);
+  m_checkbox_adapter_warning = 
+      new ConfigBool(tr("Show Adapter Poll Rate Warning"), Config::MAIN_SHOW_ADAPTER_WARNING);
   m_checkbox_show_active_title =
       new ConfigBool(tr("Show Active Title in Window Title"), Config::MAIN_SHOW_ACTIVE_TITLE);
   m_checkbox_pause_on_focus_lost =
@@ -228,6 +230,7 @@ void InterfacePane::CreateInGame()
   groupbox_layout->addWidget(m_checkbox_confirm_on_stop);
   groupbox_layout->addWidget(m_checkbox_use_panic_handlers);
   groupbox_layout->addWidget(m_checkbox_enable_osd);
+  groupbox_layout->addWidget(m_checkbox_adapter_warning);
   groupbox_layout->addWidget(m_checkbox_show_active_title);
   groupbox_layout->addWidget(m_checkbox_pause_on_focus_lost);
   groupbox_layout->addWidget(mouse_groupbox);
@@ -372,6 +375,11 @@ void InterfacePane::AddDescriptions()
       QT_TR_NOOP("Shows on-screen display messages over the render window. These messages "
                  "disappear after several seconds."
                  "<br><br><dolphin_emphasis>If unsure, leave this checked.</dolphin_emphasis>");
+  static constexpr char TR_ADAPTER_WARNING_DESCRIPTION[] =
+      QT_TR_NOOP("This setting makes Dolphin warn and show a message when inputs are being read at a reduced rate when an adapter problem is detected."
+        " This should only occur when your adapter returns something other than LIBUSB_SUCCESS."
+        " Before turning this off, try reinstalling drivers and switching USB ports."
+        "<br><br><dolphin_emphasis>If unsure, leave this checked.</dolphin_emphasis>");
   static constexpr char TR_SHOW_ACTIVE_TITLE_DESCRIPTION[] =
       QT_TR_NOOP("Shows the active game title in the render window's title bar."
                  "<br><br><dolphin_emphasis>If unsure, leave this checked.</dolphin_emphasis>");
@@ -420,6 +428,8 @@ void InterfacePane::AddDescriptions()
   m_checkbox_use_panic_handlers->SetDescription(tr(TR_USE_PANIC_HANDLERS_DESCRIPTION));
 
   m_checkbox_enable_osd->SetDescription(tr(TR_ENABLE_OSD_DESCRIPTION));
+  
+  m_checkbox_adapter_warning->SetDescription(tr(TR_ADAPTER_WARNING_DESCRIPTION));
 
   m_checkbox_show_active_title->SetDescription(tr(TR_SHOW_ACTIVE_TITLE_DESCRIPTION));
 
