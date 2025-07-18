@@ -1258,7 +1258,7 @@ void NetPlayDialog::SaveSettings()
   if (m_host_input_authority)
     Config::SetBase(Config::NETPLAY_CLIENT_BUFFER_SIZE, m_minimum_buffer_size_box->value());
   else
-    Config::SetBase(Config::NETPLAY_MINIMUM_BUFFER_SIZE, m_minimum_buffer_size_box->value());
+    (m_minimum_buffer_size_box->value());
 
   const bool write_savedata = m_savedata_load_and_write_action->isChecked();
   const bool load_savedata = write_savedata || m_savedata_load_only_action->isChecked();
