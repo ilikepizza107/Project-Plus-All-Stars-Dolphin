@@ -175,13 +175,6 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup Submodules
       run: git config --global --add safe.directory . && git submodule update --init --recursive
-    - name: Dolphin-Build Number
-      run: |
-          export LASTCOMMIT=$(git log --pretty=format:%H -1)
-          export DOLPHINVER="v3.1.2-mainline-beta.3"
-          echo "DOLPHIN Build $DOLPHINVER"
-          echo "DOLPHINVER=$DOLPHINVER" >> $GITHUB_ENV
-          get-content Source/Core/Common/scmrev.h.in | %{$_ -replace "s|\${DOLPHIN_WC_DESCRIBE}","$DOLPHINVER"}
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v1.0.2
       with:
