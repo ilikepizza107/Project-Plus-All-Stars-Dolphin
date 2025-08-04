@@ -8,6 +8,9 @@
 #define DIR_SEP_CHR '/'
 
 // The current working directory
+#ifdef __APPLE__
+#define ROOT_DIR "_NSGetExecutablePath"
+#else
 #define ROOT_DIR "."
 
 // The normal user directory
