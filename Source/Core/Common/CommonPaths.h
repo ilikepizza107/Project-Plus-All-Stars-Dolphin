@@ -12,6 +12,7 @@
 #define ROOT_DIR "_NSGetExecutablePath"
 #else
 #define ROOT_DIR "."
+#endif
 
 // The normal user directory
 #ifdef _WIN32
