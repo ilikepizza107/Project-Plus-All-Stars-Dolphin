@@ -80,7 +80,7 @@ make -C build "-j$NPROCS"
 make -C build install
 cd ..
 
-echo "Installing Qt Translations..."
+echo "Installing Qt Translations... "
 tar xf "qttranslations-everywhere$QT_SUFFIX-src-$QT.tar.xz"
 cd "qttranslations-everywhere-src-$QT"
 cmake -B build -DCMAKE_PREFIX_PATH="$INSTALLDIR" -DCMAKE_INSTALL_PREFIX="$INSTALLDIR" -DCMAKE_BUILD_TYPE=Release
