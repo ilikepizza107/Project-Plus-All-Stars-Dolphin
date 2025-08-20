@@ -311,6 +311,7 @@ bool ShouldUseDPL2Decoder()
 
 const Info<std::string> MAIN_DUMP_PATH{{System::Main, "General", "DumpPath"}, ""};
 const Info<std::string> MAIN_LOAD_PATH{{System::Main, "General", "LoadPath"}, ""};
+const Info<std::string> MAIN_LAUNCHER_PATH{{System::Main, "General", "LauncherPath"}, ""};
 const Info<std::string> MAIN_RESOURCEPACK_PATH{{System::Main, "General", "ResourcePackPath"}, ""};
 const Info<std::string> MAIN_FS_PATH{{System::Main, "General", "NANDRootPath"}, ""};
 const Info<std::string> MAIN_WII_SD_CARD_IMAGE_PATH{{System::Main, "General", "WiiSDCardPath"}, ""};
@@ -344,6 +345,7 @@ std::vector<std::string> GetIsoPaths()
     if (!iso_path.empty())
       paths.emplace_back(std::move(iso_path));
   }
+
   return paths;
 }
 

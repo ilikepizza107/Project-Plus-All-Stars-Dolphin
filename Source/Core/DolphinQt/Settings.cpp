@@ -374,6 +374,20 @@ void Settings::SetDefaultGame(QString path)
   }
 }
 
+QString Settings::GetLauncherPath() const
+{
+  return QString::fromStdString(Config::Get(Config::MAIN_LAUNCHER_PATH));
+}
+
+void Settings::SetLauncherPath(QString path)
+{
+  if (GetLauncherPath() != path)
+  {
+    Config::SetBase(Config::MAIN_LAUNCHER_PATH, path.toStdString());
+    emit LauncherPathChanged(path);
+  }
+}
+
 bool Settings::GetPreferredView() const
 {
   return GetQSettings().value(QStringLiteral("PreferredView"), true).toBool();
