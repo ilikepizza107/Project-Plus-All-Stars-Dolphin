@@ -93,7 +93,7 @@ void PathPane::BrowseLauncher()
       this, tr("Select Lanucher Path"), QString::fromStdString(Config::Get(Config::MAIN_LAUNCHER_PATH))));
   if (!dir.isEmpty())
   {
-    m_load_edit->setText(dir);
+    m_launcher_edit->setText(dir);
     Config::SetBase(Config::MAIN_LAUNCHER_PATH, dir.toStdString());
   }
 }
