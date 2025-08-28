@@ -37,6 +37,8 @@ constexpr std::array<const char*, NUM_HOTKEYS> s_hotkey_labels{{
     _trans("Unlock Cursor"),
     _trans("Center Mouse"),
     _trans("Activate NetPlay Chat"),
+    _trans("Collapse NetPlay Chat"),
+    _trans("Expand NetPlay Chat"),
     _trans("Control NetPlay Golf Mode"),
 #ifdef USE_RETRO_ACHIEVEMENTS
     _trans("Open Achievements"),
@@ -452,6 +454,8 @@ void HotkeyManager::LoadDefaults(const ControllerInterface& ciface)
   set_key_expression(HK_VOLUME_DOWN, "DOWN");
   set_key_expression(HK_VOLUME_UP, "UP");
   set_key_expression(HK_ACTIVATE_CHAT, "T");
+  set_key_expression(HK_COLLAPSE_CHAT, "LEFT");
+  set_key_expression(HK_EXPAND_CHAT, "RIGHT");
 #ifdef _WIN32
   set_key_expression(HK_STOP, "ESCAPE");
   set_key_expression(HK_FULLSCREEN, hotkey_string({"Alt", "RETURN"}));
