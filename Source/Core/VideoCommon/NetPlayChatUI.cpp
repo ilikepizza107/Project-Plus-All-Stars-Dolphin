@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "VideoCommon/NetPlayChatUI.h"
+#include "Core/Config/GraphicsSettings.h"
 
 #include <imgui.h>
 
@@ -70,14 +71,12 @@ void NetPlayChatUI::Display()
 
   if (m_collapse)
   {
-    NetPlayChatUI::Collapse();
-    m_collapse = true;
+    m_collapse = false;
   }
 
   if (m_expand)
   {
-    NetPlayChatUI::Expand();
-    m_expand = true;
+    m_expand = false;
   }
 
   ImGui::PopItemWidth();
@@ -125,28 +124,12 @@ void NetPlayChatUI::Activate()
 
 void NetPlayChatUI::Collapse()
 {
-  if (!ImGui::IsWindowCollapsed())
-  {
-    ImGui::SetWindowCollapsed(true);
-    m_collapse = false;
-  }
-  else
-  {
-    ImGui::SetWindowCollapsed(false);
-    m_collapse = true;
-  }
+  Config::SetCurrent(Config::GFX_SHOW_NETPLAY_MESSAGES, false);
+  m_collapse = true;
 }
 
 void NetPlayChatUI::Expand()
 {
-  if (ImGui::IsWindowCollapsed())
-  {
-    ImGui::SetWindowCollapsed(false);
-    m_collapse = true;
-  }
-  else
-  {
-    ImGui::SetWindowCollapsed(true);
-    m_collapse = false;
-  }
+  Config::SetCurrent(Config::GFX_SHOW_NETPLAY_MESSAGES, true);
+  m_expand = true;
 }
