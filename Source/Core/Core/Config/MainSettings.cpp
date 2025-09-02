@@ -334,11 +334,18 @@ static Info<std::string> MakeISOPathConfigInfo(size_t idx)
                                    ""};
 }
 
+// Functions below DO work when the launcher path is set manually instead of pulling from Config; try to find why these functions can't pull the path properly
+
 std::vector<std::string> GetIsoPaths()
 {
-  size_t count = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
   std::vector<std::string> paths;
-  paths.reserve(count);
+
+  // Always insert the launcher path — even if it's empty
+  paths.emplace_back(Config::Get(Config::MAIN_LAUNCHER_PATH));
+
+  size_t count = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
+  paths.reserve(count + 1);
+
   for (size_t i = 0; i < count; ++i)
   {
     std::string iso_path = Config::Get(MakeISOPathConfigInfo(i));
@@ -352,28 +359,29 @@ std::vector<std::string> GetIsoPaths()
 void SetIsoPaths(const std::vector<std::string>& paths)
 {
   size_t old_size = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
-  size_t new_size = paths.size();
+  std::string launcher_path = Config::Get(Config::MAIN_LAUNCHER_PATH);
 
   size_t current_path_idx = 0;
-  for (const std::string& p : paths)
+
+  // Start from index 1, assuming launcher path is at index 0
+  for (size_t i = 1; i < paths.size(); ++i)
   {
+    const std::string& p = paths[i];
+
     if (p.empty())
-    {
-      --new_size;
       continue;
-    }
 
     Config::SetBase(MakeISOPathConfigInfo(current_path_idx), p);
     ++current_path_idx;
   }
 
+  // Clear out old entries if any
   for (size_t i = current_path_idx; i < old_size; ++i)
   {
-    // TODO: This actually needs a Config::Erase().
     Config::SetBase(MakeISOPathConfigInfo(i), "");
   }
 
-  Config::SetBase(Config::MAIN_ISO_PATH_COUNT, MathUtil::SaturatingCast<int>(new_size));
+  Config::SetBase(Config::MAIN_ISO_PATH_COUNT, static_cast<int>(current_path_idx));
 }
 
 // Main.GBA
