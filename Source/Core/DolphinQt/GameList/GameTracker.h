@@ -54,10 +54,8 @@ private:
   void UpdateDirectory(const QString& dir);
   void UpdateFile(const QString& path);
   void AddDirectoryInternal(const QString& dir);
-  void AddLauncherDirectory(const QString& dir);
   void RemoveDirectoryInternal(const QString& dir);
   void UpdateDirectoryInternal(const QString& dir);
-  void UpdateLauncherDirectory(const QString& dir);
   void UpdateFileInternal(const QString& path);
   QSet<QString> FindMissingFiles(const QString& dir);
   void LoadGame(const QString& path);

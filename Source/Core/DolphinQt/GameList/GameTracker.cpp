@@ -43,7 +43,6 @@ GameTracker::GameTracker(QObject* parent) : QFileSystemWatcher(parent)
   connect(this, &QFileSystemWatcher::fileChanged, this, &GameTracker::UpdateFile);
   connect(&Settings::Instance(), &Settings::AutoRefreshToggled, this, [] {
     const auto paths = Settings::Instance().GetPaths();
-    const auto launcher = File::GetUserPath(D_LAUNCHERS_IDX);
 
     for (const auto& path : paths)
     {
@@ -233,18 +232,6 @@ void GameTracker::UpdateFile(const QString& dir)
   m_load_thread.EmplaceItem(Command{CommandType::UpdateFile, dir});
 }
 
-void GameTracker::AddLauncherDirectory(const QString& dir)
-{
-  if (!QFileInfo(dir).exists())
-    return;
-  for (const QString& dir : Settings::Instance().GetLauncherPath())
-  {
-    m_load_thread.EmplaceItem(Command{CommandType::RemoveDirectory, dir});
-    m_load_thread.EmplaceItem(Command{CommandType::AddDirectory, dir});
-  }
-  UpdateLauncherDirectory(dir);
-}
-
 void GameTracker::AddDirectoryInternal(const QString& dir)
 {
   if (!QFileInfo(dir).exists())
@@ -283,44 +270,6 @@ void GameTracker::RemoveDirectoryInternal(const QString& dir)
 }
 
 void GameTracker::UpdateDirectoryInternal(const QString& dir)
-{
-  auto it = GetIterator(dir);
-  while (it->hasNext() && !m_processing_halted)
-  {
-    QString path = QFileInfo(it->next()).canonicalFilePath();
-
-    if (m_tracked_files.contains(path))
-    {
-      auto& tracked_file = m_tracked_files[path];
-      if (!tracked_file.contains(dir))
-        tracked_file.insert(dir);
-    }
-    else
-    {
-      AddPath(path);
-      m_tracked_files[path] = QSet<QString>{dir};
-      LoadGame(path);
-    }
-  }
-
-  for (const auto& missing : FindMissingFiles(dir))
-  {
-    if (m_processing_halted)
-      break;
-
-    auto& tracked_file = m_tracked_files[missing];
-
-    tracked_file.remove(dir);
-    if (tracked_file.empty())
-    {
-      m_tracked_files.remove(missing);
-      if (m_started)
-        GameRemoved(missing.toStdString());
-    }
-  }
-}
-
-void GameTracker::UpdateLauncherDirectory(const QString& dir)
 {
   auto it = GetIterator(dir);
   while (it->hasNext() && !m_processing_halted)
