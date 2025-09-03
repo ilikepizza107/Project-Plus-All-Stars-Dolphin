@@ -334,14 +334,14 @@ static Info<std::string> MakeISOPathConfigInfo(size_t idx)
                                    ""};
 }
 
-// Functions below DO work when the launcher path is set manually instead of pulling from Config; try to find why these functions can't pull the path properly
+// P+ change: Get/SetIsoPaths modified to include launcher path by default, preventing us from needing to ship Dolphin.ini
 
 std::vector<std::string> GetIsoPaths()
 {
   std::vector<std::string> paths;
 
-  // Always insert the launcher path — even if it's empty
-  paths.emplace_back(Config::Get(Config::MAIN_LAUNCHER_PATH));
+  // Always insert the launcher path
+  paths.emplace_back(File::GetUserPath(D_LAUNCHERS_IDX));
 
   size_t count = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
   paths.reserve(count + 1);
@@ -359,11 +359,11 @@ std::vector<std::string> GetIsoPaths()
 void SetIsoPaths(const std::vector<std::string>& paths)
 {
   size_t old_size = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
-  std::string launcher_path = Config::Get(Config::MAIN_LAUNCHER_PATH);
+  std::string launcher_path = File::GetUserPath(D_LAUNCHERS_IDX);
 
   size_t current_path_idx = 0;
 
-  // Start from index 1, assuming launcher path is at index 0
+  // P+ change: start from index 1, assuming launcher path is at index 0
   for (size_t i = 1; i < paths.size(); ++i)
   {
     const std::string& p = paths[i];
@@ -375,7 +375,6 @@ void SetIsoPaths(const std::vector<std::string>& paths)
     ++current_path_idx;
   }
 
-  // Clear out old entries if any
   for (size_t i = current_path_idx; i < old_size; ++i)
   {
     Config::SetBase(MakeISOPathConfigInfo(i), "");
