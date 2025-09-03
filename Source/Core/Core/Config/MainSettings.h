@@ -197,6 +197,7 @@ extern const Info<bool> MAIN_TIME_TRACKING;
 
 extern const Info<std::string> MAIN_DUMP_PATH;
 extern const Info<std::string> MAIN_LOAD_PATH;
+extern const Info<std::string> MAIN_LAUNCHER_PATH;
 extern const Info<std::string> MAIN_RESOURCEPACK_PATH;
 extern const Info<std::string> MAIN_FS_PATH;
 extern const Info<std::string> MAIN_WII_SD_CARD_IMAGE_PATH;

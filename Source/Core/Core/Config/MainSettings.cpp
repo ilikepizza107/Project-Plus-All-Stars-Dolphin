@@ -311,6 +311,7 @@ bool ShouldUseDPL2Decoder()
 
 const Info<std::string> MAIN_DUMP_PATH{{System::Main, "General", "DumpPath"}, ""};
 const Info<std::string> MAIN_LOAD_PATH{{System::Main, "General", "LoadPath"}, ""};
+const Info<std::string> MAIN_LAUNCHER_PATH{{System::Main, "General", "LauncherPath"}, ""};
 const Info<std::string> MAIN_RESOURCEPACK_PATH{{System::Main, "General", "ResourcePackPath"}, ""};
 const Info<std::string> MAIN_FS_PATH{{System::Main, "General", "NANDRootPath"}, ""};
 const Info<std::string> MAIN_WII_SD_CARD_IMAGE_PATH{{System::Main, "General", "WiiSDCardPath"}, ""};
@@ -333,33 +334,42 @@ static Info<std::string> MakeISOPathConfigInfo(size_t idx)
                                    ""};
 }
 
+// P+ change: Get/SetIsoPaths modified to include launcher path by default, preventing us from needing to ship Dolphin.ini
+
 std::vector<std::string> GetIsoPaths()
 {
-  size_t count = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
   std::vector<std::string> paths;
-  paths.reserve(count);
+
+  // Always insert the launcher path
+  paths.emplace_back(File::GetUserPath(D_LAUNCHERS_IDX));
+
+  size_t count = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
+  paths.reserve(count + 1);
+
   for (size_t i = 0; i < count; ++i)
   {
     std::string iso_path = Config::Get(MakeISOPathConfigInfo(i));
     if (!iso_path.empty())
       paths.emplace_back(std::move(iso_path));
   }
+
   return paths;
 }
 
 void SetIsoPaths(const std::vector<std::string>& paths)
 {
   size_t old_size = MathUtil::SaturatingCast<size_t>(Config::Get(Config::MAIN_ISO_PATH_COUNT));
-  size_t new_size = paths.size();
+  std::string launcher_path = File::GetUserPath(D_LAUNCHERS_IDX);
 
   size_t current_path_idx = 0;
-  for (const std::string& p : paths)
+
+  // P+ change: start from index 1, assuming launcher path is at index 0
+  for (size_t i = 1; i < paths.size(); ++i)
   {
+    const std::string& p = paths[i];
+
     if (p.empty())
-    {
-      --new_size;
       continue;
-    }
 
     Config::SetBase(MakeISOPathConfigInfo(current_path_idx), p);
     ++current_path_idx;
@@ -367,11 +377,10 @@ void SetIsoPaths(const std::vector<std::string>& paths)
 
   for (size_t i = current_path_idx; i < old_size; ++i)
   {
-    // TODO: This actually needs a Config::Erase().
     Config::SetBase(MakeISOPathConfigInfo(i), "");
   }
 
-  Config::SetBase(Config::MAIN_ISO_PATH_COUNT, MathUtil::SaturatingCast<int>(new_size));
+  Config::SetBase(Config::MAIN_ISO_PATH_COUNT, static_cast<int>(current_path_idx));
 }
 
 // Main.GBA

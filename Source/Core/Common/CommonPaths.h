@@ -94,6 +94,7 @@
 #define WIISDSYNC_DIR "WiiSDSync"
 #define ASSEMBLY_DIR "SavedAssembly"
 #define NETPLAY_SAVE_DIR "NetplaySave"
+#define LAUNCHER_DIR "Launcher"
 
 
 // This one is only used to remove it if it was present
