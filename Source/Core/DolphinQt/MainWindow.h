@@ -210,6 +210,8 @@ private:
   void OnStopRecording();
   void OnExportRecording();
   void OnActivateChat();
+  void OnCollapseChat();
+  void OnExpandChat();
   void OnRequestGolfControl();
   void ShowTASInput();
 
