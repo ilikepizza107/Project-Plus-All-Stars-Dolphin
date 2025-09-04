@@ -451,15 +451,19 @@ void HotkeyManager::LoadDefaults(const ControllerInterface& ciface)
   // General hotkeys
   set_key_expression(HK_OPEN, hotkey_string({"Ctrl", "O"}));
   set_key_expression(HK_PLAY_PAUSE, "F10");
+  set_key_expression(HK_ACTIVATE_CHAT, "T");
+#ifdef _WIN32
   set_key_expression(HK_VOLUME_DOWN, "DOWN");
   set_key_expression(HK_VOLUME_UP, "UP");
-  set_key_expression(HK_ACTIVATE_CHAT, "T");
   set_key_expression(HK_COLLAPSE_CHAT, "LEFT");
   set_key_expression(HK_EXPAND_CHAT, "RIGHT");
-#ifdef _WIN32
   set_key_expression(HK_STOP, "ESCAPE");
   set_key_expression(HK_FULLSCREEN, hotkey_string({"Alt", "RETURN"}));
 #else
+  set_key_expression(HK_VOLUME_DOWN, "Down");
+  set_key_expression(HK_VOLUME_UP, "Up");
+  set_key_expression(HK_COLLAPSE_CHAT, "Left");
+  set_key_expression(HK_EXPAND_CHAT, "Right");
   set_key_expression(HK_STOP, "Escape");
   set_key_expression(HK_FULLSCREEN, hotkey_string({"Alt", "Return"}));
 #endif
