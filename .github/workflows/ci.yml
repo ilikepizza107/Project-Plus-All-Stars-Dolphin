@@ -115,7 +115,7 @@ jobs:
       - name: Dolphin-Build Number
         run: |
           export LASTCOMMIT=$(git log --pretty=format:%H -1)
-          export DOLPHINVER="v3.1.2-mainline-beta.3"
+          export DOLPHINVER="v3.1.2-mainline-beta.4"
           echo "DOLPHIN Build $DOLPHINVER"
           echo "DOLPHINVER=$DOLPHINVER" >> $GITHUB_ENV
           gsed -i "s|\${DOLPHIN_WC_DESCRIBE}|$DOLPHINVER|g" Source/Core/Common/scmrev.h.in
@@ -262,7 +262,7 @@ jobs:
     - name: Dolphin-Build Number
       run: |
         export LASTCOMMIT=$(git log --pretty=format:%H -1)
-        export DOLPHINVER="v3.1.2-mainline-beta.3"
+        export DOLPHINVER="v3.1.2-mainline-beta.4"
         echo "DOLPHIN Build $DOLPHINVER"
         echo "DOLPHINVER=$DOLPHINVER" >> $GITHUB_ENV
         sed -i "s|\${DOLPHIN_WC_DESCRIBE}|$DOLPHINVER|g" Source/Core/Common/scmrev.h.in
