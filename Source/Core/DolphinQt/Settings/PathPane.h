@@ -16,10 +16,10 @@ class PathPane final : public QWidget
   Q_OBJECT
 public:
   explicit PathPane(QWidget* parent = nullptr);
+  void BrowseDefaultGame();
 
 private:
   void Browse();
-  void BrowseDefaultGame();
   void BrowseWiiNAND();
   void BrowseDump();
   void BrowseLoad();
