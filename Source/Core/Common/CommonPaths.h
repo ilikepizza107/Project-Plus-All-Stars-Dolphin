@@ -91,8 +91,10 @@
 #define RESOURCEPACK_DIR "ResourcePacks"
 #define DYNAMICINPUT_DIR "DynamicInputTextures"
 #define GRAPHICSMOD_DIR "GraphicMods"
+#define FIRMWARE_DIR "Firmware"
 #define WIISDSYNC_DIR "WiiSDSync"
 #define ASSEMBLY_DIR "SavedAssembly"
+#define WIIBANNERS_DIR "WiiBanners"
 #define NETPLAY_SAVE_DIR "NetplaySave"
 #define LAUNCHER_DIR "Launcher"
 

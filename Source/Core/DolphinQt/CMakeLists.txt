@@ -69,8 +69,8 @@ add_executable(project-plus-dolphin
   Config/ControllerInterface/DualShockUDPClientWidget.h
   Config/ControllerInterface/ServerStringValidator.cpp
   Config/ControllerInterface/ServerStringValidator.h
-  Config/ControllersWindow.cpp
-  Config/ControllersWindow.h
+  Config/ControllersPane.cpp
+  Config/ControllersPane.h
   Config/FilesystemWidget.cpp
   Config/FilesystemWidget.h
   Config/FreeLookWidget.cpp
@@ -93,8 +93,8 @@ add_executable(project-plus-dolphin
   Config/Graphics/EnhancementsWidget.h
   Config/Graphics/GeneralWidget.cpp
   Config/Graphics/GeneralWidget.h
-  Config/Graphics/GraphicsWindow.cpp
-  Config/Graphics/GraphicsWindow.h
+  Config/Graphics/GraphicsPane.cpp
+  Config/Graphics/GraphicsPane.h
   Config/Graphics/HacksWidget.cpp
   Config/Graphics/HacksWidget.h
   Config/Graphics/ColorCorrectionConfigWindow.cpp
@@ -221,6 +221,8 @@ add_executable(project-plus-dolphin
   Debugger/CodeViewWidget.h
   Debugger/CodeWidget.cpp
   Debugger/CodeWidget.h
+  Debugger/EditSymbolDialog.cpp
+  Debugger/EditSymbolDialog.h
   Debugger/GekkoSyntaxHighlight.cpp
   Debugger/GekkoSyntaxHighlight.h
   Debugger/JitBlockTableModel.cpp
@@ -290,6 +292,8 @@ add_executable(project-plus-dolphin
   NetPlay/GameDigestDialog.h
   NetPlay/GameListDialog.cpp
   NetPlay/GameListDialog.h
+  NetPlay/ClickBlurLabel.cpp
+  NetPlay/ClickBlurLabel.h
   NetPlay/NetPlayBrowser.cpp
   NetPlay/NetPlayBrowser.h
   NetPlay/NetPlayDialog.cpp
@@ -576,7 +580,7 @@ if(GETTEXT_MSGFMT_EXECUTABLE)
     else()
       add_custom_command(OUTPUT ${mo}
         COMMAND ${CMAKE_COMMAND} -E make_directory ${mo_dir}
-        COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --quiet --update --backup=none -s ${po} ${pot_file}
+        COMMAND ${GETTEXT_MSGMERGE_EXECUTABLE} --quiet --update --backup=none ${po} ${pot_file}
         COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} -o ${mo} ${po}
         DEPENDS ${po}
       )

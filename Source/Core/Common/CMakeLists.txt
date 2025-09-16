@@ -64,6 +64,8 @@ add_library(common
   FatFsUtil.h
   FileSearch.cpp
   FileSearch.h
+  FilesystemWatcher.cpp
+  FilesystemWatcher.h
   FileUtil.cpp
   FileUtil.h
   FixedSizeQueue.h
@@ -184,6 +186,7 @@ PRIVATE
   FatFs
   Iconv::Iconv
   spng::spng
+  watcher
   ${VTUNE_LIBRARIES}
 )
 
@@ -306,6 +309,8 @@ if(WIN32)
     CompatPatches.cpp
     GL/GLInterface/WGL.cpp
     GL/GLInterface/WGL.h
+    WindowsDevice.cpp
+    WindowsDevice.h
     WindowsRegistry.cpp
   )
 elseif(APPLE)

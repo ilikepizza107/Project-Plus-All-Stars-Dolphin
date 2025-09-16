@@ -27,7 +27,7 @@ class InputBackend final : public ciface::InputBackend
 {
 public:
   InputBackend(ControllerInterface* controller_interface);
-  ~InputBackend();
+  ~InputBackend() override;
   void PopulateDevices() override;
   void UpdateInput(std::vector<std::weak_ptr<ciface::Core::Device>>& devices_to_remove) override;
 
@@ -251,9 +251,9 @@ void InputBackend::OpenAndAddDevice(SDL_JoystickID instance_id)
       // SDL tries parsing these as Joysticks
       return;
     }
-    auto gamecontroller = std::make_shared<GameController>(gc, js);
-    if (!gamecontroller->Inputs().empty() || !gamecontroller->Outputs().empty())
-      GetControllerInterface().AddDevice(std::move(gamecontroller));
+    auto gamepad = std::make_shared<Gamepad>(gc, js);
+    if (!gamepad->Inputs().empty() || !gamepad->Outputs().empty())
+      GetControllerInterface().AddDevice(std::move(gamepad));
   }
 }
 
@@ -267,7 +267,7 @@ bool InputBackend::HandleEventAndContinue(const SDL_Event& e)
   {
     GetControllerInterface().RemoveDevice([&e](const auto* device) {
       return device->GetSource() == "SDL" &&
-             static_cast<const GameController*>(device)->GetSDLInstanceID() == e.jdevice.which;
+             static_cast<const Gamepad*>(device)->GetSDLInstanceID() == e.jdevice.which;
     });
   }
   else if (e.type == m_populate_event_type)

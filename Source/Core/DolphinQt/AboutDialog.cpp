@@ -15,7 +15,6 @@
 AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
 {
   setWindowTitle(tr("About Project+ Dolphin"));
-  setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
   QString branch_str = QString::fromStdString(Common::GetScmBranchStr());
   const int commits_ahead = Common::GetScmCommitsAheadMaster();
@@ -40,7 +39,7 @@ AboutDialog::AboutDialog(QWidget* parent) : QDialog(parent)
 </p>
 
 <p>
-Built on Dolphin 2506. %CHECK_FOR_UPDATES%: <a href='https://projectplusgame.com'>projectplusgame.com.</a>
+Built on Dolphin 2509. %CHECK_FOR_UPDATES%: <a href='https://projectplusgame.com'>projectplusgame.com.</a>
 </p>
 
 <p>
