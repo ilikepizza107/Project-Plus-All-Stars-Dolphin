@@ -1384,7 +1384,6 @@ void MainWindow::ShowUpdateDialog()
           // Create and show the UpdateDialog with the fetched data
           bool forced = false; // Set this based on your logic
           UserInterface::Dialog::UpdateDialog updater(this, jsonObject, forced);
-          SetQWidgetWindowDecorations(&updater);
           updater.exec();
         } else {
           QMessageBox::information(this, tr("Info"), tr("You are already up to date."));
@@ -1421,7 +1420,6 @@ void MainWindow::CheckForUpdatesAuto()
           // Create and show the UpdateDialog with the fetched data
           bool forced = false; // Set this based on your logic
           UserInterface::Dialog::UpdateDialog updater(this, jsonObject, forced);
-          SetQWidgetWindowDecorations(&updater);
           updater.exec();
         }
     }
