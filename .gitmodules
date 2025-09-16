@@ -98,3 +98,9 @@
 	path = Externals/zstd/zstd
 	url = https://github.com/facebook/zstd.git
 	shallow = true
+[submodule "Externals/watcher/watcher"]
+	path = Externals/watcher/watcher
+	url = https://github.com/e-dant/watcher.git
+[submodule "Externals/miniupnpc/miniupnp"]
+	path = Externals/miniupnpc/miniupnp
+	url = https://github.com/miniupnp/miniupnp.git
