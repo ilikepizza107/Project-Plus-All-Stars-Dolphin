@@ -88,7 +88,7 @@ void UpdateDialog::accept()
         QString downloadUrl(object.value(QStringLiteral("browser_download_url")).toString());
 
         #ifdef _WIN32
-        if (filenameBlob.contains(QStringLiteral("win32")) || 
+        if (filenameBlob.contains(QStringLiteral("Windows.Update")) || 
             filenameBlob.contains(QStringLiteral("Windows")) || 
             filenameBlob.contains(QStringLiteral("win64")))
         {
@@ -98,7 +98,7 @@ void UpdateDialog::accept()
         }
         #endif
         #ifdef __APPLE__
-        if (filenameBlob.contains(QStringLiteral("darwin")) || 
+        if (filenameBlob.contains(QStringLiteral("macOS.Update")) || 
             filenameBlob.contains(QStringLiteral("macOS")))
         {
             filenameToDownload = filenameBlob;
