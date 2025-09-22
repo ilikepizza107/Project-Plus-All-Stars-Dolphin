@@ -10,6 +10,8 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:
+        repository: Project-Plus-Development-Team/Project-Plus-Dolphin
+        ref: dolphin-emu-release-prep-2509
         fetch-depth: 0
     - name: Setup Submodules
       run: git config --global --add safe.directory . && git submodule update --init --recursive
@@ -39,6 +41,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
+          repository: Project-Plus-Development-Team/Project-Plus-Dolphin
+          ref: dolphin-emu-release-prep-2509
           submodules: recursive
           fetch-depth: 0
 
