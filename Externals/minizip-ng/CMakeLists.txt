@@ -29,6 +29,7 @@ add_custom_target(fix_minizip_headers
 
 add_library(minizip STATIC
   minizip-ng/mz.h
+  minizip-ng/compat/crypt.h
   minizip-ng/compat/ioapi.c
   minizip-ng/compat/ioapi.h
   minizip-ng/compat/unzip.c

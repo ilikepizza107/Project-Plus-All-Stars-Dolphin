@@ -26,7 +26,6 @@
 #include "Common/StringUtil.h"
 
 #include "Core/AchievementManager.h"
-#include "Core/Boot/Boot.h"
 #include "Core/CommonTitles.h"
 #include "Core/Config/AchievementSettings.h"
 #include "Core/Config/MainSettings.h"
@@ -67,7 +66,6 @@
 #include "DolphinQt/QtUtils/NonAutodismissibleMenu.h"
 #include "DolphinQt/QtUtils/ParallelProgressDialog.h"
 #include "DolphinQt/QtUtils/QueueOnObject.h"
-#include "DolphinQt/QtUtils/SetWindowDecorations.h"
 #include "DolphinQt/Settings.h"
 #include "DolphinQt/Updater.h"
 
@@ -298,7 +296,7 @@ void MenuBar::AddToolsMenu()
 #ifdef RC_CLIENT_SUPPORTS_RAINTEGRATION
   m_achievements_dev_menu = tools_menu->addMenu(tr("RetroAchievements Development"));
   AchievementManager::GetInstance().SetDevMenuUpdateCallback(
-      [this]() { QueueOnObject(this, [this] { this->UpdateAchievementDevelopmentMenu(); }); });
+      [this] { QueueOnObject(this, [this] { this->UpdateAchievementDevelopmentMenu(); }); });
   m_achievements_dev_menu->menuAction()->setVisible(false);
 #endif  // RC_CLIENT_SUPPORTS_RAINTEGRATION
   tools_menu->addSeparator();
@@ -354,22 +352,23 @@ void MenuBar::AddToolsMenu()
   m_export_wii_saves =
       tools_menu->addAction(tr("Export All Wii Saves"), this, &MenuBar::ExportWiiSaves);
 
-  QMenu* menu = new QMenu(tr("Connect Wii Remotes"), tools_menu);
+  auto* const connect_wii_remotes_menu{
+      new QtUtils::NonAutodismissibleMenu(tr("Connect Wii Remotes"), tools_menu)};
 
   tools_menu->addSeparator();
-  tools_menu->addMenu(menu);
+  tools_menu->addMenu(connect_wii_remotes_menu);
 
   for (int i = 0; i < 4; i++)
   {
-    m_wii_remotes[i] = menu->addAction(tr("Connect Wii Remote %1").arg(i + 1), this,
-                                       [this, i] { emit ConnectWiiRemote(i); });
+    m_wii_remotes[i] = connect_wii_remotes_menu->addAction(
+        tr("Connect Wii Remote %1").arg(i + 1), this, [this, i] { emit ConnectWiiRemote(i); });
     m_wii_remotes[i]->setCheckable(true);
   }
 
-  menu->addSeparator();
+  connect_wii_remotes_menu->addSeparator();
 
-  m_wii_remotes[4] =
-      menu->addAction(tr("Connect Balance Board"), this, [this] { emit ConnectWiiRemote(4); });
+  m_wii_remotes[4] = connect_wii_remotes_menu->addAction(tr("Connect Balance Board"), this,
+                                                         [this] { emit ConnectWiiRemote(4); });
   m_wii_remotes[4]->setCheckable(true);
 }
 
@@ -408,7 +407,7 @@ void MenuBar::AddStateLoadMenu(QMenu* emu_menu)
   {
     QAction* action = m_state_load_slots_menu->addAction(QString{});
 
-    connect(action, &QAction::triggered, this, [=, this]() { emit StateLoadSlotAt(i); });
+    connect(action, &QAction::triggered, this, [=, this] { emit StateLoadSlotAt(i); });
   }
 }
 
@@ -425,7 +424,7 @@ void MenuBar::AddStateSaveMenu(QMenu* emu_menu)
   {
     QAction* action = m_state_save_slots_menu->addAction(QString{});
 
-    connect(action, &QAction::triggered, this, [=, this]() { emit StateSaveSlotAt(i); });
+    connect(action, &QAction::triggered, this, [=, this] { emit StateSaveSlotAt(i); });
   }
 }
 
@@ -442,7 +441,7 @@ void MenuBar::AddStateSlotMenu(QMenu* emu_menu)
     if (Settings::Instance().GetStateSlot() == i)
       action->setChecked(true);
 
-    connect(action, &QAction::triggered, this, [=, this]() { emit SetStateSlot(i); });
+    connect(action, &QAction::triggered, this, [=, this] { emit SetStateSlot(i); });
     connect(this, &MenuBar::SetStateSlot, [action, i](const int slot) {
       if (slot == i)
         action->setChecked(true);
@@ -603,7 +602,8 @@ void MenuBar::AddViewMenu()
 
 void MenuBar::AddOptionsMenu()
 {
-  QMenu* options_menu = addMenu(tr("&Options"));
+  auto* const options_menu{new QtUtils::NonAutodismissibleMenu(tr("&Options"), this)};
+  addMenu(options_menu);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
   options_menu->addAction(tr("Co&nfiguration"), QKeySequence::Preferences, this,
                           &MenuBar::Configure);
@@ -631,7 +631,7 @@ void MenuBar::AddOptionsMenu()
 
   m_reset_ignore_panic_handler = options_menu->addAction(tr("Reset Ignore Panic Handler"));
 
-  connect(m_reset_ignore_panic_handler, &QAction::triggered, this, []() {
+  connect(m_reset_ignore_panic_handler, &QAction::triggered, this, [] {
     Config::DeleteKey(Config::LayerType::CurrentRun, Config::MAIN_USE_PANIC_HANDLERS);
   });
 
@@ -644,13 +644,13 @@ void MenuBar::AddHelpMenu()
 
   QAction* website = help_menu->addAction(tr("&Website"));
   connect(website, &QAction::triggered, this,
-          []() { QDesktopServices::openUrl(QUrl(QStringLiteral("https://projectplusgame.com/"))); });
+          [] { QDesktopServices::openUrl(QUrl(QStringLiteral("https://projectplusgame.com/"))); });
   QAction* documentation = help_menu->addAction(tr("Project+ Discord"));
-  connect(documentation, &QAction::triggered, this, []() {
+  connect(documentation, &QAction::triggered, this, [] {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://discord.gg/vdssRDg")));
   });
   QAction* github = help_menu->addAction(tr("&GitHub Repository"));
-  connect(github, &QAction::triggered, this, []() {
+  connect(github, &QAction::triggered, this, [] {
     QDesktopServices::openUrl(QUrl(QStringLiteral("https://github.com/Project-Plus-Development-Team/Project-Plus-Dolphin")));
   });
 
@@ -874,7 +874,8 @@ void MenuBar::AddMovieMenu()
 
 void MenuBar::AddJITMenu()
 {
-  m_jit = addMenu(tr("JIT"));
+  m_jit = new QtUtils::NonAutodismissibleMenu(tr("JIT"), this);
+  addMenu(m_jit);
 
   m_jit_interpreter_core = m_jit->addAction(tr("Interpreter Core"));
   m_jit_interpreter_core->setCheckable(true);
@@ -1145,7 +1146,7 @@ void MenuBar::UpdateAchievementDevelopmentMenu()
       }
       auto* ra_dev_menu_item = m_achievements_dev_menu->addAction(
           QString::fromStdString(menu_item.label), this,
-          [menu_item]() { AchievementManager::GetInstance().ActivateDevMenuItem(menu_item.id); });
+          [menu_item] { AchievementManager::GetInstance().ActivateDevMenuItem(menu_item.id); });
       ra_dev_menu_item->setEnabled(menu_item.enabled);
       // Recommended hardcode by RAIntegration.dll developer Jamiras
       ra_dev_menu_item->setCheckable(i < 2);
@@ -1374,7 +1375,6 @@ void MenuBar::CheckNAND()
 
   {
     NANDRepairDialog dialog(result, this);
-    SetQWidgetWindowDecorations(&dialog);
     if (dialog.exec() != QDialog::Accepted)
       return;
   }
@@ -1545,7 +1545,6 @@ void MenuBar::GenerateSymbolsFromRSOAuto()
 
     return matches;
   });
-  SetQWidgetWindowDecorations(progress.GetRaw());
   progress.GetRaw()->exec();
 
   const auto matches = future.get();
@@ -1698,7 +1697,7 @@ void MenuBar::LoadSymbolMap()
   auto& ppc_symbol_db = system.GetPPCSymbolDB();
 
   std::string existing_map_file, writable_map_file;
-  bool map_exists = CBoot::FindMapFile(&existing_map_file, &writable_map_file);
+  bool map_exists = PPCSymbolDB::FindMapFile(&existing_map_file, &writable_map_file);
 
   if (!map_exists)
   {
@@ -1736,7 +1735,7 @@ void MenuBar::LoadSymbolMap()
 void MenuBar::SaveSymbolMap()
 {
   std::string existing_map_file, writable_map_file;
-  CBoot::FindMapFile(&existing_map_file, &writable_map_file);
+  PPCSymbolDB::FindMapFile(&existing_map_file, &writable_map_file);
 
   TrySaveSymbolMap(QString::fromStdString(writable_map_file));
 }
@@ -1792,7 +1791,7 @@ void MenuBar::SaveSymbolMapAs()
 void MenuBar::SaveCode()
 {
   std::string existing_map_file, writable_map_file;
-  CBoot::FindMapFile(&existing_map_file, &writable_map_file);
+  PPCSymbolDB::FindMapFile(&existing_map_file, &writable_map_file);
 
   const std::string path =
       writable_map_file.substr(0, writable_map_file.find_last_of('.')) + "_code.map";
