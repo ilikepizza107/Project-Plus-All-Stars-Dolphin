@@ -51,9 +51,9 @@ Built on Dolphin 2509. %CHECK_FOR_UPDATES%: <a href='https://projectplusgame.com
 </p>
 
 <p>
-<a href='https://github.com/dolphin-emu/dolphin/blob/master/COPYING'>%LICENSE%</a> |
-<a href='https://github.com/dolphin-emu/dolphin/graphs/contributors'>%AUTHORS%</a> |
-<a href='https://forums.dolphin-emu.org/'>%SUPPORT%</a>
+<a href='https://github.com/Project-Plus-Development-Team/Project-Plus-Dolphin/blob/master/COPYING'>License</a> |
+<a href='https://github.com/dolphin-emu/dolphin/graphs/contributors'>Dolphin Authors</a> |
+<a href='https://discord.gg/vdssRDg'>Setup Support</a>
 )")
           .replace(QStringLiteral("%VERSION_STRING%"),
                    QString::fromUtf8(Common::GetScmDescStr().c_str()))
@@ -88,7 +88,7 @@ Built on Dolphin 2509. %CHECK_FOR_UPDATES%: <a href='https://projectplusgame.com
               // in your translation, please use the type of curly quotes that's appropriate for
               // your language. If you aren't sure which type is appropriate, see
               // https://en.wikipedia.org/wiki/Quotation_mark#Specific_language_features
-              tr("\u00A9 2003-2024+ Dolphin Team. \u201cGameCube\u201d and \u201cWii\u201d are "
+              tr("\u00A9 2003-2025+ Dolphin Team. \u201cGameCube\u201d and \u201cWii\u201d are "
                  "trademarks of Nintendo. Dolphin is not affiliated with Nintendo in any way.")));
 
   QLabel* logo = new QLabel();
