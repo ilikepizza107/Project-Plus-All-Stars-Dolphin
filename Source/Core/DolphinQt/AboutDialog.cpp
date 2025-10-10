@@ -51,7 +51,7 @@ Built on Dolphin 2509. %CHECK_FOR_UPDATES%: <a href='https://projectplusgame.com
 </p>
 
 <p>
-<a href='https://github.com/Project-Plus-Development-Team/Project-Plus-Dolphin/blob/master/COPYING'>License</a> |
+<a href='https://github.com/ilikepizza107/Project-Plus-All-Stars-Dolphin/blob/master/COPYING'>License</a> |
 <a href='https://github.com/dolphin-emu/dolphin/graphs/contributors'>Dolphin Authors</a> |
 <a href='https://discord.gg/vdssRDg'>Setup Support</a>
 )")
