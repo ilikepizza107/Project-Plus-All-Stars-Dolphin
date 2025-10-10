@@ -3,7 +3,7 @@
 
 	if [ -f /usr/bin/zenity ]; then
 		zenity --question --timeout=10 --title="dolphin updater" --text="New update available. Update now?" \
-		--icon-name=project-plus-dolphin --window-icon=project-plus-dolphin.svg --height=80 --width=400
+		--icon-name=project-plus-dolphin --window-icon=project-plus-all-stars-dolphin.svg --height=80 --width=400
 		answer=$?	
 	else
 		dialog --title dolphin --timeout 10 --yesno "New update available. Update now?" 0 0

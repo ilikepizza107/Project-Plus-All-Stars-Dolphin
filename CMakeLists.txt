@@ -858,22 +858,22 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD|Darwin")
 endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Linux|FreeBSD|OpenBSD")
   # Install the application icon and menu item
-  install(FILES Data/project-plus-dolphin.svg
+  install(FILES Data/project-plus-all-starsdolphin.svg
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/scalable/apps)
-  install(FILES Data/project-plus-dolphin.png
+  install(FILES Data/project-plus-all-stars-dolphin.png
 		  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps)
-  install(FILES Data/project-plus-dolphin.desktop
+  install(FILES Data/project-plus-all-stars-dolphin.desktop
           DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
   # Install manpages
-  install(FILES Data/project-plus-dolphin.6
+  install(FILES Data/project-plus-all-stars-dolphin.6
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
-  install(FILES Data/project-plus-dolphin-nogui.6
+  install(FILES Data/project-plus-all-stars-dolphin-nogui.6
           DESTINATION ${CMAKE_INSTALL_MANDIR}/man6)
 endif()
 
 # packaging information
-set(CPACK_PACKAGE_NAME "project-plus-dolphin")
-set(CPACK_PACKAGE_VENDOR "Project Plus Development Team")
+set(CPACK_PACKAGE_NAME "project-plus-all-stars-dolphin")
+set(CPACK_PACKAGE_VENDOR "ilikepizza107, with credit to the Project Plus Development Team")
 set(CPACK_PACKAGE_VERSION_MAJOR ${DOLPHIN_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${DOLPHIN_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH ${DOLPHIN_VERSION_PATCH})
