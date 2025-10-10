@@ -3,7 +3,7 @@
 branch=`echo ${GITHUB_REF##*/}`
 
 BUILDBIN=/dolphin/dolphin/build/Binaries
-BINFILE=Project+_Dolphin-x86_64.AppImage
+BINFILE=Project+_All-Stars_Dolphin-x86_64.AppImage
 LOG_FILE=$HOME/curl.log
 CXX=g++-9
 
@@ -23,21 +23,21 @@ cd /tmp
 ./linuxdeployqt-continuous-x86_64.AppImage --appimage-extract
 cd $HOME
 mkdir -p squashfs-root/usr/bin
-cp -P "$BUILDBIN"/project-plus-dolphin $HOME/squashfs-root/usr/bin/
+cp -P "$BUILDBIN"/project-plus-all-stars-dolphin $HOME/squashfs-root/usr/bin/
 
-curl -sL https://raw.githubusercontent.com/Project-Plus-Development-Team/Project-Plus-Dolphin/$branch/Data/project-plus-dolphin.svg -o ./squashfs-root/project-plus-dolphin.svg
-curl -sL https://raw.githubusercontent.com/Project-Plus-Development-Team/Project-Plus-Dolphin/$branch/Data/project-plus-dolphin.desktop -o ./squashfs-root/project-plus-dolphin.desktop
+curl -sL https://raw.githubusercontent.com/ilikepizza107/Project-Plus-All-Stars-Dolphin/$branch/Data/project-plus-all-stars-dolphin.svg -o ./squashfs-root/project-plus-all-stars-dolphin.svg
+curl -sL https://raw.githubusercontent.com/ilikepizza107/Project-Plus-All-Stars-Dolphin/$branch/Data/project-plus-all-stars-dolphin.desktop -o ./squashfs-root/project-plus-all-stars-dolphin.desktop
 curl -sL https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 -o ./squashfs-root/runtime
-mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/project-plus-dolphin.desktop ./squashfs-root/usr/share/applications
-mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/project-plus-dolphin.svg ./squashfs-root/usr/share/icons
-mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/project-plus-dolphin.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
-mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/project-plus-dolphin.svg ./squashfs-root/usr/share/pixmaps
+mkdir -p squashfs-root/usr/share/applications && cp ./squashfs-root/project-plus-all-stars-dolphin.desktop ./squashfs-root/usr/share/applications
+mkdir -p squashfs-root/usr/share/icons && cp ./squashfs-root/project-plus-all-stars-dolphin.svg ./squashfs-root/usr/share/icons
+mkdir -p squashfs-root/usr/share/icons/hicolor/scalable/apps && cp ./squashfs-root/project-plus-all-stars-dolphin.svg ./squashfs-root/usr/share/icons/hicolor/scalable/apps
+mkdir -p squashfs-root/usr/share/pixmaps && cp ./squashfs-root/project-plus-all-stars-dolphin.svg ./squashfs-root/usr/share/pixmaps
 mkdir -p squashfs-root/usr/optional/ ; mkdir -p squashfs-root/usr/optional/libstdc++/
 
-mkdir -p squashfs-root/usr/share/project-plus-dolphin
+mkdir -p squashfs-root/usr/share/project-plus-all-stars-dolphin
 cp -R /dolphin/dolphin/Data/Sys ./squashfs-root/usr/bin
-curl -sL "https://raw.githubusercontent.com/Project-Plus-Development-Team/Project-Plus-Dolphin/$branch/Distribution/appimage/update.sh" -o $HOME/squashfs-root/update.sh
-curl -sL "https://raw.githubusercontent.com/Project-Plus-Development-Team/Project-Plus-Dolphin/$branch/Distribution/appimage/AppRun" -o $HOME/squashfs-root/AppRun
+curl -sL "https://raw.githubusercontent.com/ilikepizza107/Project-Plus-All-Stars-Dolphin/$branch/Distribution/appimage/update.sh" -o $HOME/squashfs-root/update.sh
+curl -sL "https://raw.githubusercontent.com/ilikepizza107/Project-Plus-All-Stars-Dolphin/$branch/Distribution/appimage/AppRun" -o $HOME/squashfs-root/AppRun
 curl -sL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/AppRun-patched-x86_64" -o $HOME/squashfs-root/AppRun-patched
 curl -sL "https://github.com/RPCS3/AppImageKit-checkrt/releases/download/continuous2/exec-x86_64.so" -o $HOME/squashfs-root/usr/optional/exec.so
 chmod a+x ./squashfs-root/AppRun
@@ -56,7 +56,7 @@ unset LD_LIBRARY_PATH
 unset QTDIR
 
 # /tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/project-plus-dolphin -appimage -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
-/tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/project-plus-dolphin -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
+/tmp/squashfs-root/AppRun $HOME/squashfs-root/usr/bin/project-plus-all-stars-dolphin -unsupported-allow-new-glibc -no-copy-copyright-files -no-translations -bundle-non-qt-libs
 export PATH=$(readlink -f /tmp/squashfs-root/usr/bin/):$PATH
 
 # Add AppImageUpdate as the internal updater
@@ -71,13 +71,13 @@ cp /lib/x86_64-linux-gnu/libtinfo.so.5 $HOME/squashfs-root/usr/lib/
 cp /usr/lib/x86_64-linux-gnu/libGLdispatch.so.0 $HOME/squashfs-root/usr/lib/
 
 # Package AppImage
-/tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|dolphin|continuous|Project+_Dolphin-x86_64.AppImage.zsync"
+/tmp/squashfs-root/usr/bin/appimagetool $HOME/squashfs-root -u "gh-releases-zsync|qurious-pixel|dolphin|continuous|Project+_All-Stars_Dolphin-x86_64.AppImage.zsync"
 
 mkdir $HOME/artifacts/
 mkdir -p /dolphin/artifacts/
-mv Project+_Dolphin-x86_64.AppImage* $HOME/artifacts
+mv Project+_All-Stars_Dolphin-x86_64.AppImage* $HOME/artifacts
 cp -R $HOME/artifacts/ /dolphin/
-cp $BUILDBIN/project-plus-dolphin /dolphin/artifacts
+cp $BUILDBIN/project-plus-all-stars-dolphin /dolphin/artifacts
 chmod -R 777 /dolphin/artifacts
 cd /dolphin/artifacts
 ls -al /dolphin/artifacts/
