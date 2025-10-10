@@ -123,7 +123,7 @@ modules:
       # Project Plus .dol files and icon
       - type: archive
         url: https://github.com/ilikepizza107/ilikepizza107.github.io/releases/download/P%2BASLauncher/Launcher.tar.gz
-        sha256: FDFD49F881C7F02CC9946E9C531DE3C61B1C28BB99B8CFCDAF16CDCE39EC7C5C2D2                  # This is the hash of the tar.gz file not the uncompressed
+        sha256: b39606cd943b91b68ccfc0bf5292a2ae752ab91b04b8ed2789d873dbd6c8f98f                  # This is the hash of the tar.gz file not the uncompressed
         dest: Launcher
 
       # TODO: Add x-checker-data
