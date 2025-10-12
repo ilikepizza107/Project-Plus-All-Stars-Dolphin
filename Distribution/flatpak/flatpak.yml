@@ -153,8 +153,8 @@ modules:
       #        test -S $XDG_RUNTIME_DIR/discord-ipc-$i ||
       #          ln -sf {app/com.discordapp.Discord,$XDG_RUNTIME_DIR}/discord-ipc-$i;
       #      done
-      #      project-plus-dolphin "$@"
-      #  dest-filename: project-plus-dolphin-wrapper
+      #      project-plus-all-stars-dolphin "$@"
+      #  dest-filename: project-plus-all-stars-dolphin-wrapper
     post-install:
       - |
       - install -D -t ${FLATPAK_DEST}/bin/ project-plus-all-stars-dolphin-wrapper.sh
@@ -164,8 +164,8 @@ modules:
         /app/share/applications/project-plus-all-stars-dolphin.desktop
       - rm -r ${FLATPAK_DEST}/share/project-plus-all-stars-dolphin/sys                                                                                       # Remove preinstalled sys directory
       - mv Data/Sys ${FLATPAK_DEST}/share/project-plus-all-stars-dolphin/sys/                                                                                # Move Sys directory to correct location (only use without the -DLINUX_LOCAL_DEV=true flag set
-      #- tar --transform="s|sd.raw|WiiSD.raw|" -xf sd.tar.gz -C ${FLATPAK_DEST}/share/project-plus-dolphin/user/Wii/                               # Extract, rename and move SD card to correct location
-      #- mv Launcher ${FLATPAK_DEST}/share/project-plus-dolphin/sys/Wii/                                                                            # Move Launcher directory to correct location
-      #- mkdir -p ${FLATPAK_DEST}/share/project-plus-dolphin/sys/Load/Textures                                                                      # Make directory for HD textures
-      #- mv "ModPack/Full Quality HD Textures" ${FLATPAK_DEST}/share/project-plus-dolphin/sys/Load/Textures/RSBE01/                              	  # Move HD Textures from ModPack to correct location
+      #- tar --transform="s|sd.raw|WiiSD.raw|" -xf sd.tar.gz -C ${FLATPAK_DEST}/share/project-plus-all-stars-dolphin/user/Wii/                               # Extract, rename and move SD card to correct location
+      #- mv Launcher ${FLATPAK_DEST}/share/project-plus-all-stars-dolphin/sys/Wii/                                                                            # Move Launcher directory to correct location
+      #- mkdir -p ${FLATPAK_DEST}/share/project-plus-all-stars-dolphin/sys/Load/Textures                                                                      # Make directory for HD textures
+      #- mv "ModPack/Full Quality HD Textures" ${FLATPAK_DEST}/share/project-plus-all-stars-dolphin/sys/Load/Textures/RSBE01/                              	  # Move HD Textures from ModPack to correct location
       - install -Dm644 org.projectplusgame.project-plus-all-stars-dolphin.metainfo.xml -t ${FLATPAK_DEST}/share/metainfo/                                    # Install metainfo file

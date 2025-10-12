@@ -29,7 +29,7 @@ void NetPlayChatUI::Display()
       ImVec2(DEFAULT_WINDOW_WIDTH * scale, DEFAULT_WINDOW_HEIGHT * scale),
       ImGui::GetIO().DisplaySize);
 
-  if (!ImGui::Begin("Chat", nullptr, ImGuiWindowFlags_None))
+  if (!ImGui::Begin("Chat (hide/show with <-/->)", nullptr, ImGuiWindowFlags_None))
   {
     ImGui::End();
     return;

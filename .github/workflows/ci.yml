@@ -157,7 +157,7 @@ jobs:
       #    ccache -p
       #    ccache -s
       #    ccache -z
-      #    ninja project-plus-dolphin
+      #    ninja project-plus-all-stars-dolphin
       #    ccache -s 
 
       - name: Prepare Build Artifacts

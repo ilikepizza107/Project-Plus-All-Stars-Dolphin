@@ -13,17 +13,17 @@ echo "Make directory /var/config/project-plus-all-stars-dolphin if it doesn't ex
 mkdir -p /var/config/project-plus-all-stars-dolphin
 
 # Create and set variables for the system and user SD card creation dates
-# SystemSDCardCreationDate=`stat --format="%W" /app/share/project-plus-dolphin/sys/Load/WiiSD.raw`
-# UserSDCardCreationDate=`stat --format="%W" /var/data/project-plus-dolphin/Load/WiiSD.raw`
+# SystemSDCardCreationDate=`stat --format="%W" /app/share/project-plus-all-stars-dolphin/sys/Load/WiiSD.raw`
+# UserSDCardCreationDate=`stat --format="%W" /var/data/project-plus-all-stars-dolphin/Load/WiiSD.raw`
 
 # echo "Check if there is a newer SD card version"
 # if [ $SystemSDCardCreationDate -gt ${UserSDCardCreationDate:=0} ];
 # then
-#     echo "Make directory /var/data/project-plus-dolphin/Load if it doesn't exist"
-#     mkdir -p /var/data/project-plus-dolphin/Load
+#     echo "Make directory /var/data/project-plus-all-stars-dolphin/Load if it doesn't exist"
+#     mkdir -p /var/data/project-plus-all-stars-dolphin/Load
 
 #     echo "Copy newer SD card to user data directory"
-#     cp /app/share/project-plus-dolphin/sys/Load/WiiSD.raw /var/data/project-plus-dolphin/Load/WiiSD.raw
+#     cp /app/share/project-plus-all-stars-dolphin/sys/Load/WiiSD.raw /var/data/project-plus-all-stars-dolphin/Load/WiiSD.raw
 # else
 #     echo "SD card is already at latest version"
 # fi
@@ -32,7 +32,7 @@ echo "Copy dol files to user data directory if they don't already exist"
 cp -nr /app/share/project-plus-all-stars-dolphin/sys/Wii/Launcher /var/data/project-plus-all-stars-dolphin/user/Wii/
 
 echo "Copy user directory to Flatpak user data directory (Overwritting any files already there with any newer files)"
-cp -ru /app/share/project-plus-dolphin/user /var/data/project-plus-all-stars-dolphin/
+cp -ru /app/share/project-plus-all-stars-dolphin/user /var/data/project-plus-all-stars-dolphin/
 
 # Create and set variables for the system and user HD textures creation dates
 SystemHDTexturesCreationDate=`stat --format="%W" /app/share/project-plus-all-stars-dolphin/sys/Load/Textures/RSBE01`
