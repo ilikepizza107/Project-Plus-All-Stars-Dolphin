@@ -110,8 +110,8 @@ modules:
     sources:
       - type: git
         url: https://github.com/ilikepizza107/Project-Plus-All-Stars-Dolphin
-        tag: v1.0.0											#uncomment and update these two lines to build a specific commit
-        commit: 125b25b60c593e8032e2de48daeac74d0ccbd9ff
+        tag: v1.1.0											#uncomment and update these two lines to build a specific commit
+        commit: b7c6dbf30f38288b637158a162703c9825d4df70
         
       # TODO: Add x-checker-data
       # Project Plus SD card
