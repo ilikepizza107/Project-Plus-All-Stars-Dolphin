@@ -28,7 +28,7 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "11.0.0" CACHE STRING "")
 
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_SOURCE_DIR}/CMake/FlagsOverride.cmake")
 
-project(project-plus-dolphin)
+project(project-plus-all-stars-dolphin)
 
 if (MSVC)
   if (POLICY CMP0117)
@@ -179,7 +179,7 @@ include(RemoveCompileFlag)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 # Set up paths
-set(datadir ${CMAKE_INSTALL_FULL_DATADIR}/project-plus-dolphin CACHE PATH "datadir")
+set(datadir ${CMAKE_INSTALL_FULL_DATADIR}/project-plus-all-stars-dolphin CACHE PATH "datadir")
 add_definitions(-DDATA_DIR="${datadir}/")
 
 if(CMAKE_SYSROOT)
