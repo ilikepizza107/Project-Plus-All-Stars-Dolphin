@@ -1,4 +1,4 @@
-# Project+ Dolphin Fork
+# Project+ All-Stars Dolphin Fork
 
 ![Untitled-1](https://github.com/user-attachments/assets/3bfb148a-85d1-489d-96ae-1b7892acdc11)
 
