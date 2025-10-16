@@ -3,7 +3,7 @@
 ![Untitled-1](https://github.com/user-attachments/assets/3bfb148a-85d1-489d-96ae-1b7892acdc11)
 
 
-This fork is a heavily modified version of the Dolphin Emulator designed for usage with Project+. It includes the following features:
+This fork is a heavily modified version of the Dolphin Emulator designed for usage with Project+ All-Stars. It includes the following features:
 
   * Branding, theming and iconography updates to match the Project+ aesthetic
   * Netplay button on the toolbar
