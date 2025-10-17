@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
 	<id>org.projectplusgame.project-plus-all-stars-dolphin</id>
-	<name>Project Plus Dolphin</name>
+	<name>Project Plus All-Stars Dolphin</name>
 	<summary>GameCube / Wii / Triforce Emulator for Project Plus</summary>
 	<metadata_license>CC-BY-SA-3.0</metadata_license>
 	<project_license>GPL-2.0+</project_license>
@@ -12,7 +12,7 @@
 	</supports>
 	<description>
 		<p>
-      A fork of the Dolphin emulator for playing the Brawl mod Project Plus.
+      A fork of the Dolphin emulator for playing the Brawl mod Project Plus All-Stars.
     </p>
 	</description>
 	<provides>
@@ -20,14 +20,9 @@
 		<id>org.projectplusgame.project-plus-all-stars-dolphin.desktop</id>
 	</provides>
 	<releases>
-		<release version="3.1.2" date="2025-05-02"/>
-		<release version="3.1.1" date="2025-05-02"/>
-		<release version="3.1.0" date="2025-04-23"/>
-		<release version="3.0.5" date="2024-09-23"/>
-		<release version="3.0.2" date="2024-06-27"/>
-		<release version="3.0.1" date="2024-06-24"/>
-		<release version="3.0" date="2024-06-24"/>
-		<release version="2.5.2" date="2024-06-15"/>
+		<release version="1.1.1" date="2025-10-17"/>
+		<release version="1.1.1" date="2025-10-12"/>
+		<release version="1.0.0" date="2025-10-10"/>
 	</releases>
 	<launchable type="desktop-id">org.projectplusgame.project-plus-all-stars-dolphin.desktop</launchable>
 </component>
