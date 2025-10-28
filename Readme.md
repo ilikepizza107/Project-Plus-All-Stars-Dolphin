@@ -142,7 +142,7 @@ Or useful for having multiple distinct Dolphin setups for testing/development/TA
 2. `cd Build`
 3. `cmake .. -DLINUX_LOCAL_DEV=true`
 4. `make -j $(nproc)`
-5. `cp -r ../Data/Sys/ ../Data/user/ ../Data/Launcher/ ../Data/portable.txt Binaries/`
+5. `cp -r ../Data/Sys/ ../Data/user/ ../Data/portable.txt Binaries/`
 
 
 ### Linux AppImage Build Steps:
