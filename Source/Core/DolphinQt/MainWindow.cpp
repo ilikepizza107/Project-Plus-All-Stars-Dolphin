@@ -1378,15 +1378,21 @@ void MainWindow::ShowUpdateDialog()
       
         QString currentVersion = QString::fromStdString(SCM_DESC_STR);
         QString latestVersion = jsonObject.value(QStringLiteral("tag_name")).toString();
+        QString releaseName = jsonObject.value(QStringLiteral("name")).toString();
 
+        // Add condition to check if the release name matches the correct branch
         if (currentVersion != latestVersion)
         {
-          // Create and show the UpdateDialog with the fetched data
-          bool forced = false; // Set this based on your logic
-          UserInterface::Dialog::UpdateDialog updater(this, jsonObject, forced);
-          updater.exec();
-        } else {
-          QMessageBox::information(this, tr("Info"), tr("You are already up to date."));
+            if (releaseName.contains("IL Project+ Dolphin"))
+            {
+                bool forced = false;  // Set this based on your logic
+                UserInterface::Dialog::UpdateDialog updater(this, jsonObject, forced);
+                updater.exec();
+            }
+        }
+        else
+        {
+            QMessageBox::information(this, tr("Info"), tr("You are already up to date."));
         }
     }
     else
@@ -1401,7 +1407,7 @@ void MainWindow::CheckForUpdatesAuto()
     Common::HttpRequest httpRequest;
 
     // Make the GET request
-    auto response = httpRequest.Get("https://api.github.com/repos/Project-Plus-Development-Team/Project-Plus-Dolphin/releases/latest");
+    auto response = httpRequest.Get("https://api.github.com/repos/ilikepizza107/Project-Plus-All-Stars-Dolphin/releases/latest");
 
     if (response)
     {
