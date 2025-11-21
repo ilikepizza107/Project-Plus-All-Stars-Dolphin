@@ -1365,7 +1365,7 @@ void MainWindow::ShowUpdateDialog()
     Common::HttpRequest httpRequest;
 
     // Make the GET request
-    auto response = httpRequest.Get("https://api.github.com/repos/Project-Plus-Development-Team/Project-Plus-Dolphin/releases/latest");
+    auto response = httpRequest.Get("https://api.github.com/repos/ilikepizza107/Project-Plus-All-Stars-Dolphin/releases/latest");
 
     if (response)
     {

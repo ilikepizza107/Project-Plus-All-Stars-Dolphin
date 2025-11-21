@@ -10,8 +10,8 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
       with:
-        repository: Project-Plus-Development-Team/Project-Plus-Dolphin
-        ref: master
+        repository: ilikepizza107/Project-Plus-All-Stars-Dolphin
+        ref: ILPPlus
         fetch-depth: 0
     - name: Setup Submodules
       run: git config --global --add safe.directory . && git submodule update --init --recursive
@@ -41,8 +41,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          repository: Project-Plus-Development-Team/Project-Plus-Dolphin
-          ref: master
+          repository: ilikepizza107/Project-Plus-All-Stars-Dolphin
+          ref: ILPPlus
           submodules: recursive
           fetch-depth: 0
 
@@ -200,7 +200,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Purge .git for space reasons
-      run: rm -rf /home/runner/work/Project-Plus-Dolphin-src/.git
+      run: rm -rf /home/runner/work/Project-Plus-All-Stars-Dolphin-src/.git
     - name: Setup Packages
       run: |
         flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo && \
@@ -221,8 +221,8 @@ jobs:
     - name: Checkout Upstream Repo
       uses: actions/checkout@v4
       with:
-        repository: Project-Plus-Development-Team/Project-Plus-Dolphin
-        ref: master
+        repository: ilikepizza107/Project-Plus-All-Stars-Dolphin
+        ref: ILPPlus
         fetch-depth: 0
 
     - name: Checkout Submodules
@@ -323,7 +323,7 @@ jobs:
         chmod a+x ./squashfs-root/runtime
         chmod a+x ./squashfs-root/AppRun-patched
         chmod a+x ./squashfs-root/update.sh
-        export UPD_INFO="gh-releases-zsync|Project-Plus-Development-Team|Project-Plus-Dolphin|continuous|Project+_Dolphin-x86_64.AppImage.zsync"
+        export UPD_INFO="gh-releases-zsync|ilikepizza107|Project-Plus-All-Stars-Dolphin|continuous|Project+_Dolphin-x86_64.AppImage.zsync"
         /tmp/squashfs-root/AppRun --appdir="$GITHUB_WORKSPACE"/squashfs-root/ --plugin qt -d "$GITHUB_WORKSPACE"/squashfs-root/project-plus-dolphin.desktop -i "$GITHUB_WORKSPACE"/squashfs-root/project-plus-dolphin.svg \
         --exclude-library=libglib* --output appimage
         ls . | grep *.AppImage
