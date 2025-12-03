@@ -80,9 +80,6 @@ void UpdateDialog::accept()
     QString filenameToDownload;
     QString urlToDownload;
 
-    QString releaseName = jsonObject.value(QStringLiteral("name")).toString();
-
-    // Check release name to determine which branch's update to download
     for (const QJsonValue& value : jsonArray)
     {
         QJsonObject object = value.toObject();
@@ -91,10 +88,9 @@ void UpdateDialog::accept()
         QString downloadUrl(object.value(QStringLiteral("browser_download_url")).toString());
 
         #ifdef _WIN32
-        if (releaseName.contains("IL Project+ Dolphin") &&
-            (filenameBlob.contains(QStringLiteral("ILPPlus.Windows.Update")) || 
+        if (filenameBlob.contains(QStringLiteral("ILPPlus.Windows.Update")) || 
             filenameBlob.contains(QStringLiteral("ILPPlus.Windows")) || 
-            filenameBlob.contains(QStringLiteral("ILPPlus.win64"))))
+            filenameBlob.contains(QStringLiteral("ILPPlus.win64")))
         {
             filenameToDownload = filenameBlob;
             urlToDownload = downloadUrl;
@@ -102,9 +98,8 @@ void UpdateDialog::accept()
         }
         #endif
         #ifdef __APPLE__
-        if (releaseName.contains("IL Project+ Dolphin") &&
-            (filenameBlob.contains(QStringLiteral("ILPPlus.macOS.Update")) || 
-            filenameBlob.contains(QStringLiteral("ILPPlus.macOS"))))
+        if (filenameBlob.contains(QStringLiteral("ILPPlus.macOS.Update")) || 
+            filenameBlob.contains(QStringLiteral("ILPPlus.macOS")))
         {
             filenameToDownload = filenameBlob;
             urlToDownload = downloadUrl;
