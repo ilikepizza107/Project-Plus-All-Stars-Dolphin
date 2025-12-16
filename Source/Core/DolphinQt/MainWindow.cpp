@@ -20,6 +20,9 @@
 #include <QMessageBox>
 #include <QByteArray>
 #include <QJsonDocument>
+#include <QJsonArray>
+#include <QJsonObject>
+#include <QJsonValue>
 
 #include <fmt/format.h>
 
@@ -1364,10 +1367,12 @@ static QJsonObject GetLatestILRelease(const QJsonArray& releases)
 {
     for (const QJsonValue& value : releases)
     {
-        QJsonObject release = value.toObject();
-        QString tag = release.value("tag_name").toString();
+        const QJsonObject release = value.toObject();
 
-        if (tag.startsWith("IL"))
+        const QString tag =
+            release.value(QStringLiteral("tag_name")).toString();
+
+        if (tag.startsWith(QStringLiteral("IL")))
             return release;
     }
 
