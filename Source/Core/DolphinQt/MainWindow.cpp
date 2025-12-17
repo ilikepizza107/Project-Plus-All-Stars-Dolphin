@@ -1363,7 +1363,7 @@ void MainWindow::ShowAboutDialog()
 
 // P+ change: New updater; credit to RainbowTabitha and the Mario Party Netplay team for the base code!
 
-static QJsonObject GetLatestILRelease(const QJsonArray& releases)
+static QJsonObject GetLatestNERelease(const QJsonArray& releases)
 {
     for (const QJsonValue& value : releases)
     {
@@ -1372,7 +1372,7 @@ static QJsonObject GetLatestILRelease(const QJsonArray& releases)
         const QString tag =
             release.value(QStringLiteral("tag_name")).toString();
 
-        if (tag.startsWith(QStringLiteral("IL")))
+        if (tag.startsWith(QStringLiteral("NE")))
             return release;
     }
 
@@ -1399,21 +1399,21 @@ void MainWindow::ShowUpdateDialog()
         return;
 
     QJsonArray releases = jsonDoc.array();
-    QJsonObject latestIL = GetLatestILRelease(releases);
+    QJsonObject latestNE = GetLatestNERelease(releases);
 
-    if (latestIL.isEmpty())
+    if (latestNE.isEmpty())
     {
-        QMessageBox::information(this, tr("Info"), tr("No IL releases found."));
+        QMessageBox::information(this, tr("Info"), tr("No NE releases found."));
         return;
     }
 
     QString currentVersion = QString::fromStdString(SCM_DESC_STR);
-    QString latestVersion =  latestIL.value(QStringLiteral("tag_name")).toString();
+    QString latestVersion =  latestNE.value(QStringLiteral("tag_name")).toString();
 
     if (currentVersion != latestVersion)
     {
         bool forced = false;
-        UserInterface::Dialog::UpdateDialog updater(this, latestIL, forced);
+        UserInterface::Dialog::UpdateDialog updater(this, latestNE, forced);
         updater.exec();
     }
     else
@@ -1438,17 +1438,17 @@ void MainWindow::CheckForUpdatesAuto()
     if (!jsonDoc.isArray())
         return;
 
-    QJsonObject latestIL = GetLatestILRelease(jsonDoc.array());
-    if (latestIL.isEmpty())
+    QJsonObject latestNE = GetLatestNERelease(jsonDoc.array());
+    if (latestNE.isEmpty())
         return;
 
     QString currentVersion = QString::fromStdString(SCM_DESC_STR);
-    QString latestVersion =  latestIL.value(QStringLiteral("tag_name")).toString();
+    QString latestVersion =  latestNE.value(QStringLiteral("tag_name")).toString();
 
     if (currentVersion != latestVersion)
     {
         bool forced = false;
-        UserInterface::Dialog::UpdateDialog updater(this, latestIL, forced);
+        UserInterface::Dialog::UpdateDialog updater(this, latestNE, forced);
         updater.exec();
     }
 }
