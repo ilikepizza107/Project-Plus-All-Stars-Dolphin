@@ -1408,7 +1408,7 @@ void MainWindow::ShowUpdateDialog()
     }
 
     QString currentVersion = QString::fromStdString(SCM_DESC_STR);
-    QString latestVersion = latestIL.value("tag_name").toString();
+    QString latestVersion =  latestIL.value(QStringLiteral("tag_name")).toString();
 
     if (currentVersion != latestVersion)
     {
@@ -1443,7 +1443,7 @@ void MainWindow::CheckForUpdatesAuto()
         return;
 
     QString currentVersion = QString::fromStdString(SCM_DESC_STR);
-    QString latestVersion = latestIL.value("tag_name").toString();
+    QString latestVersion =  latestIL.value(QStringLiteral("tag_name")).toString();
 
     if (currentVersion != latestVersion)
     {
