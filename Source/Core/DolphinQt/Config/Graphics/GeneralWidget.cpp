@@ -57,7 +57,7 @@ void GeneralWidget::CreateWidgets()
   for (auto& backend : VideoBackendBase::GetAvailableBackends())
   {
     options.push_back(std::make_pair(tr(backend->GetDisplayName().c_str()),
-                                     QString::fromStdString(backend->GetName())));
+                                     QString::fromStdString(backend->GetConfigName())));
   }
   m_backend_combo = new ConfigStringChoice(options, Config::MAIN_GFX_BACKEND, m_game_layer);
   m_previous_backend = m_backend_combo->currentIndex();
@@ -109,22 +109,15 @@ void GeneralWidget::CreateWidgets()
   auto* m_options_box = new QGroupBox(tr("Other"));
   auto* m_options_layout = new QGridLayout();
 
-  m_show_ping =
-      new ConfigBool(tr("Show NetPlay Ping"), Config::GFX_SHOW_NETPLAY_PING, m_game_layer);
   m_autoadjust_window_size = new ConfigBool(tr("Auto-Adjust Window Size"),
                                             Config::MAIN_RENDER_WINDOW_AUTOSIZE, m_game_layer);
-  m_show_messages =
-      new ConfigBool(tr("Show NetPlay Messages"), Config::GFX_SHOW_NETPLAY_MESSAGES, m_game_layer);
   m_render_main_window =
       new ConfigBool(tr("Render to Main Window"), Config::MAIN_RENDER_TO_MAIN, m_game_layer);
 
   m_options_box->setLayout(m_options_layout);
 
   m_options_layout->addWidget(m_render_main_window, 0, 0);
-  m_options_layout->addWidget(m_autoadjust_window_size, 1, 0);
-
-  m_options_layout->addWidget(m_show_messages, 0, 1);
-  m_options_layout->addWidget(m_show_ping, 1, 1);
+  m_options_layout->addWidget(m_autoadjust_window_size, 0, 1);
 
   // Other
   auto* shader_compilation_box = new QGroupBox(tr("Shader Compilation"));
@@ -265,23 +258,16 @@ void GeneralWidget::AddDescriptions()
       "<br><br><b>Custom (Stretch)</b>: Similar to `Custom`, but stretches the image to the "
       "specified aspect ratio. This will usually distort the image's proportions, and should not "
       "be used under normal circumstances."
-      "<br><br><dolphin_emphasis>If unsure, select Auto.</dolphin_emphasis>");
+      "<br><br><dolphin_emphasis>If unsure, select Force 69:40 (P+ Widescreen).</dolphin_emphasis>");
   static const char TR_VSYNC_DESCRIPTION[] = QT_TR_NOOP(
       "Waits for vertical blanks in order to prevent tearing.<br><br>Decreases performance "
       "if emulation speed is below 100%.<br><br><dolphin_emphasis>If unsure, leave "
       "this "
       "unchecked.</dolphin_emphasis>");
-  static const char TR_SHOW_NETPLAY_PING_DESCRIPTION[] = QT_TR_NOOP(
-      "Shows the player's maximum ping while playing on "
-      "NetPlay.<br><br><dolphin_emphasis>If unsure, leave this unchecked.</dolphin_emphasis>");
-  static const char TR_SHOW_NETPLAY_MESSAGES_DESCRIPTION[] =
-      QT_TR_NOOP("Shows chat messages, buffer changes, and desync alerts "
-                 "while playing NetPlay.<br><br><dolphin_emphasis>If unsure, leave "
-                 "this unchecked.</dolphin_emphasis>");
   static const char TR_SHADER_COMPILE_SPECIALIZED_DESCRIPTION[] =
       QT_TR_NOOP("Ubershaders are never used. Stuttering will occur during shader "
                  "compilation, but GPU demands are low.<br><br>Recommended for low-end hardware. "
-                 "<br><br><dolphin_emphasis>If unsure, select this mode.</dolphin_emphasis>");
+                 "<br><br><dolphin_emphasis>Not recommended, use other options.</dolphin_emphasis>");
   // The "very powerful GPU" mention below is by 2021 PC GPU standards
   static const char TR_SHADER_COMPILE_EXCLUSIVE_UBER_DESCRIPTION[] = QT_TR_NOOP(
       "Ubershaders will always be used. Provides a near stutter-free experience at the cost of "
@@ -296,15 +282,15 @@ void GeneralWidget::AddDescriptions()
   static const char TR_SHADER_COMPILE_SKIP_DRAWING_DESCRIPTION[] = QT_TR_NOOP(
       "Prevents shader compilation stuttering by not rendering waiting objects. Can work in "
       "scenarios where Ubershaders doesn't, at the cost of introducing visual glitches and broken "
-      "effects.<br><br><dolphin_emphasis>Not recommended, only use if the other "
-      "options give poor results.</dolphin_emphasis>");
+      "effects.<br><br><dolphin_emphasis>Use this option if you encounter excessive stuttering "
+      "with other options.</dolphin_emphasis>");
   static const char TR_SHADER_COMPILE_BEFORE_START_DESCRIPTION[] =
       QT_TR_NOOP("Waits for all shaders to finish compiling before starting a game. Enabling this "
                  "option may reduce stuttering or hitching for a short time after the game is "
                  "started, at the cost of a longer delay before the game starts. For systems with "
                  "two or fewer cores, it is recommended to enable this option, as a large shader "
                  "queue may reduce frame rates.<br><br><dolphin_emphasis>Otherwise, if "
-                 "unsure, leave this unchecked.</dolphin_emphasis>");
+                 "unsure, leave this checked.</dolphin_emphasis>");
 
   m_backend_combo->SetTitle(tr("Backend"));
   m_backend_combo->SetDescription(
@@ -323,11 +309,7 @@ void GeneralWidget::AddDescriptions()
 
   m_enable_fullscreen->SetDescription(tr(TR_FULLSCREEN_DESCRIPTION));
 
-  m_show_ping->SetDescription(tr(TR_SHOW_NETPLAY_PING_DESCRIPTION));
-
   m_autoadjust_window_size->SetDescription(tr(TR_AUTOSIZE_DESCRIPTION));
-
-  m_show_messages->SetDescription(tr(TR_SHOW_NETPLAY_MESSAGES_DESCRIPTION));
 
   m_render_main_window->SetDescription(tr(TR_RENDER_TO_MAINWINDOW_DESCRIPTION));
 
