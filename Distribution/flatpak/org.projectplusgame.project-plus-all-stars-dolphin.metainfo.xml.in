@@ -20,7 +20,8 @@
 		<id>org.projectplusgame.project-plus-all-stars-dolphin.desktop</id>
 	</provides>
 	<releases>
-		<release version="1.1.1" date="2025-10-17"/>
+		<release version="1.1.6" date="2026-01-17"/>
+		<release version="1.1.5" date="2025-10-17"/>
 		<release version="1.1.1" date="2025-10-12"/>
 		<release version="1.0.0" date="2025-10-10"/>
 	</releases>
